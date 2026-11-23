@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [M1-02 — Implementar a tela inicial](#m1-02--implementar-a-tela-inicial)
+**Próxima tarefa:** [M1-05 — Organizar app e API no monorepo](#m1-05--organizar-app-e-api-no-monorepo)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -23,9 +23,10 @@ O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. 
 
 ## M1-02 — Implementar a tela inicial
 
-- **Estado:** Pronta após a integração da M1-01.
-- **Depende de:** M1-01.
-- **Aceite:** a tela inicial apresenta a identidade roxa e dourada, a saudação e as seis categorias da especificação. A interface é legível em diferentes tamanhos de tela.
+- **Estado:** Planejada.
+- **Depende de:** M1-05.
+- **Aceite:** a tela inicial apresenta a identidade roxa e dourada, a saudação e as seis categorias da especificação. A interface é legível em diferentes tamanhos de tela. Seus textos usam catálogos `pt-BR` e `en-US`, conforme a [decisão 004](DECISOES.md#004--português-e-inglês-no-app) e o critério `UX-05` no [roteiro de aceite](CRITERIOS-DE-ACEITE.md#fluxo-navegável).
+- **Evidência parcial:** `UX-05` passou no Chrome usando a versão web exportada. Verificados a troca nos dois sentidos, o idioma salvo após recarregar, `en-GB` como preferência do aparelho e `fr-FR` com português como idioma padrão. A validação em Android e iOS e o restante da tela continuam na tarefa.
 
 ## M1-03 — Conectar as rotas da consulta e da tiragem
 
@@ -38,6 +39,15 @@ O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. 
 - **Estado:** Planejada.
 - **Depende de:** M1-03.
 - **Aceite:** lint, TypeScript e navegação são verificados. O registro informa o aparelho ou emulador usado para Android e o resultado do teste em iOS ou a pendência específica.
+
+## M1-05 — Organizar app e API no monorepo
+
+- **Estado:** Em revisão.
+- **Depende de:** M1-01.
+- **Escopo:** mover Expo para `apps/mobile`, criar a base Node.js e TypeScript em `apps/api` e centralizar a instalação. Ver [decisão 003](DECISOES.md#003--monorepo-para-o-app-e-a-api).
+- **Aceite:** os comandos da raiz resolvem os workspaces, o Expo exporta a tela inicial e a API compilada responde com sucesso em `GET /health`. O CI verifica os dois apps.
+- **Branch:** `m1-05/monorepo-api`.
+- **Evidências:** no Node.js `26.10.0`, passaram lint do Expo, TypeScript dos dois workspaces, build da API, três testes HTTP e exportação web. A API compilada respondeu `{"status":"ok"}` e o Chrome renderizou a tela inicial exportada. O workflow foi atualizado para verificar os dois apps no próximo PR.
 
 ## Modelo de tarefa
 

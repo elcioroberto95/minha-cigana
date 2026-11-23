@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,12 +11,13 @@ export const colors = {
 
 export function Screen({ children, back = true }: { children: ReactNode; back?: boolean }) {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.page}>
           {back && <Pressable accessibilityRole="button" onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.back}>
-            <Copy>‹  Voltar</Copy>
+            <Copy>‹  {t('back')}</Copy>
           </Pressable>}
           {children}
         </View>
@@ -47,7 +49,8 @@ export function Button({ label, onPress, secondary = false, disabled = false, se
 }
 
 export function DemoNotice() {
-  return <Copy>Demonstração com textos editoriais. Leitura simbólica para entretenimento e reflexão.</Copy>;
+  const { t } = useTranslation();
+  return <Copy>{t('demoNotice')}</Copy>;
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,8 @@
 # Instruções de desenvolvimento
 
-O Cigana do Destino é um app Expo para Android e iOS, em português brasileiro, com uma personagem interativa e leituras simbólicas.
+O Cigana do Destino é um app Expo para Android e iOS com uma personagem interativa e leituras simbólicas. Os idiomas iniciais são português brasileiro (`pt-BR`) e inglês dos EUA (`en-US`).
+
+O monorepo tem dois npm workspaces, `apps/mobile` para Expo e `apps/api` para Node.js. Instale dependências a partir da raiz e use os scripts do README para validar os dois.
 
 - Leia [WORKFLOW.md](WORKFLOW.md) e [docs/BACKLOG.md](docs/BACKLOG.md) ao iniciar. Consulte os trechos relevantes da [especificação](docs/SPEC.md) e as [decisões](docs/DECISOES.md) para a tarefa.
 - Confira a branch, o estado do Git e as mudanças em andamento. Preserve o trabalho existente e use o ID da tarefa ao registrar mudanças e verificações.

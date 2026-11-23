@@ -39,6 +39,17 @@ Cada linha registra o que aparece na captura enviada e uma hipótese para o Ciga
 
 Na consulta, o Google Play mostrava as faixas de 10 milhões ou mais de downloads para Kaave e 1 milhão ou mais para Labyrinthos. São faixas das listagens consultadas, sem recorte brasileiro. Na App Store brasileira, o Tarotoo aparecia com nota 4,8 e cerca de 300 avaliações. A amostra mostra concorrentes com alcance e diferentes formas de cobrança. O tamanho da demanda no Brasil e a disposição de pagar pelo Cigana do Destino seguem como hipóteses. [Kaave no Google Play](https://play.google.com/store/apps/details?id=com.didilabs.kaavefali) · [Labyrinthos no Google Play](https://play.google.com/store/apps/details?id=com.labyrinthos.app) · [Tarotoo na App Store](https://apps.apple.com/br/app/tarot-e-cartomancia-tarotoo/id6736652947)
 
+## Países e idiomas
+
+| Mercado | Sinal público | Proposta para o app |
+| --- | --- | --- |
+| Brasil | O Personare oferece tarô em português com carta diária e leituras temáticas. Em pesquisa internacional do Pew, 10% no Brasil declararam consultar videntes, horóscopos ou outros meios para tentar ver o futuro. A pergunta inclui práticas além do tarô. | Fazer o primeiro beta e a primeira campanha em `pt-BR`, usando leituras curtas sobre situações como amor e trabalho. [Personare](https://www.personare.com.br/tarot/tarot-do-dia) · [Pew Global Attitudes](https://www.pewresearch.org/wp-content/uploads/sites/20/2025/05/PR_2025.05.06_spirituality-around-the-world_report.pdf) |
+| Estados Unidos | No levantamento do Pew publicado em 2025, 11% dos adultos declararam consultar tarô pelo menos uma vez por ano. O índice foi 23% entre 18 e 29 anos, 14% entre mulheres e 7% entre homens. | Incluir `en-US` desde as primeiras telas. Para aquisição, testar a mesma experiência de três cartas com uma campanha em inglês depois do beta brasileiro. [Pew, tabela demográfica](https://www.pewresearch.org/wp-content/uploads/sites/20/2025/05/PR_2025.05.21_astrology-tarot-cards-fortune-tellers_report.pdf#page=10) |
+| Espanha | O BREC 2025 registrou consulta de tarô no último ano para 10% dos entrevistados, chegando a 23% entre 18 e 24 anos. | Usar como um dos primeiros mercados para validar a versão em espanhol. [BREC 2025, pergunta P14](https://www.observatorioreligion.es/upload/05/37/Informe_Resultados_BREC_2025.pdf#page=32) |
+| México | Na mesma pesquisa internacional do Pew, 12% declararam consultar videntes, horóscopos ou outros meios de ver o futuro. | Testar uma campanha em espanhol latino separadamente. O indicador é de práticas relacionadas e a demanda pelo app ainda precisa ser medida. [Pew Global Attitudes, p. 63](https://www.pewresearch.org/wp-content/uploads/sites/20/2025/05/PR_2025.05.06_spirituality-around-the-world_report.pdf#page=63) |
+
+As pesquisas medem práticas declaradas e usam definições diferentes. Elas ajudam a escolher onde testar. Downloads, retorno e intenção de compra do Cigana do Destino serão medidos no produto. Comparar por país e idioma a conclusão da primeira leitura, retorno em sete dias e custo por primeira leitura concluída.
+
 ## Prioridades propostas
 
 1. **Primeira leitura completa.** Tema, pergunta opcional, seleção, revelação e interpretação com áudio. Testar se a primeira leitura pode ser concluída como visitante, preservando o login para sincronizar dados. A leitura deve usar as posições das três cartas e refletir o tema ou a pergunta da pessoa.
