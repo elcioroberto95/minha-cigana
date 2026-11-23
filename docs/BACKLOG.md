@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [M1-01 — Criar a base Expo](#m1-01--criar-a-base-expo)
+**Próxima tarefa:** [M1-02 — Implementar a tela inicial](#m1-02--implementar-a-tela-inicial)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -15,14 +15,15 @@ O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. 
 
 ## M1-01 — Criar a base Expo
 
-- **Estado:** Pronta.
+- **Estado:** Concluída com a integração do PR.
 - **Escopo:** inicialização do projeto, estrutura inicial de rotas e comandos de desenvolvimento.
 - **Aceite:** `BASE-01` e `BASE-02` no [roteiro da fundação Expo](CRITERIOS-DE-ACEITE.md#fundação-expo). Registrar o resultado da instalação, do lint, do TypeScript e da inicialização do app.
-- **Próxima ação:** selecionar uma versão LTS de Node compatível, conferir os arquivos da base Expo já presentes na raiz e completar a inicialização a partir deles. [Guia do Expo](https://docs.expo.dev/get-started/create-a-project/)
+- **Evidências:** Node.js `26.10.0`. O GitHub Actions verifica a instalação pelo lockfile, lint, TypeScript, exportação web e abertura da tela inicial no Chrome. A validação em Android e iOS segue em M1-04.
+- **Integração:** [PR #1](https://github.com/elcioroberto95/minha-cigana/pull/1).
 
 ## M1-02 — Implementar a tela inicial
 
-- **Estado:** Planejada.
+- **Estado:** Pronta após a integração da M1-01.
 - **Depende de:** M1-01.
 - **Aceite:** a tela inicial apresenta a identidade roxa e dourada, a saudação e as seis categorias da especificação. A interface é legível em diferentes tamanhos de tela.
 
