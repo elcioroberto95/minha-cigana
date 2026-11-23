@@ -1,24 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { LanguagePicker } from '../components/LanguagePicker';
 import { Button, colors, Copy, Panel, Screen, Title } from '../components/ui';
 
 const portrait = require('../assets/personagem.png');
 
 export default function Home() {
+  const { t } = useTranslation();
   return <Screen back={false}>
     <View style={styles.brand}>
       <View style={styles.mark}><Text style={styles.star}>✦</Text></View>
       <Copy emphasis>Cigana do Destino</Copy>
     </View>
-    <Image source={portrait} style={styles.portrait} accessibilityLabel="Retrato da anfitriã virtual" />
-    <Title>O que te trouxe aqui hoje?</Title>
-    <Copy>Escolha uma leitura simbólica e reserve um momento para refletir.</Copy>
-    <Copy>Versão de desenvolvimento. As leituras ainda estão em preparação.</Copy>
-    <Button label="Começar leitura beta" disabled />
-    <Button label="Carta do Dia" secondary disabled />
+    <LanguagePicker />
+    <Image source={portrait} style={styles.portrait} accessibilityLabel={t('portrait')} />
+    <Title>{t('homeTitle')}</Title>
+    <Copy>{t('homeIntro')}</Copy>
+    <Copy>{t('developmentNotice')}</Copy>
+    <Button label={t('startBeta')} disabled />
+    <Button label={t('dailyCard')} secondary disabled />
     <Panel>
-      <Copy emphasis>Para ir mais fundo</Copy>
-      <Button label="Leitura de personalidade" secondary disabled />
-      <Button label="Tiragem de dez cartas" secondary disabled />
+      <Copy emphasis>{t('goDeeper')}</Copy>
+      <Button label={t('personalityReading')} secondary disabled />
+      <Button label={t('tenCardReading')} secondary disabled />
     </Panel>
   </Screen>;
 }

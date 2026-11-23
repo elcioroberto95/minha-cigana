@@ -1,0 +1,31 @@
+export const ptBR = {
+  language: 'Idioma',
+  languageSaveError: 'Não foi possível salvar o idioma. Tente de novo.',
+  back: 'Voltar',
+  portrait: 'Retrato da anfitriã virtual',
+  homeTitle: 'O que te trouxe aqui hoje?',
+  homeIntro: 'Escolha uma leitura simbólica e reserve um momento para refletir.',
+  developmentNotice: 'Versão de desenvolvimento. As leituras ainda estão em preparação.',
+  startBeta: 'Começar leitura beta',
+  dailyCard: 'Carta do Dia',
+  goDeeper: 'Para ir mais fundo',
+  personalityReading: 'Leitura de personalidade',
+  tenCardReading: 'Tiragem de dez cartas',
+  demoNotice: 'Demonstração com textos editoriais. Leitura simbólica para entretenimento e reflexão.',
+};
+
+export const enUS = {
+  language: 'Language',
+  languageSaveError: 'Couldn’t save your language. Try again.',
+  back: 'Back',
+  portrait: 'Portrait of the virtual host',
+  homeTitle: 'What brings you here today?',
+  homeIntro: 'Choose a symbolic reading and take a moment to reflect.',
+  developmentNotice: 'Development version. Readings are coming soon.',
+  startBeta: 'Start beta reading',
+  dailyCard: 'Card of the Day',
+  goDeeper: 'Explore further',
+  personalityReading: 'Personality reading',
+  tenCardReading: 'Ten-card reading',
+  demoNotice: 'Demo with sample readings. Symbolic readings for entertainment and reflection.',
+} satisfies Record<keyof typeof ptBR, string>;

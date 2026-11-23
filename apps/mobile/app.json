@@ -6,7 +6,7 @@
     "scheme": "ciganadodestino",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", ["expo-localization", { "supportedLocales": ["pt-BR", "en-US"] }]],
     "web": { "output": "single" }
   }
 }

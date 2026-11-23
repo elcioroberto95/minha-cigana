@@ -19,6 +19,23 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Validação:** usar casos fixos com tiragens conhecidas e testar se a resposta preserva os IDs e as posições e se usa o significado editorial da categoria. Se faltar a interpretação temática, usar o significado geral. Se faltar uma carta do catálogo, reportar a inconsistência antes de chamar o modelo.
 - **Experimento futuro:** quando houver um acervo editorial revisado, avaliar RAG para perguntas abertas sobre símbolos e combinações de cartas. Comparar busca textual e semântica em perguntas representativas, medindo relevância dos trechos, fidelidade da resposta às fontes, latência e custo. Usar conteúdo editorial como corpus inicial. [Artigo original sobre RAG](https://arxiv.org/abs/2005.11401)
 
+## 003 — Monorepo para o app e a API
+
+- **Data:** 2026-11-23.
+- **Estado:** Aceita.
+- **Decisão:** manter o Expo em `apps/mobile` e o backend Node.js e TypeScript em `apps/api`, com npm workspaces e lockfile compartilhado.
+- **Motivo:** versionar mudanças de interface, rotas e contratos no mesmo PR e medir a compatibilidade dos dois apps no CI.
+- **Consequências:** os comandos da raiz continuam sendo o ponto de entrada. O Expo usa a configuração automática de Metro para workspaces. Cada app mantém suas próprias dependências. [Expo](https://docs.expo.dev/guides/monorepos/) · [npm Workspaces](https://docs.npmjs.com/cli/v11/using-npm/workspaces/)
+
+## 004 — Português e inglês no app
+
+- **Data:** 2026-11-23.
+- **Estado:** Aceita para `pt-BR` e `en-US`. Espanhol em avaliação.
+- **Decisão:** organizar os textos da interface em catálogos de tradução desde a primeira tela. Permitir escolher o idioma e manter a preferência. O beta fechado concentra a validação com participantes no Brasil.
+- **Bibliotecas:** `i18next` e `react-i18next` no workspace `apps/mobile`. Os componentes usam `useTranslation()` para reagir à troca de idioma. `expo-localization` lê o idioma do aparelho e AsyncStorage guarda a escolha feita no app. [React Native e Expo com i18next](https://www.i18next.com/react/react-native) · [Expo Localization](https://docs.expo.dev/versions/latest/sdk/localization/) · [AsyncStorage](https://docs.expo.dev/versions/latest/sdk/async-storage/)
+- **Ordem do idioma:** preferência salva, idioma compatível do aparelho e, por fim, `pt-BR`. Os textos ficam em catálogos locais e `Intl` formata números e datas. A API recebe um `locale` validado nas consultas para orientar o idioma da resposta e manter os códigos de erro estáveis. [Guia de localização do Expo](https://docs.expo.dev/guides/localization/)
+- **Consequências:** a consulta, os nomes das cartas e o áudio acompanham o idioma escolhido conforme os recursos forem implementados. Usar português brasileiro como idioma padrão para idiomas indisponíveis. Testar espanhol com campanhas separadas no México e na Espanha antes de incluir o idioma na oferta pública. [Sinais de mercado](PESQUISA-DE-MERCADO.md#países-e-idiomas)
+
 ## Modelo de decisão
 
 ```markdown

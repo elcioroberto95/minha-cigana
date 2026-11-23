@@ -3,7 +3,7 @@ Aplicativo mobile com inteligência artificial, personagem animada e consultas m
 
 Nome do projeto: Cigana do Destino
 Plataformas: Android e iOS
-Idioma: Português brasileiro (pt-BR)
+Idiomas iniciais: português brasileiro (pt-BR) e inglês dos EUA (en-US). Espanhol em avaliação.
 Tipo: Aplicativo mobile com IA conversacional
 Objetivo: Criar uma cigana virtual que conversa com usuários, realiza leituras simbólicas, interpreta cartas de tarô e oferece experiências místicas personalizadas.
 
@@ -158,7 +158,7 @@ Botão enviar.
 Botão para ouvir respostas.
 Botão para iniciar gravação de áudio.
 
-A IA deve responder em português brasileiro, com linguagem natural.
+A IA deve responder no idioma escolhido no aplicativo, com linguagem natural.
 
 Não utilizar respostas genéricas repetitivas.
 
@@ -249,7 +249,7 @@ Utilizar expressões como:
 Não repetir constantemente as mesmas expressões.
 
 Regras da IA
-Responder sempre em português brasileiro.
+Responder no idioma escolhido no aplicativo. Usar português brasileiro quando não houver uma preferência de idioma disponível.
 Manter a personalidade da personagem.
 Entender o contexto da conversa.
 Não inventar que possui poderes sobrenaturais.
@@ -265,7 +265,7 @@ Implementar voz feminina madura e acolhedora.
 
 Requisitos:
 
-Português brasileiro.
+Português brasileiro ou inglês dos EUA, conforme o idioma escolhido no aplicativo.
 Pronúncia natural.
 Ritmo moderado.
 Entonação suave.
@@ -492,7 +492,7 @@ A tela inicial estiver implementada.
 A identidade visual estiver consistente.
 A personagem aparecer corretamente.
 O usuário conseguir conversar com a IA.
-A IA responder em português brasileiro.
+A IA responder no idioma escolhido no aplicativo.
 A personalidade da cigana for consistente.
 O usuário conseguir realizar uma tiragem de três cartas.
 As cartas forem sorteadas e interpretadas corretamente.
