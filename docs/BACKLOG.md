@@ -4,6 +4,8 @@
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
+O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. Os [critérios de aceite](CRITERIOS-DE-ACEITE.md) detalham os cenários, resultados esperados e evidências para cada etapa.
+
 - `Planejada` — depende de outra tarefa ou ainda precisa detalhar escopo ou aceite.
 - `Pronta` — pode entrar em execução.
 - `Em andamento` — trabalho iniciado, com branch registrada.
@@ -15,8 +17,8 @@
 
 - **Estado:** Pronta.
 - **Escopo:** inicialização do projeto, estrutura inicial de rotas e comandos de desenvolvimento.
-- **Aceite:** a instalação pelo lockfile funciona, o app inicia com Expo Router e o README informa a versão de Node usada e os comandos de instalação, execução e verificação. Registrar o resultado de lint, TypeScript e inicialização do app.
-- **Próxima ação:** selecionar uma versão LTS de Node compatível e inicializar o app na raiz, preservando os arquivos do workflow. [Guia do Expo](https://docs.expo.dev/get-started/create-a-project/)
+- **Aceite:** `BASE-01` e `BASE-02` no [roteiro da fundação Expo](CRITERIOS-DE-ACEITE.md#fundação-expo). Registrar o resultado da instalação, do lint, do TypeScript e da inicialização do app.
+- **Próxima ação:** selecionar uma versão LTS de Node compatível, conferir os arquivos da base Expo já presentes na raiz e completar a inicialização a partir deles. [Guia do Expo](https://docs.expo.dev/get-started/create-a-project/)
 
 ## M1-02 — Implementar a tela inicial
 

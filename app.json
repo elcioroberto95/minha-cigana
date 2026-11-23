@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Cigana do Destino",
+    "slug": "cigana-do-destino",
+    "version": "0.1.0",
+    "scheme": "ciganadodestino",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "plugins": ["expo-router"],
+    "web": { "output": "single" }
+  }
+}
