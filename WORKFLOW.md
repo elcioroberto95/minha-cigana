@@ -10,12 +10,27 @@ O primeiro marco é abrir o app no celular e navegar da tela inicial até a cons
 - [DECISOES.md](docs/DECISOES.md) guarda as decisões que afetam outras tarefas ou que o código sozinho não explica.
 - [AGENTS.md](AGENTS.md) dá as instruções comuns. O Codex lê esse arquivo e o Claude Code recebe as mesmas instruções pelo import em [CLAUDE.md](CLAUDE.md). [Guia do Codex](https://learn.chatgpt.com/docs/agent-configuration/agents-md) · [Guia do Claude Code](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)
 
-## Como trabalhar a cada entrega
+## Etapas de uma tarefa
 
-1. Na raiz do projeto, conferir `git status --short --branch` e ler a tarefa indicada no backlog. Se houver trabalho em andamento, retomar na branch registrada e conferir o diff antes de editar. Para uma tarefa nova, usar uma branch curta como `m1-01/base-expo` a partir da `main`.
-2. Implementar uma mudança que possa ser demonstrada isoladamente. Referenciar o ID no commit, como `M1-01: inicializa base Expo`. Registrar uma decisão quando ela mudar uma escolha que outras tarefas precisam conhecer.
-3. Rodar TypeScript, lint e os testes aplicáveis assim que esses comandos existirem. Repetir o fluxo alterado no app. Registrar o comando e o resultado, ou o motivo pelo qual uma verificação ficou pendente.
-4. Ao pausar, atualizar o registro de retomada na própria tarefa. Ao concluir, registrar a validação e atualizar o próximo passo do backlog. Versionar a atualização junto da implementação. Integrar à `main` após revisão e verificação. Atualizar o README quando a forma de executar o projeto mudar.
+1. **Preparar.** Desdobrar o marco em entregas que possam ser demonstradas isoladamente. Definir o resultado, o escopo, as dependências e como o aceite será verificado. Passar de `Planejada` para `Pronta` quando esses pontos estiverem claros e as dependências necessárias para iniciar estiverem disponíveis.
+2. **Implementar.** Conferir `git status --short --branch` e o diff. Criar uma branch curta a partir da `main` ou retomar a branch da tarefa. Marcar `Em andamento`, registrar a branch e usar o ID no commit, por exemplo `M1-01: inicializa base Expo`.
+3. **Verificar e revisar.** Rodar os comandos aplicáveis e demonstrar o fluxo alterado. Registrar evidências e colocar a tarefa `Em revisão`. Usar o [modelo de PR](.github/pull_request_template.md) no GitHub ou na descrição de uma revisão local. Se houver correções, voltar a `Em andamento`.
+4. **Integrar.** Confirmar a definição de pronto abaixo, integrar à `main`, registrar o link do PR ou commit no backlog e marcar `Concluída`. Atualizar a próxima tarefa quando o caminho mudar. Se a atualização do backlog entrar no mesmo PR, ela passa a valer com a integração.
+
+## Definição de pronto
+
+Uma tarefa está concluída quando todos os itens aplicáveis foram atendidos.
+
+- Cada critério de aceite tem evidência. Para comportamento manual, guardar passos, ambiente e resultado. Para checagens automatizadas, guardar comando e resultado ou link para o CI.
+- TypeScript, lint e testes aplicáveis passam quando os scripts estiverem disponíveis. Um critério obrigatório sem verificação continua pendente, com o motivo registrado.
+- O diff foi revisado. Alterações de configuração, execução ou contratos foram documentadas. Decisões que afetam outras tarefas estão registradas e vinculadas pelo ID.
+- A mudança foi integrada à `main` e o backlog aponta para o PR ou commit e para as evidências.
+
+## Bloqueios e decisões
+
+- Use `Bloqueada` quando uma tarefa pronta ou iniciada depender de algo que impeça a entrega ou uma validação obrigatória. Registre desde quando, o impacto, quem ou o que pode destravar e o próximo passo. Uma dependência normal de uma tarefa futura fica em `Planejada`.
+- Vincule a mesma entrada de bloqueio nas demais tarefas afetadas, se houver. Enquanto aguarda, avance uma tarefa independente que esteja pronta. Quando resolver, registre o que liberou o trabalho e volte para `Pronta`, `Em andamento` ou `Em revisão`, conforme a etapa.
+- Registre decisões de arquitetura, dados, dependências ou escopo em [DECISOES.md](docs/DECISOES.md) quando afetarem mais de uma tarefa. Uma proposta pode ter um experimento próprio. Se a implementação depender da decisão, vincule o ID e deixe essa dependência visível no backlog.
 
 ## Como trocar de agente
 
@@ -26,6 +41,10 @@ O primeiro marco é abrir o app no celular e navegar da tela inicial até a cons
    > Leia `AGENTS.md` e retome `M1-01` em `docs/BACKLOG.md`. Confira a branch e o diff antes de editar. Atualize a tarefa com o que foi verificado e a próxima ação.
 
 ## Marcos e critérios de conclusão
+
+Antes de iniciar um marco, use os critérios da tabela para definir as primeiras tarefas. Para fechar o marco, conclua as tarefas necessárias, execute o fluxo integrado e registre no [backlog](docs/BACKLOG.md) a referência testada, as plataformas cobertas e as pendências que passem para o próximo marco. Uma pendência que impeça o objetivo mantém o marco aberto.
+
+O teste em iOS pode ficar pendente no marco de fundação se faltar ambiente de teste. O fechamento do beta exige o fluxo completo em Android e iOS. Chat e tiragem podem ser validados em ambiente de desenvolvimento antes da fase de conta. Acesso externo ao backend depende dos controles descritos na fase 6.
 
 | Fase | Entrega | Como validar |
 | --- | --- | --- |
@@ -41,4 +60,4 @@ Voz neural, sincronização labial com áudio, TensorFlow.js e cobrança ficam p
 
 ## Verificações automatizadas
 
-Quando houver um remoto e o app tiver comandos de verificação, executar a instalação pelo lockfile, lint, TypeScript e testes no CI a cada pull request. Usar os mesmos comandos localmente. Gerar builds internas nos marcos que precisem de distribuição para testes em aparelho. [Documentação do Expo Build](https://docs.expo.dev/build/introduction/)
+Assim que o app tiver comandos de verificação, configurar o CI dos pull requests para instalar pelo lockfile e executar lint, TypeScript e testes disponíveis. Usar os mesmos comandos localmente. Gerar builds internas nos marcos que precisem de distribuição para testes em aparelho. [Documentação do Expo Build](https://docs.expo.dev/build/introduction/)
