@@ -56,14 +56,25 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
   const id = randomUUID();
   const calls = [];
   let app;
-  let fail = true;
+  let providerOutcome = 'unavailable';
   let createdSchema = false;
   const provider = createServer(async (request, response) => {
     let data = '';
     for await (const chunk of request) data += chunk;
-    calls.push(JSON.parse(data));
-    response.writeHead(fail ? 500 : 200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify({ model: 'esmeralda', message: { content: 'Meu bem, vejo um caminho que pede calma.' } }));
+    const call = JSON.parse(data);
+    calls.push(call);
+    let content = 'Meu bem, vejo um caminho que pede calma.';
+    if (call.format && providerOutcome !== 'plain') {
+      const { cartas } = JSON.parse(call.messages.at(-1).content.split('\n')[1]);
+      const cards = cartas.map(({ cardId }, index) => ({ cardId, interpretation: 'Reflexão ' + (index + 1) + '.' }));
+      if (providerOutcome === 'duplicate') cards[1].cardId = cards[0].cardId;
+      if (providerOutcome === 'reordered') cards.reverse();
+      if (providerOutcome === 'invented') cards[0].cardId = 'outra-carta';
+      if (providerOutcome === 'missing') cards.pop();
+      content = JSON.stringify({ cards, summary: 'Conecte experiência e possibilidade.', advice: 'Comece com um passo simples.' });
+    }
+    response.writeHead(providerOutcome === 'unavailable' ? 500 : 200, { 'Content-Type': 'application/json' });
+    response.end(JSON.stringify({ model: 'esmeralda', message: { content } }));
   });
 
   async function start() {
@@ -104,16 +115,36 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     assert.equal((await request('interpret/' + id, 'POST', visitor)).status, 503);
     assert.deepEqual(await (await request('draw/' + id, 'GET', visitor)).json(), draw);
 
-    fail = false;
+    for (const invalid of ['plain', 'duplicate', 'reordered', 'invented', 'missing']) {
+      providerOutcome = invalid;
+      const rejected = await request('interpret/' + id, 'POST', visitor);
+      assert.equal(rejected.status, 503);
+      assert.deepEqual(await rejected.json(), { error: 'tarot_unavailable' });
+      assert.deepEqual(await (await request('draw/' + id, 'GET', visitor)).json(), draw);
+    }
+
+    providerOutcome = 'valid';
+    const previousCalls = calls.length;
     const outcomes = await Promise.all(Array.from({ length: 4 }, async () => {
       const interpreted = await request('interpret/' + id, 'POST', visitor);
       assert.equal(interpreted.status, 200);
       return interpreted.json();
     }));
-    assert.ok(outcomes.every((result) => result.reading === outcomes[0].reading));
+    for (const result of outcomes) assert.deepEqual(result, outcomes[0]);
     assert.deepEqual(outcomes[0].cards, draw.cards);
-    assert.equal(calls.length, 2);
-    const messages = calls[1].messages;
+    assert.deepEqual(outcomes[0].structuredReading, {
+      cards: draw.cards.map(({ card }, index) => ({ cardId: card.id, interpretation: 'Reflexão ' + (index + 1) + '.' })),
+      summary: 'Conecte experiência e possibilidade.',
+      advice: 'Comece com um passo simples.',
+    });
+    for (const { card } of draw.cards) assert.ok(outcomes[0].reading.includes(card.name));
+    assert.equal(calls.length, previousCalls + 1);
+    const structuredCall = calls.at(-1);
+    assert.deepEqual(structuredCall.format.properties.cards.items.properties.cardId.enum, draw.cards.map(({ card }) => card.id));
+    assert.equal(structuredCall.format.properties.cards.minItems, 3);
+    assert.equal(structuredCall.format.properties.cards.maxItems, 3);
+    assert.equal(structuredCall.tools, undefined);
+    const { messages } = structuredCall;
     assert.equal(messages.length, 4);
     const content = messages.at(-1).content;
     assert.match(content, /Como retomar\?/);
@@ -121,7 +152,7 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     for (const [index, selected] of draw.cards.entries()) {
       const editorial = deck.find(({ id }) => id === selected.card.id);
       assert.deepEqual(actualCards[index], {
-        carta: selected.card.name, posição: selected.position, orientação: selected.orientation,
+        cardId: selected.card.id, carta: selected.card.name, posição: selected.position, orientação: selected.orientation,
         significado: selected.orientation === 'invertida' ? editorial.significado_invertido : editorial.significado_normal,
       });
     }
@@ -131,7 +162,22 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     await start();
     assert.deepEqual(await (await request('draw/' + id, 'GET', visitor)).json(), outcomes[0]);
     assert.deepEqual(await (await request('interpret/' + id, 'POST', visitor)).json(), outcomes[0]);
-    assert.equal(calls.length, 2);
+    assert.equal(calls.length, previousCalls + 1);
+
+    const legacyId = randomUUID();
+    assert.equal((await request('draw', 'POST', visitor, { ...input, id: legacyId })).status, 200);
+    await admin.query(`UPDATE ${schema}.tarot_draws SET reading = $2, model = 'legacy' WHERE id = $1`, [legacyId, 'Leitura anterior.']);
+    const legacy = await (await request('interpret/' + legacyId, 'POST', visitor)).json();
+    assert.equal(legacy.reading, 'Leitura anterior.');
+    assert.equal(legacy.structuredReading, undefined);
+    assert.equal(calls.length, previousCalls + 1);
+
+    const yesNoId = randomUUID();
+    assert.equal((await request('draw', 'POST', visitor, { ...input, id: yesNoId, format: 'sim-ou-nao', slots: [0] })).status, 200);
+    const yesNo = await (await request('interpret/' + yesNoId, 'POST', visitor)).json();
+    assert.equal(yesNo.reading, 'Meu bem, vejo um caminho que pede calma.');
+    assert.equal(yesNo.structuredReading, undefined);
+    assert.equal(calls.at(-1).format, undefined);
   } finally {
     await app?.close();
     if (provider.listening) {

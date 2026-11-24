@@ -2,17 +2,25 @@ import { HttpException, Injectable, Logger, NotFoundException, ServiceUnavailabl
 import type { OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
 import { OllamaService } from '../chat/ollama.service.js';
+import { requestContext } from '../observability/request-context.js';
 import { localizedCards, readingPrompt, shuffleSelection, type SelectedCard } from './deck.js';
+import { readStructuredReading, structuredReadingSchema, type StructuredReading } from './structured-reading.js';
 import type { readDraw } from './tarot-input.js';
 
 type Input = ReturnType<typeof readDraw>;
-type Draw = Omit<Input, 'slots'> & { cards: SelectedCard[]; reading: string | null; model: string | null };
+type Draw = Omit<Input, 'slots'> & {
+  cards: SelectedCard[];
+  reading: string | null;
+  structuredReading: StructuredReading | null;
+  model: string | null;
+};
 
 function present(draw: Draw) {
   return {
     id: draw.id, format: draw.format, topic: draw.topic,
     cards: localizedCards(draw.format, draw.cards, draw.locale),
     reading: draw.reading,
+    ...(draw.structuredReading && { structuredReading: draw.structuredReading }),
   };
 }
 
@@ -38,7 +46,7 @@ export class TarotService implements OnModuleDestroy {
       const { rows: [created] } = await pool.query<Draw>(
         `INSERT INTO tarot_draws (id, owner_hash, format, locale, topic, question, cards)
          VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb) ON CONFLICT DO NOTHING
-         RETURNING id, format, locale, topic, question, cards, reading, model`,
+         RETURNING id, format, locale, topic, question, cards, reading, structured_reading AS "structuredReading", model`,
         [id, owner, format, locale, topic, question, JSON.stringify(cards)],
       );
       return created ?? this.find(owner, id);
@@ -64,13 +72,27 @@ export class TarotService implements OnModuleDestroy {
 
   private async generate(owner: string, draw: Draw) {
     const { id, format, locale, topic, question, cards } = draw;
-    const { reply, model } = await this.ollama.interpret({ locale, topic, message: readingPrompt(format, cards, locale, question) });
+    const schema = format === 'tres-cartas' ? structuredReadingSchema(cards) : undefined;
+    const { reply, model } = await this.ollama.interpret({ locale, topic, message: readingPrompt(format, cards, locale, question) }, schema);
+    const structuredReading = schema ? readStructuredReading(reply, cards) : undefined;
+    if (schema && !structuredReading) {
+      this.logger.warn({ event: 'tarot.structured_reading.invalid', request_id: requestContext.getStore() });
+      throw new ServiceUnavailableException({ error: 'tarot_unavailable' });
+    }
+    const reading = structuredReading
+      ? [
+        ...localizedCards(format, cards, locale).map(({ card, position }, index) =>
+          position + ' — ' + card.name + '\n' + structuredReading.cards[index].interpretation),
+        structuredReading.summary,
+        structuredReading.advice,
+      ].join('\n\n')
+      : reply;
     return this.database(async (pool) => {
       const { rows: [updated] } = await pool.query<Draw>(
-        `UPDATE tarot_draws SET reading = $3, model = $4
+        `UPDATE tarot_draws SET reading = $3, model = $4, structured_reading = $5::jsonb
          WHERE owner_hash = $1 AND id = $2 AND reading IS NULL
-         RETURNING id, format, locale, topic, question, cards, reading, model`,
-        [owner, id, reply, model],
+         RETURNING id, format, locale, topic, question, cards, reading, structured_reading AS "structuredReading", model`,
+        [owner, id, reading, model, structuredReading ?? null],
       );
       return updated ?? this.find(owner, id);
     });
@@ -79,7 +101,8 @@ export class TarotService implements OnModuleDestroy {
   private find(owner: string, id: string) {
     return this.database(async (pool) => {
       const { rows: [draw] } = await pool.query<Draw>(
-        'SELECT id, format, locale, topic, question, cards, reading, model FROM tarot_draws WHERE owner_hash = $1 AND id = $2',
+        `SELECT id, format, locale, topic, question, cards, reading, structured_reading AS "structuredReading", model
+         FROM tarot_draws WHERE owner_hash = $1 AND id = $2`,
         [owner, id],
       );
       if (!draw) throw new NotFoundException();

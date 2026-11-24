@@ -8,6 +8,11 @@ export type TarotDraw = {
   topic: Topic;
   cards: { card: { id: string; name: string }; position: string; orientation: 'normal' | 'invertida' }[];
   reading: string | null;
+  structuredReading?: {
+    cards: { cardId: string; interpretation: string }[];
+    summary: string;
+    advice: string;
+  };
 };
 
 type NewDraw = { id: string; format: Spread; locale: AppLocale; topic: Topic; question: string; slots: number[] };
