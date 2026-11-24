@@ -22,6 +22,8 @@ https://{$CIGANA_PUBLIC_IP} {
 		}
 	}
 	handle {
-		respond 404
+		root * /srv/current
+		try_files {path} /index.html
+		file_server
 	}
 }

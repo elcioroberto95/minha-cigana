@@ -30,3 +30,7 @@ if ! "${compose[@]}" up -d --no-deps --wait --wait-timeout 75 api; then
 fi
 curl --fail --silent --show-error http://127.0.0.1:3000/health
 printf '\n'
+
+if [[ -f /etc/cigana/public.env ]]; then
+  bash deploy/publish-web.sh "$CIGANA_RELEASE"
+fi

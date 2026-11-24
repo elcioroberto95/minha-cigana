@@ -1,0 +1,12 @@
+*
+!package.json
+!package-lock.json
+!apps
+!apps/api
+!apps/api/package.json
+!apps/mobile
+!apps/mobile/**
+apps/mobile/.env*
+apps/mobile/.expo
+apps/mobile/dist
+apps/mobile/node_modules
