@@ -25,7 +25,6 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run build:api
       - run: npm run test:api
       - run: npm run build:web
       - name: Abrir a tela inicial no Chrome

@@ -1,12 +1,15 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { LanguagePicker } from '../components/LanguagePicker';
-import { Button, colors, Copy, Panel, Screen, Title } from '../components/ui';
+import { LanguagePicker } from '../../components/LanguagePicker';
+import { Button, colors, Copy, Panel, Screen, Title } from '../../components/ui';
+import { TopicPicker } from '../tarot/TopicPicker';
 
-const portrait = require('../assets/personagem.png');
+const portrait = require('../../assets/personagem.png');
 
-export default function Home() {
+export default function HomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   return <Screen back={false}>
     <View style={styles.brand}>
       <View style={styles.mark}><Text style={styles.star}>✦</Text></View>
@@ -16,13 +19,11 @@ export default function Home() {
     <Image source={portrait} style={styles.portrait} accessibilityLabel={t('portrait')} />
     <Title>{t('homeTitle')}</Title>
     <Copy>{t('homeIntro')}</Copy>
-    <Copy>{t('developmentNotice')}</Copy>
-    <Button label={t('startBeta')} disabled />
-    <Button label={t('dailyCard')} secondary disabled />
+    <Button label={t('chat')} onPress={() => router.push('/consulta')} />
+    <Button label={t('startBeta')} secondary onPress={() => router.push('/leituras/beta')} />
+    <Button label={t('dailyCard')} secondary onPress={() => router.push('/carta-do-dia')} />
     <Panel>
-      <Copy emphasis>{t('goDeeper')}</Copy>
-      <Button label={t('personalityReading')} secondary disabled />
-      <Button label={t('tenCardReading')} secondary disabled />
+      <TopicPicker onSelect={(topic) => router.push({ pathname: '/consulta', params: { topic } })} />
     </Panel>
   </Screen>;
 }

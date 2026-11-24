@@ -1,29 +1,23 @@
 import assert from 'node:assert/strict';
-import { once } from 'node:events';
 import { after, before, test } from 'node:test';
-import { createApiServer } from '../src/http.ts';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from '../dist/app.module.js';
 
-const server = createApiServer();
+let app;
 let baseUrl;
 
 before(async () => {
-  const listening = once(server, 'listening');
-  server.listen(0, '127.0.0.1');
-  await listening;
-  baseUrl = `http://127.0.0.1:${server.address().port}`;
+  app = await NestFactory.create(AppModule, { logger: false });
+  await app.listen(0, '127.0.0.1');
+  baseUrl = await app.getUrl();
 });
 
-after(async () => {
-  if (server.listening) {
-    const closed = once(server, 'close');
-    server.close();
-    await closed;
-  }
-});
+after(() => app?.close());
 
 test('GET /health informa que a API está disponível', async () => {
   const response = await fetch(`${baseUrl}/health?probe=1`);
   assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), { status: 'ok' });
 });
 
@@ -37,6 +31,7 @@ test('a API diferencia método inválido de rota inexistente', async () => {
   const unsupported = await fetch(`${baseUrl}/health`, { method: 'POST' });
   assert.equal(unsupported.status, 405);
   assert.equal(unsupported.headers.get('Allow'), 'GET, HEAD');
+  assert.deepEqual(await unsupported.json(), { error: 'method_not_allowed' });
 
   const missing = await fetch(`${baseUrl}/nao-existe`);
   assert.equal(missing.status, 404);
