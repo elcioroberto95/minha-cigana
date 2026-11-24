@@ -34,7 +34,7 @@ npm.cmd --silent run eval:ai > "$env:TEMP\cigana-evals.json"
 Os IDs estão em [apps/api/evals/cases.ts](apps/api/evals/cases.ts). O runner usa `http://127.0.0.1:3000`. Defina `EVAL_API_URL` para apontar para outra porta local. Sem IDs, executa os dez casos em sequência. O JSON na saída padrão inclui perguntas, respostas, cartas, checks, latência por chamada e ID de requisição quando fornecido pela API.
 
 - `ready_for_review` significa que a resposta chegou e passou pelos checks aplicáveis. Use o campo `review` para avaliar idioma, tom, relevância e fidelidade às cartas e suas orientações.
-- `flagged` indica uma divergência automática. Os checks buscam nomes de cartas, nomes fictícios no histórico e um código que a personagem deve evitar. Abreviações ou paráfrases podem exigir revisão humana.
+- `flagged` indica uma divergência automática. Os checks verificam a estrutura na tiragem de três cartas, nomes de cartas nos demais formatos, nomes fictícios no histórico e um código que a personagem deve evitar. Abreviações ou paráfrases podem exigir revisão humana.
 - `error` indica falha de transporte, HTTP ou contrato. Confira `calls` para identificar a etapa e correlacionar o evento com os logs. O comando retorna código 2 se houve erro operacional, 1 se houve alerta sem erro e 0 se todos os casos ficaram prontos para revisão.
 
 Ao comparar configurações, registre modelo, commit e estado do Ollama antes da execução. Compare os mesmos IDs de chat e revise cada tiragem usando as cartas registradas no relatório, pois o sorteio é novo a cada rodada. Os percentis usam apenas chamadas de geração com resposta utilizável e incluem a espera pela API. Em amostras pequenas, olhe também os tempos individuais.
@@ -78,6 +78,8 @@ Depois de [criar o modelo Esmeralda](#persona-e-tiragens-de-tarô), confira `OLL
 Use `docker compose ps` para ver a saúde do container e `docker compose exec -T ollama ollama list` para conferir o modelo. `docker compose stop ollama` para o serviço e conserva os modelos.
 
 `POST /api/chat` recebe `locale`, `topic`, `message` e um `history` opcional de até quatro pares recentes. A resposta contém `reply` e `model`. Se o modelo estiver indisponível, a API retorna `503` e o app mantém o rascunho. `CHAT_PERSONA_FILE` pode apontar para um arquivo UTF-8 de configuração da persona no backend. Autenticação de conta, limites de uso e proteção de produção antecedem a publicação do endpoint.
+
+Na Consulta, pergunte **“Qual é a minha Carta do Dia?”** antes e depois de revelar a carta na tela **Carta do Dia**. Com uma identidade válida, o Ollama pode solicitar `get_daily_card`. A API busca a carta de hoje da identidade atual e devolve ao modelo o título e a reflexão no idioma da Consulta, ou o estado `not_revealed`. Esse caminho apenas lê a carta. O sorteio acontece ao tocar em **Revelar minha carta**. A resposta pública continua com `reply` e `model`, e o log do Ollama registra `tool_calls` para ajudar a verificar o percurso. O modelo em `OLLAMA_MODEL` deve aceitar ferramentas. [Tool calling do Ollama](https://docs.ollama.com/capabilities/tool-calling)
 
 ## Carta do Dia
 
@@ -145,6 +147,8 @@ Em `apps/api/.env`, use `OLLAMA_MODEL=esmeralda`. Os parâmetros de geração, i
 No Expo, abra **Tarô**, escolha **Tiragem de três cartas**, **Sim ou Não** ou **Cruz Celta**, selecione cartas e toque em **Revelar cartas**. Confira se nomes, posições e orientações aparecem antes da interpretação. Para testar o retry de indisponibilidade, tente novamente com a mesma tiragem depois de recuperar a conexão com o Ollama.
 
 Na API, `POST /api/tarot/draw` recebe `id` (UUID v4), `format` (`tres-cartas`, `sim-ou-nao` ou `dez-cartas`), `locale`, `topic`, `question` e os índices de `slots`. `GET /api/tarot/draw/:id` consulta as cartas guardadas e `POST /api/tarot/interpret/:id` gera ou recupera a interpretação. Use a mesma credencial de visitante ou sessão entre essas chamadas.
+
+Aplique as migrações com `npm.cmd run migrate:api` antes de iniciar a API. Na tiragem de três cartas, a API pede ao Ollama uma interpretação por carta, uma síntese e um conselho em JSON. O backend exige os IDs na ordem da tiragem e só salva após validar a resposta. O app mostra cada interpretação junto da carta. O campo `structuredReading` acompanha o texto `reading`, que mantém a compatibilidade com leituras e versões anteriores do app. Se a resposta for inválida, **Tentar novamente** reusa a tiragem salva. [Structured Outputs no Ollama](https://docs.ollama.com/capabilities/structured-outputs)
 
 ## Histórico local com PostgreSQL
 

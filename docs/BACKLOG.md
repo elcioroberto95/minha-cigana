@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-11 — Avaliar as respostas da Esmeralda](#esm-11--avaliar-as-respostas-da-esmeralda)
+**Próxima tarefa:** [ESM-13 — Estruturar a interpretação de três cartas](#esm-13--estruturar-a-interpretação-de-três-cartas)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -29,6 +29,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Depende de:** M1-05.
 - **Aceite:** a tela inicial apresenta a identidade roxa e dourada, a saudação e as seis categorias da especificação. A interface é legível em diferentes tamanhos de tela. Seus textos usam catálogos `pt-BR` e `en-US`, conforme a [decisão 004](DECISOES.md#004--português-e-inglês-no-app) e o critério `UX-05` no [roteiro de aceite](CRITERIOS-DE-ACEITE.md#fluxo-navegável).
 - **Evidência parcial:** `UX-05` passou no Chrome usando a versão web exportada. Verificados a troca nos dois sentidos, o idioma salvo após recarregar, `en-GB` como preferência do aparelho e `fr-FR` com português como idioma padrão. A validação em Android e iOS e o restante da tela continuam na tarefa.
+- **Ajuste em revisão:** enquadramento responsivo da capa e agrupamento da introdução incluídos no commit `48b2aed`. Lint, TypeScript e exportação web passaram com o ajuste presente. [PR #11](https://github.com/elcioroberto95/minha-cigana/pull/11).
 
 ## M1-03 — Conectar as rotas da consulta e da tiragem
 
@@ -191,6 +192,28 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Execução real (24/11/2026):** NestJS, PostgreSQL 17 e Ollama 0.40.17 no Docker Desktop em CPU, com o modelo local `esmeralda` baseado no Qwen 2.5 1,5B. `chat-trabalho-en` (90,23 s), `chat-memoria-pt` (90,02 s) e a interpretação de `tarot-sim-en` (90,05 s) devolveram HTTP 503. Os IDs das requisições confirmaram timeout de inferência nos três casos. A rota de sorteio revelou a carta em 291 ms e o relatório manteve essa evidência. A rodada mediu disponibilidade e tempos de falha.
 - **Próxima ação:** executar os dez casos em ambiente de desenvolvimento com o modelo de 3B usado no beta e revisar as respostas pelos critérios de cada caso.
 - **Revisão:** [PR #10](https://github.com/elcioroberto95/minha-cigana/pull/10).
+
+## ESM-12 — Consultar a Carta do Dia com tool calling
+
+- **Estado:** Em revisão. A validação com geração real está pendente.
+- **Branch:** `esm-12/tool-calling`.
+- **Dependências:** ESM-03, ESM-05, ESM-10 e [decisão 013](DECISOES.md#013--tool-calling-na-consulta).
+- **Aceite:** na Consulta, o Ollama pode solicitar a Carta do Dia já revelada para a identidade atual. A API devolve ao modelo somente o texto localizado ou a ausência de carta. Verificar isolamento, ausência de sorteio, rejeição de chamadas inválidas e continuidade do chat comum e da leitura com carta explícita.
+- **Evidências:** lint, compilação da API, checagem de tipos dos workspaces e 22 testes da API com PostgreSQL real passaram. Com Ollama simulado, o teste da Carta do Dia cobriu a sequência de chamada e resposta, o isolamento por visitante, a virada do dia, a ausência de sorteio, as chamadas inválidas e o reaproveitamento do resultado na correção da persona.
+- **Execução real (24/11/2026):** a Consulta com Ollama local em CPU e Esmeralda 1,5B retornou HTTP 503 por timeout de inferência em 90 s, antes de solicitar a ferramenta. A requisição `b5209371-bafe-423e-a0ba-f32a7000a693` registrou `tool_calls: 0`.
+- **Próxima ação:** testar no app com o modelo de 3B em ambiente de desenvolvimento, antes e depois de revelar uma carta, e conferir `tool_calls: 1` no log.
+- **Revisão:** [PR #11](https://github.com/elcioroberto95/minha-cigana/pull/11).
+
+## ESM-13 — Estruturar a interpretação de três cartas
+
+- **Estado:** Em revisão. A geração com o modelo real segue pendente.
+- **Branch:** `esm-12/tool-calling`, no worktree atual com a ESM-12 em revisão.
+- **Dependências:** ESM-08, ESM-11 e [decisão 014](DECISOES.md#014--interpretação-estruturada-de-três-cartas).
+- **Aceite:** gerar uma interpretação por carta na ordem da tiragem, uma síntese e um conselho. Rejeitar respostas inválidas sem trocar as cartas. Exibir a estrutura no app e ler interpretações antigas em texto.
+- **Evidências:** lint, checagem de tipos, compilação da API, exportação web e 22 testes da API com PostgreSQL real passaram. O teste integrado usou Ollama simulado e cobriu respostas em texto livre, IDs repetidos, fora de ordem, desconhecidos e ausentes, além de reabertura, concorrência e registros antigos. A migração 007 foi aplicada ao PostgreSQL local. O eval passou com IDs em ordem e sinalizou a inversão com código 1. No Chrome, com respostas controladas, a tela exibiu a interpretação das três cartas, a síntese e o conselho. Uma tiragem antiga exibiu o texto salvo.
+- **Execução real (24/11/2026):** o sorteio no PostgreSQL respondeu com as três cartas. A interpretação com Esmeralda 1,5B em CPU atingiu o limite de 90 s e retornou HTTP 503. O log correlacionou o timeout com a requisição `55b61063-8b6d-498a-9af5-fcbf668cef9d`.
+- **Próxima ação:** rodar `npm.cmd --silent run eval:ai -- tarot-tres-pt` em desenvolvimento com Esmeralda 3B e revisar a fidelidade da interpretação às cartas e orientações.
+- **Revisão:** [PR #11](https://github.com/elcioroberto95/minha-cigana/pull/11).
 
 ## Modelo de tarefa
 

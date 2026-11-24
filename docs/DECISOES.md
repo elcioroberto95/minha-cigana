@@ -103,3 +103,15 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Decisão:** executar NestJS, PostgreSQL e Ollama no mesmo host com Compose. O acesso da estação de desenvolvimento usa túnel SSH. O modelo e o banco usam volumes persistentes e suas portas ficam no loopback.
 - **Integração contínua:** cada PR valida a imagem da API em um ambiente descartável. O deploy usa um ambiente GitHub restrito à `main` e uma chave SSH exclusiva com um comando que aceita o SHA atual dessa branch.
 - **Próxima etapa:** para acesso externo ao ambiente, aplicar os controles da decisão 006 e configurar HTTPS, backups e restauração.
+
+## 013 — Tool calling na Consulta
+
+- **Data e estado:** 2026-11-24, aceita para desenvolvimento.
+- **Decisão:** oferecer ao Ollama uma ferramenta de leitura da Carta do Dia para a identidade autenticada pelo guard, incluindo visitantes com credencial do app. A ferramenta recebe um objeto vazio. O backend determina a identidade e o idioma, reaproveita a consulta por proprietário e dia e devolve o título e a reflexão localizados ou a ausência de carta.
+- **Execução:** aceitar uma única chamada válida, enviar o resultado como mensagem `tool` e pedir ao Ollama a resposta final. A correção de persona pode reutilizar esse resultado, dentro do orçamento de inferência da requisição. O fluxo com `dailyCardId` continua usando a carta explicitamente selecionada. [Protocolo de tool calling do Ollama](https://docs.ollama.com/capabilities/tool-calling)
+
+## 014 — Interpretação estruturada de três cartas
+
+- **Data e estado:** 2026-11-24, aceita para desenvolvimento.
+- **Decisão:** enviar o JSON Schema no `format` do Ollama e validar no backend os campos, os limites de texto e os IDs na ordem da tiragem persistida. A interface usa os nomes, posições e orientações do baralho. [Structured Outputs no Ollama](https://docs.ollama.com/capabilities/structured-outputs)
+- **Persistência:** salvar o objeto e uma versão em texto na mesma atualização. A coluna JSONB aceita ausência de estrutura nos registros existentes e mantém o contrato de texto dos clientes anteriores. Uma resposta inválida deixa a tiragem sem interpretação para nova tentativa.

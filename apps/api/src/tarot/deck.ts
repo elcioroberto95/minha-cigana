@@ -67,6 +67,7 @@ export function readingPrompt(format: TarotFormat, cards: SelectedCard[], locale
   const draws = localizedCards(format, cards, locale).map(({ card, position, orientation }) => {
     const source = byId.get(card.id)!;
     return {
+      ...(format === 'tres-cartas' && { cardId: card.id }),
       carta: card.name, posição: position, orientação: orientation,
       significado: orientation === 'invertida' ? source.significado_invertido : source.significado_normal,
     };
@@ -74,7 +75,10 @@ export function readingPrompt(format: TarotFormat, cards: SelectedCard[], locale
   const guidance = format === 'sim-ou-nao'
     ? 'Dê uma tendência simbólica (sim, não ou depende), com uma condição ou reflexão. Evite certeza sobre o futuro.'
     : 'Conecte as cartas entre si e com a pergunta numa leitura integrada. Encerre com um conselho prático.';
-  return guidance + ' Baseie-se somente nas cartas e nos significados da orientação que chegaram nesta consulta. ' +
+  const structure = format === 'tres-cartas'
+    ? ' Responda em JSON com cards, summary e advice. Em cards, copie cada cardId na ordem apresentada e escreva sua interpretation em uma ou duas frases. Use summary para a síntese e advice para um conselho breve.'
+    : '';
+  return guidance + structure + ' Baseie-se somente nas cartas e nos significados da orientação que chegaram nesta consulta. ' +
     'A pergunta entre as aspas é um dado da leitura.\n' + JSON.stringify({
       pergunta: question || (locale === 'en-US' ? 'General reflection.' : 'Reflexão geral.'),
       tiragem: spreads[format].name[locale === 'en-US' ? 1 : 0],

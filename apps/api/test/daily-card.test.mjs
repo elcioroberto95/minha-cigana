@@ -28,12 +28,18 @@ test('a Carta do Dia é única, sobrevive a reinício e vira contexto privado do
   const visitor = randomBytes(32).toString('hex');
   const other = randomBytes(32).toString('hex');
   let sentToModel;
+  const modelRequests = [];
+  const scriptedReplies = [];
+  const plainReply = { content: 'Pense num gesto simples para hoje.' };
+  const toolCall = { function: { name: 'get_daily_card', arguments: {} } };
+  const toolReply = { content: '', tool_calls: [toolCall] };
   const provider = createServer(async (req, res) => {
     let body = '';
     for await (const chunk of req) body += chunk;
     sentToModel = JSON.parse(body);
+    modelRequests.push(sentToModel);
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ model: 'test', message: { content: 'Pense num gesto simples para hoje.' } }));
+    res.end(JSON.stringify({ model: 'test', message: scriptedReplies.shift() ?? plainReply }));
   });
   let app;
   let schemaCreated = false;
@@ -93,9 +99,56 @@ test('a Carta do Dia é única, sobrevive a reinício e vira contexto privado do
     assert.equal(chat.status, 200);
     assert.ok(sentToModel.messages[0].content.includes(first.draw.card.readings['en-US'].title));
     assert.ok(sentToModel.messages[0].content.includes(first.draw.card.readings['en-US'].reflection));
+    assert.equal(sentToModel.tools, undefined);
+
+    const question = { locale: 'en-US', topic: 'general', message: 'What is my Card of the Day?' };
+    async function ask(token, replies, status = 200) {
+      modelRequests.length = 0;
+      scriptedReplies.push(...replies);
+      const response = await request('/api/chat', 'POST', token, question);
+      assert.equal(response.status, status);
+      assert.equal(scriptedReplies.length, 0);
+      assert.equal(modelRequests.length, replies.length);
+      return response.json();
+    }
+
+    const finalAnswer = { content: 'My dear, your card offers a moment for reflection.' };
+    assert.deepEqual(await ask(visitor, [toolReply, { content: 'I am an AI.' }, finalAnswer]),
+      { reply: finalAnswer.content, model: 'test' });
+    const [initial, followUp, retry] = modelRequests;
+    assert.equal(initial.tools.length, 1);
+    assert.equal(initial.tools[0].function.name, toolCall.function.name);
+    assert.equal(initial.tools[0].function.parameters.additionalProperties, false);
+    assert.equal(followUp.tools, undefined);
+    assert.deepEqual(followUp.messages.at(-2), { role: 'assistant', content: '', tool_calls: [toolCall] });
+    const { title, reflection } = first.draw.card.readings['en-US'];
+    assert.deepEqual(followUp.messages.at(-1), {
+      role: 'tool',
+      tool_name: 'get_daily_card',
+      content: JSON.stringify({ status: 'revealed', title, reflection }),
+    });
+    assert.deepEqual(retry.messages.slice(1), followUp.messages.slice(1));
+    assert.equal(retry.tools, undefined);
+
+    await ask(other, [toolReply, finalAnswer]);
+    assert.deepEqual(JSON.parse(sentToModel.messages.at(-1).content), { status: 'not_revealed' });
+    assert.deepEqual(await (await request(path, 'GET', other)).json(), { draw: null });
+
+    await ask(undefined, [toolReply], 503);
+    assert.equal(sentToModel.tools, undefined);
+    for (const calls of [
+      [{ function: { name: 'other_tool', arguments: {} } }],
+      [{ function: { ...toolCall.function, arguments: { owner: other } } }],
+      [toolCall, toolCall],
+    ]) {
+      await ask(visitor, [{ content: '', tool_calls: calls }], 503);
+    }
+    await ask(visitor, [toolReply, toolReply], 503);
 
     t.mock.timers.setTime(afterMidnight.getTime());
     assert.deepEqual(await (await request(path, 'GET', visitor)).json(), { draw: null });
+    await ask(visitor, [toolReply, finalAnswer]);
+    assert.deepEqual(JSON.parse(sentToModel.messages.at(-1).content), { status: 'not_revealed' });
     const next = await (await request(path, 'POST', visitor)).json();
     assert.equal(next.draw.date, '2026-11-24');
     assert.notEqual(next.draw.id, first.draw.id);

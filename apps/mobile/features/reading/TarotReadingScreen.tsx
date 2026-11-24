@@ -39,14 +39,26 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
     return () => controller.abort();
   }, [id, format, attempt]);
 
+  const structured = draw?.structuredReading;
+
   return <Screen backTo="/tarot">
     <Title>{t(spreadLabels[format])}</Title>
-    {draw?.cards.map(({ card, position, orientation }) => <Panel key={card.id}>
-      <Copy>{position}</Copy>
-      <Copy emphasis>{card.name}</Copy>
-      {orientation === 'invertida' && <Copy>{t('reversedCard')}</Copy>}
-    </Panel>)}
-    {draw?.reading && <Panel>
+    {draw?.cards.map(({ card, position, orientation }) => {
+      const interpretation = structured?.cards.find(({ cardId }) => cardId === card.id)?.interpretation;
+      return <Panel key={card.id}>
+        <Copy>{position}</Copy>
+        <Copy emphasis>{card.name}</Copy>
+        {orientation === 'invertida' && <Copy>{t('reversedCard')}</Copy>}
+        {interpretation && <Copy>{interpretation}</Copy>}
+      </Panel>;
+    })}
+    {structured && <Panel>
+      <Copy emphasis>{t('readingSummary')}</Copy>
+      <Copy>{structured.summary}</Copy>
+      <Copy emphasis>{t('readingAdvice')}</Copy>
+      <Copy>{structured.advice}</Copy>
+    </Panel>}
+    {!structured && draw?.reading && <Panel>
       <Copy emphasis>Madame Esmeralda</Copy>
       <Copy>{draw.reading}</Copy>
     </Panel>}

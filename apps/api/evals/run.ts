@@ -126,6 +126,20 @@ async function tarot(origin: string, scenario: TarotScenario, result: Result) {
   }
   const reading = interpretation.reading;
   result.answer = reading;
+  if (format === 'tres-cartas') {
+    const structured = object(interpretation.structuredReading);
+    const entries = structured.cards;
+    const passed = Array.isArray(entries) && entries.length === cards.length && cards.every(({ card }, index) => {
+      const entry = object(entries[index]);
+      return entry.cardId === card.id && textField(entry.interpretation);
+    }) && textField(structured.summary) && textField(structured.advice);
+    result.checks.push({
+      rule: 'structured_reading',
+      passed,
+      detail: 'Uma interpretação por carta na ordem revelada, com síntese e conselho.',
+    });
+    return;
+  }
   const missing = cards.filter(({ card }) => !contains(reading, card.name)).map(({ card }) => card.name);
   result.checks.push({
     rule: 'drawn_card_names',

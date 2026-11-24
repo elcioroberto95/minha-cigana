@@ -24,6 +24,12 @@ export class ChatController {
     if (input.dailyCardId && !owner) throw new UnauthorizedException({ error: 'visitor_required' });
     const card = input.dailyCardId && owner ? await this.daily.ownedCard(owner, input.dailyCardId) : undefined;
     const personal = owner ? await this.profiles.chatContext(owner, input.topic) : undefined;
-    return this.ollama.reply(input, card?.readings[input.locale], personal);
+    return this.ollama.reply(input, {
+      daily: card?.readings[input.locale],
+      personal,
+      lookupDailyCard: owner && !input.dailyCardId
+        ? async () => (await this.daily.today(owner))?.card.readings[input.locale]
+        : undefined,
+    });
   }
 }
