@@ -49,3 +49,39 @@ jobs:
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           curl --fail --silent --show-error --retry 5 --retry-connrefused http://127.0.0.1:4173/ > /dev/null
           node .github/scripts/check-expo-home.mjs
+      - name: Subir a API isolada
+        run: |
+          docker build --file deploy/api.Dockerfile --tag cigana-api:ci .
+          docker run --rm --network host --env DATABASE_URL="$TEST_DATABASE_URL" cigana-api:ci node scripts/migrate.mjs
+          container_id=$(docker run --detach --network host --env HOST=127.0.0.1 --env PORT=3000 --env DATABASE_URL="$TEST_DATABASE_URL" cigana-api:ci)
+          trap 'docker logs "$container_id"; docker rm --force "$container_id" >/dev/null' EXIT
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:3000/health | grep -Fx '{"status":"ok"}'
+
+  deploy:
+    name: Atualizar API na VPS
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: vps
+    concurrency:
+      group: cigana-vps
+      cancel-in-progress: false
+    steps:
+      - name: Publicar o commit validado
+        env:
+          SSH_HOST: ${{ vars.VPS_SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_DEPLOY_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ vars.VPS_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          : "${SSH_HOST:?Configure VPS_SSH_HOST}" "${SSH_PRIVATE_KEY:?Configure VPS_DEPLOY_SSH_KEY}" "${SSH_KNOWN_HOSTS:?Configure VPS_SSH_KNOWN_HOSTS}"
+          umask 077
+          key="$RUNNER_TEMP/cigana-deploy"
+          known_hosts="$RUNNER_TEMP/cigana-known-hosts"
+          trap 'rm -f "$key" "$known_hosts"' EXIT
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$key"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$known_hosts"
+          ssh -n -i "$key" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            -o UserKnownHostsFile="$known_hosts" "root@$SSH_HOST" "$GITHUB_SHA"

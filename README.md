@@ -22,6 +22,20 @@ A tela inicial oferece **Português** e **English**. O app usa a escolha salva n
 
 Em outro terminal, rode `npm.cmd run dev:api`. A API escuta em `127.0.0.1:3000` e `GET /health` retorna `{"status":"ok"}`. Para mudar o endereço ou a porta, copie [apps/api/.env.example](apps/api/.env.example) para `apps/api/.env` e ajuste `HOST` e `PORT`. Use `npm.cmd run build:api` e `npm.cmd run start:api` para executar a versão compilada.
 
+## API de desenvolvimento na VPS
+
+A API, o PostgreSQL e o Ollama são executados com [Compose](compose.vps.yaml). A API aceita conexões locais na VPS e o celular continua a depender de um acesso HTTPS autorizado. Para usar a API remota no Expo Web, abra um túnel no seu computador:
+
+```powershell
+ssh -NT -o ExitOnForwardFailure=yes -i "$env:USERPROFILE/.ssh/cigana_hostinger_ed25519" -L 127.0.0.1:13000:127.0.0.1:3000 root@179.197.94.86
+```
+
+No arquivo local `apps/mobile/.env`, configure `EXPO_PUBLIC_API_URL=http://127.0.0.1:13000` e reinicie o Expo. Confira `http://127.0.0.1:13000/health` com o túnel aberto.
+
+Em cada PR, o GitHub Actions monta a imagem da API, aplica as migrações em um banco descartável e verifica `/health`. Com a verificação aprovada em `main`, o job de deploy usa o ambiente `vps`. Esse ambiente recebe as variáveis `VPS_SSH_HOST` e `VPS_SSH_KNOWN_HOSTS` e o segredo `VPS_DEPLOY_SSH_KEY`.
+
+A VPS usa o [comando SSH restrito](deploy/ssh-hook.sh) instalado em `/usr/local/sbin/cigana-deploy-hook` e as credenciais do banco em `/etc/cigana/compose.env`. O [script de deploy](deploy/release.sh) cria ou atualiza o modelo, aplica as migrações antes de trocar a API e tenta restaurar a imagem anterior se a nova falhar na checagem. As migrações precisam manter compatibilidade com a versão anterior durante a troca.
+
 ## Chat com Ollama
 
 Com o Docker Desktop iniciado em modo Linux, rode os comandos abaixo na raiz. O [Compose](compose.yaml) fixa a imagem do Ollama, guarda os modelos em volume persistente e publica a porta apenas na máquina local. O `qwen2.5:1.5b` é o modelo inicial de teste. [Docker e Ollama](https://docs.ollama.com/docker) · [Modelo no Ollama](https://ollama.com/library/qwen2.5:1.5b).

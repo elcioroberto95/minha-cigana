@@ -1,0 +1,21 @@
+services:
+  api:
+    image: cigana-api:${CIGANA_RELEASE:?Informe o commit do deploy}
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    environment:
+      HOST: 0.0.0.0
+      PORT: '3000'
+      DATABASE_URL: postgresql://cigana:${POSTGRES_PASSWORD:?Configure a senha no servidor}@postgres:5432/cigana
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: esmeralda
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081,http://127.0.0.1:8081}
+    ports:
+      - '127.0.0.1:3000:3000'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health').then(r => { if (!r.ok) process.exitCode = 1 }).catch(() => { process.exitCode = 1 })"]
+      interval: 5s
+      timeout: 3s
+      retries: 12

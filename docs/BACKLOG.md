@@ -158,6 +158,14 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Próxima ação:** validar a qualidade da interpretação com inferência real em um ambiente que conclua a geração no tempo da Consulta.
 - **Revisão:** [PR #6](https://github.com/elcioroberto95/minha-cigana/pull/6).
 
+## ESM-09 — Subir a API e o Ollama na VPS
+
+- **Estado:** Em andamento.
+- **Branch:** `esm-09/deploy-vps`.
+- **Dependências e decisões:** ESM-08 e [decisão 012](DECISOES.md#012--api-de-desenvolvimento-na-vps).
+- **Aceite:** consultar a API da VPS pelo Expo via túnel SSH, confirmar migrações e resposta do Ollama real, subir a API isolada para cada PR e publicar automaticamente o commit validado da `main`.
+- **Próxima ação:** testar a Consulta pelo túnel, abrir o PR e verificar a execução da integração contínua.
+
 ## Modelo de tarefa
 
 Crie a tarefa com ID, estado, escopo e aceite. Preencha os demais campos conforme o trabalho avança. Atualize a mesma entrada na retomada. O Git conserva o histórico.

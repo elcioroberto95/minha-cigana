@@ -96,3 +96,10 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Decisão ou proposta:** caminho escolhido e motivo.
 - **Consequências:** impactos e eventual condição para reavaliar.
 ```
+
+## 012 — API de desenvolvimento na VPS
+
+- **Estado:** Aceita para o ambiente de desenvolvimento.
+- **Decisão:** executar NestJS, PostgreSQL e Ollama no mesmo host com Compose. O acesso da estação de desenvolvimento usa túnel SSH. O modelo e o banco usam volumes persistentes e suas portas ficam no loopback.
+- **Integração contínua:** cada PR valida a imagem da API em um ambiente descartável. O deploy usa um ambiente GitHub restrito à `main` e uma chave SSH exclusiva com um comando que aceita o SHA atual dessa branch.
+- **Próxima etapa:** para acesso externo ao ambiente, aplicar os controles da decisão 006 e configurar HTTPS, backups e restauração.
