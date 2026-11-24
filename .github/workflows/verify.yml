@@ -48,5 +48,4 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           curl --fail --silent --show-error --retry 5 --retry-connrefused http://127.0.0.1:4173/ > /dev/null
-          timeout 30s google-chrome --headless --no-sandbox --disable-gpu --virtual-time-budget=10000 --dump-dom http://127.0.0.1:4173/ > "$RUNNER_TEMP/expo-home.html"
-          grep -Fq -e 'O que te trouxe aqui hoje?' -e 'What brings you here today?' "$RUNNER_TEMP/expo-home.html"
+          node .github/scripts/check-expo-home.mjs

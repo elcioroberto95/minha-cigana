@@ -34,7 +34,7 @@ if (-not (Test-Path apps/api/.env)) {
 }
 ```
 
-Em `apps/api/.env`, confira `OLLAMA_MODEL=qwen2.5:1.5b` e `OLLAMA_BASE_URL=http://127.0.0.1:11434`. Inicie a API com `npm.cmd run dev:api`, abra o app com `npm.cmd run web` e envie duas mensagens relacionadas pela Consulta. Se o Expo usar outra porta, inclua sua origem em `CORS_ORIGINS`. Para testar em aparelho físico, ajuste o `HOST` da API para o endereço da máquina na rede de desenvolvimento e configure `EXPO_PUBLIC_API_URL` em `apps/mobile/.env` com esse endereço e porta. O app fala com o NestJS. O Ollama fica acessível no loopback do host.
+Depois de [criar o modelo Esmeralda](#persona-e-tiragens-de-tarô), confira `OLLAMA_MODEL=esmeralda` em `apps/api/.env` e `OLLAMA_BASE_URL=http://127.0.0.1:11434`. Inicie a API com `npm.cmd run dev:api`, abra o app com `npm.cmd run web` e envie duas mensagens relacionadas pela Consulta. A API solicita que o Ollama mantenha o modelo em memória por 30 minutos após o uso. Ajuste `OLLAMA_KEEP_ALIVE` no ambiente da API com uma duração como `10m` ou `0s`. Se o Expo usar outra porta, inclua sua origem em `CORS_ORIGINS`. Para testar em aparelho físico, ajuste o `HOST` da API para o endereço da máquina na rede de desenvolvimento e configure `EXPO_PUBLIC_API_URL` em `apps/mobile/.env` com esse endereço e porta. O app fala com o NestJS. O Ollama fica acessível no loopback do host.
 
 Use `docker compose ps` para ver a saúde do container e `docker compose exec -T ollama ollama list` para conferir o modelo. `docker compose stop ollama` para o serviço e conserva os modelos.
 
@@ -83,6 +83,29 @@ Defina `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:9090/api/v1/otlp/v1
 | PostgreSQL | `cigana_history_database_operations_total` e `cigana_history_database_duration_seconds_bucket` por operação do histórico, `cigana_history_pool_connections` por estado e `cigana_history_pool_waiting` |
 
 Os rótulos são categorias operacionais. O `request_id` fica nos logs para localizar um atendimento específico.
+
+## Persona e tiragens de tarô
+
+Na raiz do projeto, crie o modelo com o Ollama local:
+
+```powershell
+ollama create esmeralda -f Modelfile
+```
+
+Se usa o Ollama do Docker Compose, crie o modelo no mesmo servidor que a API consulta:
+
+```powershell
+docker compose cp Modelfile ollama:/tmp/esmeralda.Modelfile
+docker compose exec -T ollama ollama create esmeralda -f /tmp/esmeralda.Modelfile
+npm.cmd run migrate:api
+npm.cmd run dev:api
+```
+
+Em `apps/api/.env`, use `OLLAMA_MODEL=esmeralda`. Os parâmetros de geração, incluindo temperatura e janela de contexto, ficam no [Modelfile](Modelfile). Depois de alterá-lo, recrie o modelo e reinicie a API. `CHAT_HISTORY_LIMIT` controla as mensagens anteriores enviadas ao modelo, com padrão 12 e máximo 24 em pares completos. `CHAT_CHARACTER_BREAK_PHRASES` permite substituir as frases monitoradas por uma lista separada por `|`.
+
+No Expo, abra **Tarô**, escolha **Tiragem de três cartas**, **Sim ou Não** ou **Cruz Celta**, selecione cartas e toque em **Revelar cartas**. Confira se nomes, posições e orientações aparecem antes da interpretação. Para testar o retry de indisponibilidade, tente novamente com a mesma tiragem depois de recuperar a conexão com o Ollama.
+
+Na API, `POST /api/tarot/draw` recebe `id` (UUID v4), `format` (`tres-cartas`, `sim-ou-nao` ou `dez-cartas`), `locale`, `topic`, `question` e os índices de `slots`. `GET /api/tarot/draw/:id` consulta as cartas guardadas e `POST /api/tarot/interpret/:id` gera ou recupera a interpretação. Use a mesma credencial de visitante ou sessão entre essas chamadas.
 
 ## Histórico local com PostgreSQL
 

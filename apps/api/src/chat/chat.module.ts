@@ -5,5 +5,5 @@ import { ProfileModule } from '../profile/profile.module.js';
 import { ChatController } from './chat.controller.js';
 import { OllamaService } from './ollama.service.js';
 
-@Module({ imports: [AuthModule, DailyCardModule, ProfileModule], controllers: [ChatController], providers: [OllamaService] })
+@Module({ imports: [AuthModule, DailyCardModule, ProfileModule], controllers: [ChatController], providers: [OllamaService], exports: [OllamaService] })
 export class ChatModule {}

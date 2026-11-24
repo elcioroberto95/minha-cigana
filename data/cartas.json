@@ -1,0 +1,1384 @@
+[
+  {
+    "id": "maior-0",
+    "nome": "O Louco",
+    "nome_en": "The Fool",
+    "arcano": "maior",
+    "numero": 0,
+    "palavras_chave": [
+      "início",
+      "liberdade",
+      "risco"
+    ],
+    "significado_normal": "Uma partida sem roteiro abre espaço para curiosidade e experiência direta.",
+    "significado_invertido": "Impulsividade ou medo do desconhecido dificultam avaliar o primeiro passo.",
+    "amor": "Experimente conhecer alguém sem prometer mais do que pode cumprir.",
+    "trabalho": "Uma oportunidade pouco convencional pede testes antes de compromisso maior.",
+    "conselho": "Dê um passo pequeno e confira onde pisa."
+  },
+  {
+    "id": "maior-1",
+    "nome": "O Mago",
+    "nome_en": "The Magician",
+    "arcano": "maior",
+    "numero": 1,
+    "palavras_chave": [
+      "habilidade",
+      "intenção",
+      "iniciativa"
+    ],
+    "significado_normal": "Os instrumentos à mesa indicam capacidade de transformar intenção em ação concreta.",
+    "significado_invertido": "Talentos dispersos ou persuasão vazia afastam a realização do que foi prometido.",
+    "amor": "Mostre interesse com atitudes que confirmem suas palavras.",
+    "trabalho": "Escolha os recursos disponíveis e inicie uma demonstração prática.",
+    "conselho": "Defina um objetivo e use uma ferramenta de cada vez."
+  },
+  {
+    "id": "maior-2",
+    "nome": "A Sacerdotisa",
+    "nome_en": "The High Priestess",
+    "arcano": "maior",
+    "numero": 2,
+    "palavras_chave": [
+      "intuição",
+      "silêncio",
+      "mistério"
+    ],
+    "significado_normal": "O véu e o livro sugerem conhecimento que amadurece pela observação e pela escuta.",
+    "significado_invertido": "Segredos, ruído interno ou pressa podem embaralhar a percepção.",
+    "amor": "Dê espaço ao que ainda precisa ser nomeado antes de pedir definições.",
+    "trabalho": "Observe o ambiente e reúna informações antes de anunciar uma decisão.",
+    "conselho": "Registre uma impressão e procure evidências que a sustentem."
+  },
+  {
+    "id": "maior-3",
+    "nome": "A Imperatriz",
+    "nome_en": "The Empress",
+    "arcano": "maior",
+    "numero": 3,
+    "palavras_chave": [
+      "cuidado",
+      "criação",
+      "abundância"
+    ],
+    "significado_normal": "A paisagem fértil representa nutrição e desenvolvimento de algo cultivado com atenção.",
+    "significado_invertido": "Excesso de doação ou abandono das próprias necessidades sufoca a criatividade.",
+    "amor": "Cultive presença e afeto com reciprocidade, preservando seu espaço.",
+    "trabalho": "Dê tempo e recursos a um projeto criativo em formação.",
+    "conselho": "Reserve para si parte do cuidado que oferece aos outros."
+  },
+  {
+    "id": "maior-4",
+    "nome": "O Imperador",
+    "nome_en": "The Emperor",
+    "arcano": "maior",
+    "numero": 4,
+    "palavras_chave": [
+      "estrutura",
+      "autoridade",
+      "limites"
+    ],
+    "significado_normal": "O trono de pedra indica ordem, responsabilidade e capacidade de criar uma base estável.",
+    "significado_invertido": "Controle excessivo ou falta de direção transforma proteção em rigidez.",
+    "amor": "Construa acordos claros sem confundir cuidado com controle.",
+    "trabalho": "Defina responsabilidades e critérios de decisão antes de delegar.",
+    "conselho": "Estabeleça um limite simples que todos possam entender."
+  },
+  {
+    "id": "maior-5",
+    "nome": "O Hierofante",
+    "nome_en": "The Hierophant",
+    "arcano": "maior",
+    "numero": 5,
+    "palavras_chave": [
+      "tradição",
+      "ensino",
+      "instituições"
+    ],
+    "significado_normal": "O mestre e seus discípulos apontam para aprendizado com um sistema de valores compartilhado.",
+    "significado_invertido": "Questionar convenções ou obedecê-las mecanicamente pode expor conflitos de valores.",
+    "amor": "Conversem sobre quais compromissos fazem sentido para vocês.",
+    "trabalho": "Busque mentoria e avalie quais normas realmente servem ao trabalho.",
+    "conselho": "Examine a razão por trás de uma regra antes de segui-la."
+  },
+  {
+    "id": "maior-6",
+    "nome": "Os Enamorados",
+    "nome_en": "The Lovers",
+    "arcano": "maior",
+    "numero": 6,
+    "palavras_chave": [
+      "escolha",
+      "vínculo",
+      "valores"
+    ],
+    "significado_normal": "O encontro sob o anjo reúne afinidade e uma escolha que pede coerência com os próprios valores.",
+    "significado_invertido": "Divisão interna ou promessas desencontradas dificultam escolher com integridade.",
+    "amor": "Escolha pela reciprocidade e pela clareza sobre o que querem construir.",
+    "trabalho": "Ao decidir entre caminhos, compare os valores exigidos por cada um.",
+    "conselho": "Nomeie o princípio que você não quer negociar."
+  },
+  {
+    "id": "maior-7",
+    "nome": "O Carro",
+    "nome_en": "The Chariot",
+    "arcano": "maior",
+    "numero": 7,
+    "palavras_chave": [
+      "direção",
+      "vontade",
+      "avanço"
+    ],
+    "significado_normal": "Forças em direções diferentes podem avançar juntas quando há propósito e disciplina.",
+    "significado_invertido": "Pressa, dispersão ou disputa pelo controle puxam o carro para lados opostos.",
+    "amor": "Alinhem a direção em vez de disputar quem conduz a relação.",
+    "trabalho": "Defina uma prioridade e reduza frentes concorrentes antes de avançar.",
+    "conselho": "Coordene o próximo movimento antes de acelerar."
+  },
+  {
+    "id": "maior-8",
+    "nome": "A Força",
+    "nome_en": "Strength",
+    "arcano": "maior",
+    "numero": 8,
+    "palavras_chave": [
+      "coragem",
+      "paciência",
+      "autocontrole"
+    ],
+    "significado_normal": "A mão que acalma o leão mostra firmeza exercida com paciência e gentileza.",
+    "significado_invertido": "Autocrítica ou impulsos reprimidos podem minar a confiança e estourar em irritação.",
+    "amor": "Expresse o que sente sem atacar nem engolir o desconforto.",
+    "trabalho": "Conduza uma conversa difícil com firmeza e tato.",
+    "conselho": "Faça uma pausa antes de responder no calor da emoção."
+  },
+  {
+    "id": "maior-9",
+    "nome": "O Eremita",
+    "nome_en": "The Hermit",
+    "arcano": "maior",
+    "numero": 9,
+    "palavras_chave": [
+      "introspecção",
+      "prudência",
+      "busca"
+    ],
+    "significado_normal": "A lanterna ilumina um trecho de cada vez e favorece reflexão independente.",
+    "significado_invertido": "Isolamento prolongado ou recusa de ajuda pode estreitar a visão.",
+    "amor": "Peça tempo para pensar sem desaparecer da conversa.",
+    "trabalho": "Reserve um período de foco e procure mentoria se ficar estagnado.",
+    "conselho": "Dê espaço ao silêncio e combine quando voltará ao assunto."
+  },
+  {
+    "id": "maior-10",
+    "nome": "A Roda da Fortuna",
+    "nome_en": "Wheel of Fortune",
+    "arcano": "maior",
+    "numero": 10,
+    "palavras_chave": [
+      "ciclos",
+      "mudança",
+      "contingência"
+    ],
+    "significado_normal": "A roda em movimento indica transição e oportunidade diante de circunstâncias variáveis.",
+    "significado_invertido": "Instabilidade ou resistência a uma virada dificulta adaptar os planos.",
+    "amor": "Reavalie expectativas quando a rotina da relação mudar.",
+    "trabalho": "Mantenha uma alternativa para fatores que você não controla.",
+    "conselho": "Ajuste o plano ao que mudou e preserve o que ainda funciona."
+  },
+  {
+    "id": "maior-11",
+    "nome": "A Justiça",
+    "nome_en": "Justice",
+    "arcano": "maior",
+    "numero": 11,
+    "palavras_chave": [
+      "equilíbrio",
+      "responsabilidade",
+      "discernimento"
+    ],
+    "significado_normal": "A balança e a espada unem exame imparcial e responsabilidade pelas consequências.",
+    "significado_invertido": "Julgamento enviesado ou fuga de responsabilidade desequilibra os acordos.",
+    "amor": "Ouça as duas versões e responda pela sua parte no conflito.",
+    "trabalho": "Documente critérios e compromissos antes de tomar uma decisão.",
+    "conselho": "Separe fatos, suposições e preferências."
+  },
+  {
+    "id": "maior-12",
+    "nome": "O Enforcado",
+    "nome_en": "The Hanged Man",
+    "arcano": "maior",
+    "numero": 12,
+    "palavras_chave": [
+      "pausa",
+      "perspectiva",
+      "rendição"
+    ],
+    "significado_normal": "Suspender a ação oferece um ponto de vista novo e pode revelar o valor de abrir mão.",
+    "significado_invertido": "Estagnação ou sacrifício sem propósito prolonga uma pausa que perdeu o sentido.",
+    "amor": "Observe a situação de outro ângulo antes de insistir na mesma conversa.",
+    "trabalho": "Suspenda uma estratégia repetitiva e revise suas premissas.",
+    "conselho": "Pergunte o que você ganha e o que perde ao esperar."
+  },
+  {
+    "id": "maior-13",
+    "nome": "A Morte",
+    "nome_en": "Death",
+    "arcano": "maior",
+    "numero": 13,
+    "palavras_chave": [
+      "encerramento",
+      "passagem",
+      "renovação"
+    ],
+    "significado_normal": "O corte de um ciclo abre passagem para outra forma de viver ou agir.",
+    "significado_invertido": "Apego ao que terminou mantém hábitos e situações que pedem renovação.",
+    "amor": "Reconheça o que mudou antes de decidir o que ainda merece cuidado.",
+    "trabalho": "Encerre um processo esgotado e planeje uma transição gradual.",
+    "conselho": "Dê nome ao que termina e a um hábito que deseja levar adiante."
+  },
+  {
+    "id": "maior-14",
+    "nome": "A Temperança",
+    "nome_en": "Temperance",
+    "arcano": "maior",
+    "numero": 14,
+    "palavras_chave": [
+      "moderação",
+      "integração",
+      "harmonia"
+    ],
+    "significado_normal": "A água entre as taças mostra ajuste paciente entre necessidades diferentes.",
+    "significado_invertido": "Excessos ou tentativas de ajuste apressadas tornam difícil encontrar uma medida comum.",
+    "amor": "Procurem um ritmo que acomode as diferenças de ambos.",
+    "trabalho": "Distribua esforço e prazos de modo sustentável.",
+    "conselho": "Teste um ajuste pequeno por vez e observe seu efeito."
+  },
+  {
+    "id": "maior-15",
+    "nome": "O Diabo",
+    "nome_en": "The Devil",
+    "arcano": "maior",
+    "numero": 15,
+    "palavras_chave": [
+      "apego",
+      "tentação",
+      "dependência"
+    ],
+    "significado_normal": "As correntes simbolizam vínculos e desejos que parecem limitar mais do que precisam.",
+    "significado_invertido": "Reconhecer uma dependência pode abrir caminho para soltá-la, ou revelar resistência a mudar.",
+    "amor": "Observe ciúme, possessividade ou acordos mantidos por medo.",
+    "trabalho": "Identifique incentivos que o prendem a uma rotina desgastante.",
+    "conselho": "Nomeie o hábito que tomou espaço demais e procure apoio para mudá-lo."
+  },
+  {
+    "id": "maior-16",
+    "nome": "A Torre",
+    "nome_en": "The Tower",
+    "arcano": "maior",
+    "numero": 16,
+    "palavras_chave": [
+      "ruptura",
+      "choque",
+      "revelação"
+    ],
+    "significado_normal": "O raio expõe uma estrutura frágil e obriga a reorganizar o que parecia seguro.",
+    "significado_invertido": "Medo de uma ruptura ou sinais ignorados prolongam a instabilidade.",
+    "amor": "Fale sobre o que já se tornou insustentável e procure segurança primeiro.",
+    "trabalho": "Revise pontos frágeis antes de reconstruir um plano interrompido.",
+    "conselho": "Proteja o essencial antes de tentar recompor o resto."
+  },
+  {
+    "id": "maior-17",
+    "nome": "A Estrela",
+    "nome_en": "The Star",
+    "arcano": "maior",
+    "numero": 17,
+    "palavras_chave": [
+      "esperança",
+      "renovação",
+      "confiança"
+    ],
+    "significado_normal": "A água devolvida à terra e ao lago representa esperança e recuperação gradual.",
+    "significado_invertido": "Desânimo ou dúvida podem encobrir recursos de recuperação já disponíveis.",
+    "amor": "Recupere confiança com gestos pequenos e consistentes.",
+    "trabalho": "Retome um objetivo inspirador em uma etapa realizável.",
+    "conselho": "Repita um gesto concreto que devolva esperança ao seu cotidiano."
+  },
+  {
+    "id": "maior-18",
+    "nome": "A Lua",
+    "nome_en": "The Moon",
+    "arcano": "maior",
+    "numero": 18,
+    "palavras_chave": [
+      "incerteza",
+      "sonho",
+      "imaginação"
+    ],
+    "significado_normal": "O caminho entre as torres atravessa incertezas que pedem atenção a medos e aparências.",
+    "significado_invertido": "Confusões começam a se esclarecer ou velhas ansiedades ainda distorcem os sinais.",
+    "amor": "Pergunte diretamente antes de tomar silêncio como prova de algo.",
+    "trabalho": "Confirme rumores e dados antes de decidir sob pressão.",
+    "conselho": "Anote aquilo que sabe e o que ainda é hipótese."
+  },
+  {
+    "id": "maior-19",
+    "nome": "O Sol",
+    "nome_en": "The Sun",
+    "arcano": "maior",
+    "numero": 19,
+    "palavras_chave": [
+      "vitalidade",
+      "clareza",
+      "alegria"
+    ],
+    "significado_normal": "A luz sobre o jardim indica clareza, confiança e alegria compartilhada.",
+    "significado_invertido": "Alegria contida, atraso ou otimismo forçado pode esconder dificuldades pequenas.",
+    "amor": "Celebre o que funciona sem exigir que tudo pareça bem o tempo inteiro.",
+    "trabalho": "Dê visibilidade a um resultado e compartilhe o reconhecimento.",
+    "conselho": "Valorize uma melhora real, ainda que modesta."
+  },
+  {
+    "id": "maior-20",
+    "nome": "O Julgamento",
+    "nome_en": "Judgement",
+    "arcano": "maior",
+    "numero": 20,
+    "palavras_chave": [
+      "chamado",
+      "avaliação",
+      "renovação"
+    ],
+    "significado_normal": "A trombeta marca uma revisão que permite assumir responsabilidades e recomeçar com consciência.",
+    "significado_invertido": "Autocrítica excessiva ou recusa de ouvir um chamado adia a mudança.",
+    "amor": "Revisitem o passado para aprender e decidir com mais maturidade.",
+    "trabalho": "Reavalie a direção à luz do que já aprendeu em vez de repetir um roteiro.",
+    "conselho": "Escolha uma lição do passado e aplique-a hoje."
+  },
+  {
+    "id": "maior-21",
+    "nome": "O Mundo",
+    "nome_en": "The World",
+    "arcano": "maior",
+    "numero": 21,
+    "palavras_chave": [
+      "conclusão",
+      "integração",
+      "realização"
+    ],
+    "significado_normal": "A figura dentro da coroa simboliza um ciclo completado e partes que enfim formam um todo.",
+    "significado_invertido": "Pendências ou busca de perfeição dificultam reconhecer o fechamento.",
+    "amor": "Reconheçam o que construíram juntos antes de iniciar outra etapa.",
+    "trabalho": "Finalize entregas pendentes e registre o aprendizado do projeto.",
+    "conselho": "Conclua o que está ao alcance e marque o encerramento."
+  },
+  {
+    "id": "paus-1",
+    "nome": "Ás de Paus",
+    "nome_en": "Ace of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 1,
+    "palavras_chave": [
+      "inspiração",
+      "impulso",
+      "criação"
+    ],
+    "significado_normal": "A centelha inicial favorece um projeto, desejo ou iniciativa criativa.",
+    "significado_invertido": "O entusiasmo se dispersa ou encontra um bloqueio antes de ganhar forma.",
+    "amor": "Abra espaço para a espontaneidade sem apressar intimidade.",
+    "trabalho": "Teste a ideia com um protótipo pequeno.",
+    "conselho": "Anote um primeiro gesto que possa fazer hoje."
+  },
+  {
+    "id": "paus-2",
+    "nome": "Dois de Paus",
+    "nome_en": "Two of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 2,
+    "palavras_chave": [
+      "planejamento",
+      "escolha",
+      "horizonte"
+    ],
+    "significado_normal": "A figura com o globo pesa alternativas antes de sair do território conhecido.",
+    "significado_invertido": "Indecisão ou apego à segurança estreita as possibilidades percebidas.",
+    "amor": "Conversem sobre seus planos antes de assumir uma direção em comum.",
+    "trabalho": "Compare oportunidades pelo que exigem e pelo que abrem.",
+    "conselho": "Faça uma comparação simples entre dois caminhos."
+  },
+  {
+    "id": "paus-3",
+    "nome": "Três de Paus",
+    "nome_en": "Three of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 3,
+    "palavras_chave": [
+      "expansão",
+      "expectativa",
+      "colaboração"
+    ],
+    "significado_normal": "Observar os navios sugere acompanhar os primeiros frutos de um esforço e planejar expansão.",
+    "significado_invertido": "Atrasos ou expectativas grandes demais pedem revisão do alcance.",
+    "amor": "Equilibrem seus planos de futuro com o tempo de cada pessoa.",
+    "trabalho": "Acompanhe o que já foi lançado e ajuste a estratégia de crescimento.",
+    "conselho": "Divida a visão de longo prazo em etapas observáveis."
+  },
+  {
+    "id": "paus-4",
+    "nome": "Quatro de Paus",
+    "nome_en": "Four of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 4,
+    "palavras_chave": [
+      "celebração",
+      "apoio",
+      "alicerce"
+    ],
+    "significado_normal": "A guirlanda e o encontro mostram celebração de um marco e senso de pertencimento.",
+    "significado_invertido": "Instabilidade em casa ou celebração adiada revela a necessidade de fortalecer a base.",
+    "amor": "Valorizem rituais compartilhados que deixam ambos à vontade.",
+    "trabalho": "Reconheça uma entrega da equipe e cuide dos acordos que a sustentam.",
+    "conselho": "Celebre um avanço com quem contribuiu para ele."
+  },
+  {
+    "id": "paus-5",
+    "nome": "Cinco de Paus",
+    "nome_en": "Five of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 5,
+    "palavras_chave": [
+      "tensão",
+      "competição",
+      "diversidade"
+    ],
+    "significado_normal": "Os bastões cruzados mostram disputa de ideias e energia sem coordenação.",
+    "significado_invertido": "Evitar conflito ou deixá-lo escalar dificulta o entendimento.",
+    "amor": "Delimitem o que é divergência de gosto e o que realmente pede acordo.",
+    "trabalho": "Organize o debate para tirar propostas úteis da competição.",
+    "conselho": "Escolha um ponto de desacordo para discutir de cada vez."
+  },
+  {
+    "id": "paus-6",
+    "nome": "Seis de Paus",
+    "nome_en": "Six of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 6,
+    "palavras_chave": [
+      "reconhecimento",
+      "vitória",
+      "visibilidade"
+    ],
+    "significado_normal": "A coroa do cavaleiro indica vitória reconhecida e confiança após um esforço.",
+    "significado_invertido": "Carência de reconhecimento ou orgulho excessivo desvia a atenção do avanço real.",
+    "amor": "Aprecie o parceiro sem transformar afeto em disputa por aprovação.",
+    "trabalho": "Compartilhe os méritos por uma entrega bem-sucedida.",
+    "conselho": "Reconheça um mérito seu e um de quem ajudou."
+  },
+  {
+    "id": "paus-7",
+    "nome": "Sete de Paus",
+    "nome_en": "Seven of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 7,
+    "palavras_chave": [
+      "defesa",
+      "coragem",
+      "posição"
+    ],
+    "significado_normal": "Em terreno elevado, a figura sustenta sua posição diante de pressão externa.",
+    "significado_invertido": "Sentir-se cercado pode levar à desistência ou a defender tudo ao mesmo tempo.",
+    "amor": "Proteja seus limites e escolha em quais discussões insistir.",
+    "trabalho": "Defenda prioridades sem reagir a toda provocação.",
+    "conselho": "Distinga o que merece firmeza do que pode ser negociado."
+  },
+  {
+    "id": "paus-8",
+    "nome": "Oito de Paus",
+    "nome_en": "Eight of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 8,
+    "palavras_chave": [
+      "movimento",
+      "notícia",
+      "rapidez"
+    ],
+    "significado_normal": "Os bastões em voo indicam fluxo rápido, mensagens e encaminhamento decidido.",
+    "significado_invertido": "Atrasos ou pressa excessiva podem produzir mensagens desencontradas.",
+    "amor": "Converse quando ambos tiverem tempo de entender a resposta.",
+    "trabalho": "Cheque dependências antes de acelerar uma entrega.",
+    "conselho": "Confirme a informação importante antes de repassá-la."
+  },
+  {
+    "id": "paus-9",
+    "nome": "Nove de Paus",
+    "nome_en": "Nine of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 9,
+    "palavras_chave": [
+      "resiliência",
+      "cautela",
+      "experiência"
+    ],
+    "significado_normal": "A figura ferida permanece de guarda e usa a experiência para proteger o que construiu.",
+    "significado_invertido": "Exaustão ou vigilância constante torna difícil reconhecer quando já é seguro descansar.",
+    "amor": "Não trate toda discordância atual como repetição de uma ferida antiga.",
+    "trabalho": "Revise a carga antes de assumir outra tarefa urgente.",
+    "conselho": "Tire um descanso e escolha uma defesa que ainda faz sentido."
+  },
+  {
+    "id": "paus-10",
+    "nome": "Dez de Paus",
+    "nome_en": "Ten of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 10,
+    "palavras_chave": [
+      "carga",
+      "esforço",
+      "responsabilidade"
+    ],
+    "significado_normal": "O feixe pesado representa conquistas acompanhadas de excesso de tarefas assumidas.",
+    "significado_invertido": "Dividir a carga traz alívio, enquanto ignorar limites pode levar ao colapso da rotina.",
+    "amor": "Distribuam responsabilidades sem adivinhar o cansaço um do outro.",
+    "trabalho": "Delegue trabalho ou renegocie a entrega que ficou pesada demais.",
+    "conselho": "Retire uma tarefa que você assumiu sem precisar."
+  },
+  {
+    "id": "paus-11",
+    "nome": "Valete de Paus",
+    "nome_en": "Page of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 11,
+    "palavras_chave": [
+      "curiosidade",
+      "descoberta",
+      "notícia"
+    ],
+    "significado_normal": "O jovem de Paus examina uma possibilidade nova e quer experimentá-la.",
+    "significado_invertido": "Ansiedade ou inexperiência pode interromper a iniciativa antes do primeiro teste.",
+    "amor": "Mostre interesse fazendo perguntas sinceras e sem criar promessas.",
+    "trabalho": "Explore uma habilidade por meio de um exercício prático.",
+    "conselho": "Experimente antes de julgar se algo serve para você."
+  },
+  {
+    "id": "paus-12",
+    "nome": "Cavaleiro de Paus",
+    "nome_en": "Knight of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 12,
+    "palavras_chave": [
+      "aventura",
+      "movimento",
+      "ousadia"
+    ],
+    "significado_normal": "O cavaleiro parte com energia e busca experiência, desafio e movimento.",
+    "significado_invertido": "Impaciência ou alternância constante de rumo compromete a continuidade.",
+    "amor": "Atração e novidade precisam conviver com combinados claros.",
+    "trabalho": "Use sua energia em uma tarefa com começo e fim.",
+    "conselho": "Pergunte quem sustentará o plano depois do entusiasmo inicial."
+  },
+  {
+    "id": "paus-13",
+    "nome": "Rainha de Paus",
+    "nome_en": "Queen of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 13,
+    "palavras_chave": [
+      "carisma",
+      "confiança",
+      "autonomia"
+    ],
+    "significado_normal": "A rainha reúne iniciativa e presença calorosa, abrindo espaço para agir com autenticidade.",
+    "significado_invertido": "Comparações ou insegurança podem mascarar a própria competência.",
+    "amor": "Expresse seu desejo sem depender do olhar alheio para validá-lo.",
+    "trabalho": "Assuma voz em uma reunião e também abra espaço para outras.",
+    "conselho": "Faça uma escolha que você defenderia sem plateia."
+  },
+  {
+    "id": "paus-14",
+    "nome": "Rei de Paus",
+    "nome_en": "King of Wands",
+    "arcano": "menor",
+    "naipe": "paus",
+    "numero": 14,
+    "palavras_chave": [
+      "liderança",
+      "visão",
+      "empreendedorismo"
+    ],
+    "significado_normal": "O rei indica visão ampla e capacidade de mobilizar pessoas para uma direção criativa.",
+    "significado_invertido": "Autoritarismo ou decisões no impulso desperdiçam a energia de uma equipe.",
+    "amor": "Lidere pelo exemplo e aceite que decisões em casal pedem escuta.",
+    "trabalho": "Transforme a visão em prioridades compreensíveis e delegáveis.",
+    "conselho": "Peça retorno antes de definir sozinho o rumo de todos."
+  },
+  {
+    "id": "copas-1",
+    "nome": "Ás de Copas",
+    "nome_en": "Ace of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 1,
+    "palavras_chave": [
+      "afeto",
+      "abertura",
+      "renovação"
+    ],
+    "significado_normal": "A taça transbordante anuncia abertura emocional e disponibilidade para criar vínculos.",
+    "significado_invertido": "Sentimentos abafados ou excesso de carência dificultam receber e oferecer afeto.",
+    "amor": "Aproxime-se com sinceridade e reconheça seu próprio ritmo.",
+    "trabalho": "Um projeto pode ganhar força ao acolher a contribuição emocional da equipe.",
+    "conselho": "Dê nome ao sentimento antes de agir por ele."
+  },
+  {
+    "id": "copas-2",
+    "nome": "Dois de Copas",
+    "nome_en": "Two of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 2,
+    "palavras_chave": [
+      "reciprocidade",
+      "parceria",
+      "encontro"
+    ],
+    "significado_normal": "A troca de taças representa pacto, reconhecimento mútuo e afinidade.",
+    "significado_invertido": "Falta de reciprocidade ou acordo mal compreendido desequilibra a troca.",
+    "amor": "Conversem sobre o que cada um oferece e espera receber.",
+    "trabalho": "Formalize uma parceria com expectativas claras para os dois lados.",
+    "conselho": "Pergunte ao outro o que ele entendeu do acordo."
+  },
+  {
+    "id": "copas-3",
+    "nome": "Três de Copas",
+    "nome_en": "Three of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 3,
+    "palavras_chave": [
+      "amizade",
+      "celebração",
+      "comunidade"
+    ],
+    "significado_normal": "As três figuras com taças celebram convivência, apoio e alegria compartilhada.",
+    "significado_invertido": "Excessos sociais ou exclusão de alguém podem empobrecer a celebração.",
+    "amor": "Dê lugar a amizades e acordos de convivência que nutrem a relação.",
+    "trabalho": "Celebre resultados coletivos e reconheça contribuições discretas.",
+    "conselho": "Convide quem você deixou de ouvir ultimamente."
+  },
+  {
+    "id": "copas-4",
+    "nome": "Quatro de Copas",
+    "nome_en": "Four of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 4,
+    "palavras_chave": [
+      "apatia",
+      "contemplação",
+      "oferta"
+    ],
+    "significado_normal": "A figura ensimesmada diante das taças pode deixar passar uma oportunidade por desinteresse ou recolhimento.",
+    "significado_invertido": "A atenção pode voltar ao mundo, ou a insatisfação pode continuar mascarando alternativas.",
+    "amor": "Repare se distância significa desalento ou necessidade de pausa.",
+    "trabalho": "Avalie sugestões recusadas automaticamente antes de seguir igual.",
+    "conselho": "Examine uma oferta que você descartou sem considerar."
+  },
+  {
+    "id": "copas-5",
+    "nome": "Cinco de Copas",
+    "nome_en": "Five of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 5,
+    "palavras_chave": [
+      "perda",
+      "luto",
+      "recuperação"
+    ],
+    "significado_normal": "As taças caídas dominam o olhar, embora duas ainda permaneçam de pé.",
+    "significado_invertido": "A recuperação começa ao reconhecer o que ficou disponível e elaborar a perda.",
+    "amor": "Reconheça a tristeza sem perder de vista o apoio que permanece.",
+    "trabalho": "Aprenda com uma frustração e identifique os recursos preservados.",
+    "conselho": "Deixe a perda ter nome antes de procurar um novo caminho."
+  },
+  {
+    "id": "copas-6",
+    "nome": "Seis de Copas",
+    "nome_en": "Six of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 6,
+    "palavras_chave": [
+      "memória",
+      "infância",
+      "generosidade"
+    ],
+    "significado_normal": "A entrega de flores evoca lembranças, inocência e pequenos cuidados do passado.",
+    "significado_invertido": "A idealização do passado ou velhos padrões podem impedir um passo adiante.",
+    "amor": "Relembrem algo bom sem exigir que a relação volte a ser como era.",
+    "trabalho": "Recupere um hábito útil de uma fase anterior do trabalho.",
+    "conselho": "Escolha uma memória que inspire uma ação possível hoje."
+  },
+  {
+    "id": "copas-7",
+    "nome": "Sete de Copas",
+    "nome_en": "Seven of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 7,
+    "palavras_chave": [
+      "escolhas",
+      "fantasia",
+      "discernimento"
+    ],
+    "significado_normal": "As taças nas nuvens apresentam desejos variados cuja aparência pode iludir.",
+    "significado_invertido": "As opções começam a se ordenar ou a sobrecarga leva a escolher sem examinar.",
+    "amor": "Distinga afinidade real da história que você imaginou sobre alguém.",
+    "trabalho": "Reduza alternativas a dois caminhos com critérios verificáveis.",
+    "conselho": "Cheque o custo e a realidade da opção que mais encanta."
+  },
+  {
+    "id": "copas-8",
+    "nome": "Oito de Copas",
+    "nome_en": "Eight of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 8,
+    "palavras_chave": [
+      "partida",
+      "busca",
+      "desapego"
+    ],
+    "significado_normal": "Deixar taças para trás representa buscar sentido quando o que existe já não satisfaz.",
+    "significado_invertido": "Medo de partir ou retorno apressado impede entender o que faltava.",
+    "amor": "Pergunte se deseja distância por necessidade real ou por evitar uma conversa.",
+    "trabalho": "Revise o que precisa mudar antes de abandonar um projeto desgastado.",
+    "conselho": "Nomeie o que procura e o que está disposto a deixar."
+  },
+  {
+    "id": "copas-9",
+    "nome": "Nove de Copas",
+    "nome_en": "Nine of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 9,
+    "palavras_chave": [
+      "satisfação",
+      "prazer",
+      "desejo"
+    ],
+    "significado_normal": "A figura diante das taças desfruta uma conquista e o prazer do que reuniu.",
+    "significado_invertido": "Satisfação aparente ou excessos podem ocultar desejos que seguem sem atendimento.",
+    "amor": "Compartilhe prazeres sem exigir que a relação preencha todas as suas necessidades.",
+    "trabalho": "Reconheça um objetivo atingido e verifique se ele ainda o satisfaz.",
+    "conselho": "Aprecie uma conquista sem transformar prazer em obrigação."
+  },
+  {
+    "id": "copas-10",
+    "nome": "Dez de Copas",
+    "nome_en": "Ten of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 10,
+    "palavras_chave": [
+      "harmonia",
+      "lar",
+      "pertencimento"
+    ],
+    "significado_normal": "O arco de taças representa alegria compartilhada, acolhimento e vínculos duradouros.",
+    "significado_invertido": "Uma imagem ideal de harmonia esconde descompassos ou expectativas familiares diferentes.",
+    "amor": "Conversem sobre o que felicidade compartilhada significa para cada um.",
+    "trabalho": "Cuide da confiança e do sentimento de participação no grupo.",
+    "conselho": "Escolha um acordo que melhore a convivência de verdade."
+  },
+  {
+    "id": "copas-11",
+    "nome": "Valete de Copas",
+    "nome_en": "Page of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 11,
+    "palavras_chave": [
+      "sensibilidade",
+      "mensagem",
+      "imaginação"
+    ],
+    "significado_normal": "O peixe na taça sugere notícia afetiva ou inspiração inesperada recebida com curiosidade.",
+    "significado_invertido": "Insegurança ou fantasia pode tornar difícil comunicar o que se sente com clareza.",
+    "amor": "Fale do seu interesse sem esperar que a outra pessoa adivinhe.",
+    "trabalho": "Dê forma a uma ideia criativa antes de apresentá-la.",
+    "conselho": "Trate uma inspiração como convite para elaborar, não como certeza."
+  },
+  {
+    "id": "copas-12",
+    "nome": "Cavaleiro de Copas",
+    "nome_en": "Knight of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 12,
+    "palavras_chave": [
+      "romance",
+      "convite",
+      "idealismo"
+    ],
+    "significado_normal": "O cavaleiro oferece a taça e convida a agir com gentileza, imaginação e afeto.",
+    "significado_invertido": "Promessas românticas ou criativas sem sustentação fazem o encanto perder força.",
+    "amor": "Observe se a delicadeza das palavras aparece também nas atitudes.",
+    "trabalho": "Apresente uma proposta inspiradora junto de um passo concreto.",
+    "conselho": "Confirme um combinado antes de celebrá-lo como feito."
+  },
+  {
+    "id": "copas-13",
+    "nome": "Rainha de Copas",
+    "nome_en": "Queen of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 13,
+    "palavras_chave": [
+      "empatia",
+      "escuta",
+      "intuição"
+    ],
+    "significado_normal": "A rainha contempla a taça e acolhe sentimentos com atenção e profundidade.",
+    "significado_invertido": "Absorver o humor alheio ou negligenciar as próprias emoções fragiliza a escuta.",
+    "amor": "Escute com presença sem assumir como seus os problemas do outro.",
+    "trabalho": "Ofereça apoio à equipe com limites para proteger sua própria energia.",
+    "conselho": "Pergunte se você escuta para compreender ou para resolver tudo."
+  },
+  {
+    "id": "copas-14",
+    "nome": "Rei de Copas",
+    "nome_en": "King of Cups",
+    "arcano": "menor",
+    "naipe": "copas",
+    "numero": 14,
+    "palavras_chave": [
+      "maturidade",
+      "serenidade",
+      "equilíbrio"
+    ],
+    "significado_normal": "O rei mantém-se estável no mar e representa emoções conduzidas com responsabilidade.",
+    "significado_invertido": "Repressão emocional ou uso dos sentimentos para controlar pessoas abala a confiança.",
+    "amor": "Converse sobre emoções com calma sem esconder o que realmente sente.",
+    "trabalho": "Conduza conflitos com sensatez e clareza de expectativas.",
+    "conselho": "Reconheça a emoção e escolha com cuidado como expressá-la."
+  },
+  {
+    "id": "espadas-1",
+    "nome": "Ás de Espadas",
+    "nome_en": "Ace of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 1,
+    "palavras_chave": [
+      "clareza",
+      "verdade",
+      "decisão"
+    ],
+    "significado_normal": "A espada coroada representa uma ideia nítida capaz de separar o essencial da confusão.",
+    "significado_invertido": "Ambiguidade ou uso agressivo de uma verdade prejudica a compreensão.",
+    "amor": "Diga o que precisa ser dito com precisão e gentileza.",
+    "trabalho": "Defina o problema antes de defender uma solução.",
+    "conselho": "Escreva a decisão em uma frase concreta."
+  },
+  {
+    "id": "espadas-2",
+    "nome": "Dois de Espadas",
+    "nome_en": "Two of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 2,
+    "palavras_chave": [
+      "impasse",
+      "proteção",
+      "escolha"
+    ],
+    "significado_normal": "A figura de olhos vendados suspende uma decisão enquanto sustenta forças em equilíbrio precário.",
+    "significado_invertido": "Informações contraditórias ou excesso de opções tornam difícil manter a indecisão.",
+    "amor": "Identifique o assunto que ambos evitam e escolham um momento para falar.",
+    "trabalho": "Descubra qual informação falta para destravar uma escolha.",
+    "conselho": "Retire uma suposição da frente dos fatos."
+  },
+  {
+    "id": "espadas-3",
+    "nome": "Três de Espadas",
+    "nome_en": "Three of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 3,
+    "palavras_chave": [
+      "tristeza",
+      "ferida",
+      "separação"
+    ],
+    "significado_normal": "As espadas atravessam o coração e mostram dor que precisa ser reconhecida e expressa.",
+    "significado_invertido": "O alívio pode começar, ou a dor reprimida pode continuar determinando as reações.",
+    "amor": "Não apresse a reconciliação antes de nomear o que machucou.",
+    "trabalho": "Reserve espaço para elaborar um retorno duro ou uma ruptura de equipe.",
+    "conselho": "Procure uma pessoa de confiança para falar sobre a ferida."
+  },
+  {
+    "id": "espadas-4",
+    "nome": "Quatro de Espadas",
+    "nome_en": "Four of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 4,
+    "palavras_chave": [
+      "descanso",
+      "recolhimento",
+      "recuperação"
+    ],
+    "significado_normal": "A figura deitada pede repouso e distância temporária das tensões.",
+    "significado_invertido": "Inquietação e exaustão dificultam recuperar forças após uma fase intensa.",
+    "amor": "Faça uma pausa combinada para que o silêncio não vire castigo.",
+    "trabalho": "Proteja um tempo sem interrupções antes de retomar uma decisão.",
+    "conselho": "Planeje descanso antes que a rotina o imponha."
+  },
+  {
+    "id": "espadas-5",
+    "nome": "Cinco de Espadas",
+    "nome_en": "Five of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 5,
+    "palavras_chave": [
+      "conflito",
+      "vitória amarga",
+      "limites"
+    ],
+    "significado_normal": "A coleta das espadas sugere ganho que pode ter custado confiança ou cooperação.",
+    "significado_invertido": "Cansaço da disputa abre espaço para acordo ou amplia ressentimento acumulado.",
+    "amor": "Pergunte se vencer a discussão ajuda o vínculo.",
+    "trabalho": "Avalie o custo para a equipe de uma vitória apenas individual.",
+    "conselho": "Encerre uma disputa que já perdeu seu propósito."
+  },
+  {
+    "id": "espadas-6",
+    "nome": "Seis de Espadas",
+    "nome_en": "Six of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 6,
+    "palavras_chave": [
+      "transição",
+      "distância",
+      "passagem"
+    ],
+    "significado_normal": "A travessia de barco desloca problemas para um cenário mais administrável.",
+    "significado_invertido": "A transição pode ser adiada por assuntos mal resolvidos levados na bagagem.",
+    "amor": "Façam a passagem com acordos claros sobre o que ainda precisa ser resolvido.",
+    "trabalho": "Planeje a transferência de responsabilidade e registre pendências.",
+    "conselho": "Leve somente o aprendizado que ajuda na próxima etapa."
+  },
+  {
+    "id": "espadas-7",
+    "nome": "Sete de Espadas",
+    "nome_en": "Seven of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 7,
+    "palavras_chave": [
+      "estratégia",
+      "discrição",
+      "evasão"
+    ],
+    "significado_normal": "Carregar espadas às escondidas sugere estratégia indireta, reserva ou esquiva de responsabilidades.",
+    "significado_invertido": "Um segredo pode aparecer ou a pessoa pode reconhecer que o atalho cobra um preço.",
+    "amor": "Prefira uma conversa franca a testar o outro em silêncio.",
+    "trabalho": "Questione atalhos que dependam de esconder informação relevante.",
+    "conselho": "Esclareça o que pode compartilhar com quem será afetado."
+  },
+  {
+    "id": "espadas-8",
+    "nome": "Oito de Espadas",
+    "nome_en": "Eight of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 8,
+    "palavras_chave": [
+      "restrição",
+      "crenças",
+      "perspectiva"
+    ],
+    "significado_normal": "A figura vendada entre as espadas percebe menos saídas do que existem ao seu redor.",
+    "significado_invertido": "Reconhecer limites imaginados abre espaço para pedir ajuda e recuperar movimento.",
+    "amor": "Repare se o medo de uma reação está impedindo uma conversa possível.",
+    "trabalho": "Peça uma visão externa antes de supor que o impasse é inevitável.",
+    "conselho": "Escolha uma ação pequena que ainda está sob seu controle."
+  },
+  {
+    "id": "espadas-9",
+    "nome": "Nove de Espadas",
+    "nome_en": "Nine of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 9,
+    "palavras_chave": [
+      "ansiedade",
+      "vigília",
+      "preocupação"
+    ],
+    "significado_normal": "As espadas acima da cama representam preocupações que crescem no silêncio e tiram o repouso.",
+    "significado_invertido": "Dividir o peso pode trazer alívio, mas a vergonha pode prolongar a aflição.",
+    "amor": "Conte o que o aflige sem tratar o pior cenário como fato.",
+    "trabalho": "Separe o problema urgente de hipóteses que não precisam de ação imediata.",
+    "conselho": "Registre as preocupações e procure apoio se persistirem."
+  },
+  {
+    "id": "espadas-10",
+    "nome": "Dez de Espadas",
+    "nome_en": "Ten of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 10,
+    "palavras_chave": [
+      "fim",
+      "esgotamento",
+      "encerramento"
+    ],
+    "significado_normal": "O céu escuro e a luz distante mostram um ponto final doloroso que abre outra etapa.",
+    "significado_invertido": "A recuperação começa devagar ou o apego mantém uma situação já encerrada.",
+    "amor": "Reconheça quando um padrão precisa acabar antes de reconstruir confiança.",
+    "trabalho": "Encerre uma abordagem esgotada e proteja sua energia para recomeçar.",
+    "conselho": "Trate o fim como fim e cuide primeiro do básico."
+  },
+  {
+    "id": "espadas-11",
+    "nome": "Valete de Espadas",
+    "nome_en": "Page of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 11,
+    "palavras_chave": [
+      "observação",
+      "agilidade",
+      "pergunta"
+    ],
+    "significado_normal": "O jovem atento ao vento representa curiosidade, vigilância e busca de informações.",
+    "significado_invertido": "Fofoca, nervosismo ou respostas apressadas podem distorcer fatos.",
+    "amor": "Pergunte por curiosidade e respeito, sem interrogar.",
+    "trabalho": "Confirme a fonte de uma informação antes de agir.",
+    "conselho": "Troque uma conclusão rápida por uma pergunta específica."
+  },
+  {
+    "id": "espadas-12",
+    "nome": "Cavaleiro de Espadas",
+    "nome_en": "Knight of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 12,
+    "palavras_chave": [
+      "determinação",
+      "velocidade",
+      "confronto"
+    ],
+    "significado_normal": "O cavaleiro avança com uma ideia clara e pouco tempo para ponderar.",
+    "significado_invertido": "Precipitação ou retórica agressiva torna o movimento menos eficaz.",
+    "amor": "Expresse sua posição sem atropelar o tempo de resposta do outro.",
+    "trabalho": "Teste decisões rápidas contra o impacto sobre quem vai executá-las.",
+    "conselho": "Faça uma checagem antes de partir para o confronto."
+  },
+  {
+    "id": "espadas-13",
+    "nome": "Rainha de Espadas",
+    "nome_en": "Queen of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 13,
+    "palavras_chave": [
+      "discernimento",
+      "honestidade",
+      "autonomia"
+    ],
+    "significado_normal": "A rainha usa a espada para separar clareza de ilusão sem abandonar a experiência emocional.",
+    "significado_invertido": "Ressentimento ou severidade pode tornar o julgamento inflexível.",
+    "amor": "Fale com honestidade e deixe espaço para a versão alheia.",
+    "trabalho": "Aplique critérios claros e dê retorno direto sem humilhar.",
+    "conselho": "Nomeie o limite sem transformar a pessoa no problema."
+  },
+  {
+    "id": "espadas-14",
+    "nome": "Rei de Espadas",
+    "nome_en": "King of Swords",
+    "arcano": "menor",
+    "naipe": "espadas",
+    "numero": 14,
+    "palavras_chave": [
+      "razão",
+      "autoridade",
+      "estratégia"
+    ],
+    "significado_normal": "O rei representa autoridade intelectual, critérios claros e julgamento fundamentado.",
+    "significado_invertido": "Frieza ou manipulação de argumentos usa a razão para dominar a conversa.",
+    "amor": "Equilibre lógica e vulnerabilidade ao discutir acordos.",
+    "trabalho": "Tome decisões com base em dados e explique os critérios.",
+    "conselho": "Use a firmeza para esclarecer o assunto e não para encerrar a escuta."
+  },
+  {
+    "id": "ouros-1",
+    "nome": "Ás de Ouros",
+    "nome_en": "Ace of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 1,
+    "palavras_chave": [
+      "oportunidade",
+      "recursos",
+      "semente"
+    ],
+    "significado_normal": "A mão com a moeda aponta para uma oportunidade material que precisa ser cultivada.",
+    "significado_invertido": "Oportunidade mal planejada ou foco excessivo no ganho pode desperdiçar o recurso.",
+    "amor": "Demonstre afeto com um gesto concreto e sustentável.",
+    "trabalho": "Avalie recursos e viabilidade antes de iniciar um projeto.",
+    "conselho": "Transforme a oportunidade em um primeiro compromisso realista."
+  },
+  {
+    "id": "ouros-2",
+    "nome": "Dois de Ouros",
+    "nome_en": "Two of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 2,
+    "palavras_chave": [
+      "adaptação",
+      "equilíbrio",
+      "prioridade"
+    ],
+    "significado_normal": "O malabarismo com as moedas indica administrar tarefas em um cenário que oscila.",
+    "significado_invertido": "Sobrecarga ou organização frágil deixa compromissos importantes cair.",
+    "amor": "Distribuam tempo e atenção com acordos claros em vez de improviso constante.",
+    "trabalho": "Renegocie prazos e reduza o número de frentes abertas.",
+    "conselho": "Escolha uma prioridade e adie algo menos importante."
+  },
+  {
+    "id": "ouros-3",
+    "nome": "Três de Ouros",
+    "nome_en": "Three of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 3,
+    "palavras_chave": [
+      "colaboração",
+      "técnica",
+      "aprendizado"
+    ],
+    "significado_normal": "O artesão e seus interlocutores mostram trabalho conjunto e aperfeiçoamento de uma habilidade.",
+    "significado_invertido": "Papéis confusos ou pouca atenção à qualidade dificultam o esforço coletivo.",
+    "amor": "Reconheçam as diferentes habilidades que cada um traz para a vida em comum.",
+    "trabalho": "Alinhe papéis e critérios de qualidade antes de entregar.",
+    "conselho": "Peça retorno específico sobre algo que deseja melhorar."
+  },
+  {
+    "id": "ouros-4",
+    "nome": "Quatro de Ouros",
+    "nome_en": "Four of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 4,
+    "palavras_chave": [
+      "segurança",
+      "posse",
+      "controle"
+    ],
+    "significado_normal": "A figura agarrada às moedas protege reservas e enfrenta o custo de mantê-las fechadas.",
+    "significado_invertido": "Apego ou gasto impulsivo pode substituir uma gestão tranquila dos recursos.",
+    "amor": "Observe quando a necessidade de segurança virou possessividade.",
+    "trabalho": "Proteja recursos sem travar delegação e investimento em habilidade.",
+    "conselho": "Defina quanto quer preservar e onde pode abrir espaço."
+  },
+  {
+    "id": "ouros-5",
+    "nome": "Cinco de Ouros",
+    "nome_en": "Five of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 5,
+    "palavras_chave": [
+      "escassez",
+      "exclusão",
+      "apoio"
+    ],
+    "significado_normal": "As figuras no frio evocam dificuldade e a possibilidade de ajuda que passa despercebida.",
+    "significado_invertido": "Reconhecer uma rede de apoio pode aliviar a dificuldade; isolamento prolonga a escassez.",
+    "amor": "Falem do que está faltando antes de se isolarem na mesma casa.",
+    "trabalho": "Procure recursos disponíveis e descreva o tipo de apoio necessário.",
+    "conselho": "Peça ajuda concreta a alguém em quem confia."
+  },
+  {
+    "id": "ouros-6",
+    "nome": "Seis de Ouros",
+    "nome_en": "Six of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 6,
+    "palavras_chave": [
+      "generosidade",
+      "troca",
+      "equidade"
+    ],
+    "significado_normal": "A balança ao lado das moedas sugere dar e receber com atenção às necessidades e ao poder.",
+    "significado_invertido": "Favor condicionado ou desequilíbrio nas trocas pode criar dependência ou ressentimento.",
+    "amor": "Conversem sobre o que cada um oferece sem transformar cuidado em dívida.",
+    "trabalho": "Divida recursos com critérios transparentes e sem favores ocultos.",
+    "conselho": "Antes de aceitar ajuda, esclareça o que se espera em troca."
+  },
+  {
+    "id": "ouros-7",
+    "nome": "Sete de Ouros",
+    "nome_en": "Seven of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 7,
+    "palavras_chave": [
+      "paciência",
+      "avaliação",
+      "cultivo"
+    ],
+    "significado_normal": "A figura observa a colheita e avalia o retorno de um trabalho que leva tempo.",
+    "significado_invertido": "Impaciência ou esforço mal direcionado pode pedir uma revisão da estratégia.",
+    "amor": "Observe se os cuidados de ambos estão gerando mudanças ao longo do tempo.",
+    "trabalho": "Revise resultados intermediários antes de insistir na mesma abordagem.",
+    "conselho": "Defina quando avaliará o progresso e quais sinais observar."
+  },
+  {
+    "id": "ouros-8",
+    "nome": "Oito de Ouros",
+    "nome_en": "Eight of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 8,
+    "palavras_chave": [
+      "prática",
+      "dedicação",
+      "ofício"
+    ],
+    "significado_normal": "O artesão repete o trabalho com atenção e transforma esforço em competência.",
+    "significado_invertido": "Perfeccionismo ou repetição mecânica reduz o aprendizado e gasta energia.",
+    "amor": "Trate bons hábitos de convivência como algo que se pratica.",
+    "trabalho": "Divida uma habilidade em etapas e pratique com feedback.",
+    "conselho": "Melhore um detalhe que possa repetir com consistência."
+  },
+  {
+    "id": "ouros-9",
+    "nome": "Nove de Ouros",
+    "nome_en": "Nine of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 9,
+    "palavras_chave": [
+      "autonomia",
+      "conforto",
+      "recompensa"
+    ],
+    "significado_normal": "O jardim cultivado e a figura autônoma indicam desfrutar resultados de disciplina e cuidado.",
+    "significado_invertido": "Aparência de conforto pode esconder dependência ou trabalho excessivo para mantê-la.",
+    "amor": "Preserve sua autonomia e valorize encontros escolhidos livremente.",
+    "trabalho": "Reconheça o que conquistou e verifique se o ritmo é sustentável.",
+    "conselho": "Separe tempo para aproveitar algo que você construiu."
+  },
+  {
+    "id": "ouros-10",
+    "nome": "Dez de Ouros",
+    "nome_en": "Ten of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 10,
+    "palavras_chave": [
+      "legado",
+      "continuidade",
+      "segurança"
+    ],
+    "significado_normal": "O pátio com gerações diferentes simboliza patrimônio compartilhado e continuidade.",
+    "significado_invertido": "Conflitos sobre recursos, herança simbólica ou prioridades fragilizam o que foi construído.",
+    "amor": "Conversem sobre projetos de longo prazo e sobre quem decide o quê.",
+    "trabalho": "Documente e transfira conhecimento que o grupo precisa preservar.",
+    "conselho": "Examine se seus acordos de hoje sustentam o futuro desejado."
+  },
+  {
+    "id": "ouros-11",
+    "nome": "Valete de Ouros",
+    "nome_en": "Page of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 11,
+    "palavras_chave": [
+      "estudo",
+      "diligência",
+      "começo"
+    ],
+    "significado_normal": "O jovem examina a moeda com atenção e se dispõe a aprender uma habilidade útil.",
+    "significado_invertido": "Distração ou falta de prática impede transformar interesse em resultado.",
+    "amor": "Mostre interesse com pequenos gestos que possam ser repetidos.",
+    "trabalho": "Escolha uma competência e pratique com um objetivo concreto.",
+    "conselho": "Estude o suficiente para executar um passo simples."
+  },
+  {
+    "id": "ouros-12",
+    "nome": "Cavaleiro de Ouros",
+    "nome_en": "Knight of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 12,
+    "palavras_chave": [
+      "constância",
+      "método",
+      "responsabilidade"
+    ],
+    "significado_normal": "O cavaleiro parado indica progresso regular e disposição para cumprir o combinado.",
+    "significado_invertido": "Rigidez ou monotonia pode transformar disciplina em imobilidade.",
+    "amor": "Valorize a confiabilidade e encontre uma forma nova de demonstrar carinho.",
+    "trabalho": "Use uma rotina estável e revise o que virou burocracia.",
+    "conselho": "Mantenha um hábito útil e ajuste o que já perdeu a função."
+  },
+  {
+    "id": "ouros-13",
+    "nome": "Rainha de Ouros",
+    "nome_en": "Queen of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 13,
+    "palavras_chave": [
+      "cuidado prático",
+      "estabilidade",
+      "nutrição"
+    ],
+    "significado_normal": "A rainha cuida da moeda e do jardim com atenção, tornando recursos úteis à vida cotidiana.",
+    "significado_invertido": "Negligência das próprias necessidades ou sobrecarga doméstica desequilibra o cuidado.",
+    "amor": "Distribuam tarefas e encontrem formas concretas de apoio mútuo.",
+    "trabalho": "Crie um ambiente de trabalho em que os recursos estejam à mão.",
+    "conselho": "Faça por si um cuidado que costuma guardar só para os outros."
+  },
+  {
+    "id": "ouros-14",
+    "nome": "Rei de Ouros",
+    "nome_en": "King of Pentacles",
+    "arcano": "menor",
+    "naipe": "ouros",
+    "numero": 14,
+    "palavras_chave": [
+      "prosperidade",
+      "gestão",
+      "consistência"
+    ],
+    "significado_normal": "O rei em meio às vinhas representa estabilidade construída com gestão paciente dos recursos.",
+    "significado_invertido": "Materialismo ou controle excessivo pode transformar estabilidade em apego.",
+    "amor": "Conversem sobre segurança material junto do afeto e do tempo disponível.",
+    "trabalho": "Proteja recursos e invista esforço na continuidade do projeto.",
+    "conselho": "Avalie se a decisão serve à estabilidade que você de fato deseja."
+  }
+]

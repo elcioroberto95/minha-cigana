@@ -1,7 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
+import { maxChatHistory } from './chat-config.js';
 import { isVisitorRecordId } from '../visitor/visitor-identity.js';
 
 const topics = ['love', 'money', 'work', 'future', 'spirituality', 'general'] as const;
+
+export type ChatLocale = 'pt-BR' | 'en-US';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; model?: string };
 
@@ -43,6 +46,6 @@ export function readChatInput(body: unknown) {
   const supportedLocale = (['pt-BR', 'en-US'] as const).find((value) => value === locale);
   if (!supportedLocale) invalid();
   if (dailyCardId !== undefined && !isVisitorRecordId(dailyCardId)) invalid();
-  const previous = readMessages(history, 8).map(({ role, content }) => ({ role, content }));
+  const previous = readMessages(history, maxChatHistory).map(({ role, content }) => ({ role, content }));
   return { locale: supportedLocale, topic: readTopic(topic), message: readText(message, 500), history: previous, dailyCardId };
 }

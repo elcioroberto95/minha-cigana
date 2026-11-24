@@ -1,4 +1,12 @@
 export const ptBR = {
+  yesNoSpread: "Sim ou Não",
+  revealSpread: "Revelar cartas",
+  revealingSpread: "Revelando as cartas…",
+  interpretingSpread: "Esmeralda está interpretando as cartas…",
+  reversedCard: "Invertida",
+  drawError: "Não foi possível carregar a tiragem. Tente de novo.",
+  interpretationError: "Não foi possível interpretar agora. Suas cartas ficaram guardadas para tentar de novo.",
+  entertainmentNotice: "Para fins de entretenimento.",
   signOut: "Sair da conta",
   signOutFailed: "Não foi possível sair da conta. Tente de novo.",
   registrationIntro: "Crie uma conta para acessar suas conversas salvas também em outros aparelhos.",
@@ -107,7 +115,7 @@ export const ptBR = {
   dailyOffer: "Pacote de sete cartas",
   dailyOfferIntro: "O pacote dá acesso a sete novas tiragens da Carta do Dia. O limite continua sendo uma nova tiragem por dia.",
   buy: "Comprar",
-  tenIntro: "Uma tiragem aprofundada com três pontos fortes, três desafios e uma reflexão sobre o futuro.",
+  tenIntro: "Uma tiragem de dez cartas para explorar a questão, suas influências e possíveis desdobramentos.",
   personalityIntro: "Reflita sobre seus pontos fortes, padrões e próximos passos a partir de perguntas sobre o momento atual.",
   personalityStart: "Ver perguntas",
   purchaseUnavailable: "As compras ainda estão indisponíveis.",
@@ -160,10 +168,18 @@ export const ptBR = {
   startBeta: 'Começar leitura beta',
   dailyCard: 'Carta do Dia',
   personalityReading: 'Leitura de personalidade',
-  tenCardReading: 'Tiragem de dez cartas',
+  tenCardReading: 'Cruz Celta',
 };
 
 export const enUS = {
+  yesNoSpread: "Yes or No",
+  revealSpread: "Reveal cards",
+  revealingSpread: "Revealing the cards…",
+  interpretingSpread: "Esmeralda is interpreting the cards…",
+  reversedCard: "Reversed",
+  drawError: "Could not load the spread. Please try again.",
+  interpretationError: "Could not interpret the spread right now. Your cards are saved so you can try again.",
+  entertainmentNotice: "For entertainment purposes.",
   signOut: "Sign out",
   signOutFailed: "Could not sign out. Please try again.",
   registrationIntro: "Create an account to access your saved conversations on other devices.",
@@ -325,5 +341,5 @@ export const enUS = {
   startBeta: 'Start beta reading',
   dailyCard: 'Card of the Day',
   personalityReading: 'Personality reading',
-  tenCardReading: 'Ten-card reading',
+  tenCardReading: 'Celtic Cross',
 } satisfies Record<keyof typeof ptBR, string>;

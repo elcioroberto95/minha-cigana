@@ -1,5 +1,5 @@
-import { ReadingResult } from '../../../features/reading/ReadingScreens';
+import { TarotReadingScreen } from '../../../features/reading/TarotReadingScreen';
 
 export default function ResultRoute() {
-  return <ReadingResult format="dez-cartas" />;
+  return <TarotReadingScreen format="dez-cartas" />;
 }

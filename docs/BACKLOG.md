@@ -133,6 +133,31 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Próxima ação:** testar em Android e iOS e repetir a consulta com o modelo real disponível antes do beta.
 - **Revisão:** [PR #5](https://github.com/elcioroberto95/minha-cigana/pull/5).
 
+## ESM-07 — Mostrar o carregamento da Consulta
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-07/loader-consulta`.
+- **Dependências:** ESM-03. [Decisão 007](DECISOES.md#007--ollama-como-provedor-inicial-de-respostas).
+- **Aceite:** mostrar um indicador animado junto ao envio enquanto aguarda a API. Retirar o indicador ao receber a resposta ou falhar e manter o rascunho disponível para reenvio após falha.
+- **Evidências:** TypeScript, lint e exportação web passaram. No Chrome, com resposta controlada, o indicador ficou visível e o botão de envio ficou desativado enquanto aguardava. O indicador sumiu ao receber a resposta. Em resposta 503, o erro apareceu junto ao envio, com rascunho preservado e reenvio disponível.
+- **Desempenho:** solicitar ao Ollama que mantenha o modelo em memória por 30 minutos por padrão e registrar tokens de prompt reutilizados quando o provedor informar.
+- **Evidências de desempenho:** os 16 testes da API passaram com PostgreSQL real. O substituto do Ollama confirmou `keep_alive: 30m` e o campo `prompt_cached_tokens` no log. No Ollama local, uma consulta curta com o modelo carregado respondeu em 7 s e `/api/ps` confirmou 30 minutos de retenção. O ensaio com duas perguntas do mesmo tema excedeu o tempo de medição. A API da prévia foi recompilada e reiniciada.
+- **Próxima ação:** medir o ganho por tema com mais amostras e revisar o indicador em Android e iOS.
+- **Revisão:** [PR #6](https://github.com/elcioroberto95/minha-cigana/pull/6).
+
+## ESM-08 — Firmar a persona e interpretar tiragens
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-08/esmeralda-e-tarot`, com as alterações locais da ESM-07 preservadas.
+- **Dependências e decisões:** ESM-03, ESM-06, ESM-07 e [decisão 011](DECISOES.md#011--persona-e-tiragens-da-esmeralda).
+- **Aceite:** gerar com o modelo `esmeralda`, enviar exemplo e histórico limitado, corrigir uma quebra de personagem uma vez e impedir que uma segunda quebra conhecida chegue à interface. Sortear e guardar as três modalidades pelo backend, enviar apenas os significados da orientação sorteada e revelar as cartas antes do texto.
+- **Evidências:** passaram TypeScript, lint e exportação web. Os 20 testes da API passaram com PostgreSQL real. A integração verificou apenas os significados da orientação sorteada, retry de falha sem novo sorteio, persistência e proteção de proprietário. O teste de chat passou novamente com a frase exata de quebra relatada.
+- **Prévia:** migração 006 aplicada. O Ollama local confirmou o modelo `esmeralda` com contexto 8192, temperatura 0,8, top-p 0,9 e penalidade 1,1. Os três formatos retornaram 3, 1 e 10 cartas distintas pela API local. No Chrome, a tiragem de três cartas revelou nomes, posições e orientações antes do carregamento da interpretação.
+- **CI:** duas execuções passaram no lint, TypeScript, API e exportação web, mas o Chrome excedeu 30 segundos na abertura. A verificação passou a esperar o texto renderizado pelo navegador.
+- **Validação pendente:** o Ollama real em CPU excedeu 90 segundos nas duas tentativas de interpretação. As cartas ficaram guardadas e a interpretação permanece disponível para nova tentativa. A validação do texto com o modelo real e em Android e iOS segue pendente.
+- **Próxima ação:** validar a qualidade da interpretação com inferência real em um ambiente que conclua a geração no tempo da Consulta.
+- **Revisão:** [PR #6](https://github.com/elcioroberto95/minha-cigana/pull/6).
+
 ## Modelo de tarefa
 
 Crie a tarefa com ID, estado, escopo e aceite. Preencha os demais campos conforme o trabalho avança. Atualize a mesma entrada na retomada. O Git conserva o histórico.
