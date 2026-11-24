@@ -8,7 +8,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "test": "node --test test/*.test.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.evals.json",
     "pretest": "npm run build",
     "migrate": "node scripts/migrate.mjs"
   },
