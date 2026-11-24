@@ -61,7 +61,8 @@ export function PrivacyScreen() {
     <Title>{t('privacy')}</Title>
     <Panel>
       <Copy emphasis>{t('saveHistory')}</Copy>
-      <Copy>{t('saveHistoryIntro')}</Copy>
+      <Copy>{t('saveConversationPrivacy')}</Copy>
+      <Button label={t('history')} secondary onPress={() => router.navigate('/historico')} />
     </Panel>
     <Panel>
       <Copy emphasis>{t('memory')}</Copy>

@@ -53,7 +53,15 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 
 - **Data e estado:** 2026-11-23, Aceita para a integração local.
 - **Decisão.** A Consulta pede respostas ao NestJS, que usa o Ollama com modelo configurado em `OLLAMA_MODEL`. O backend aplica a persona, o idioma e o contexto recente. A configuração do modelo pode mudar independentemente da interface.
+- **Desenvolvimento.** O [Compose](../compose.yaml) fixa a imagem por digest e monta um volume de modelos. A porta é publicada apenas no loopback e os recursos de nuvem do Ollama estão desativados.
 - **Consequência.** Indisponibilidade é apresentada na Consulta e preserva o rascunho. A escolha do modelo do beta depende de avaliação de qualidade e latência. A [decisão 006](#006--persistência-portátil-e-inferência-local) segue em proposta quanto ao armazenamento.
+
+## 008 — Histórico de visitante no PostgreSQL
+
+- **Data e estado:** 2026-11-24, Aceita para o ambiente de desenvolvimento.
+- **Decisão.** PostgreSQL guarda as sessões e mensagens quando o visitante seleciona **Salvar esta conversa**. A API separa proprietários por uma credencial aleatória do cliente e guarda seu hash. O aplicativo guarda a credencial no SecureStore nativo e no armazenamento do navegador na web.
+- **Consequência.** A Consulta existente segue usando Ollama. A abertura ou exclusão do histórico verifica o proprietário. A primeira entrega permite leitura e exclusão no mesmo aparelho ou navegador. Conta, sincronização, memória entre consultas e controles de publicação ficam para etapas futuras.
+- **Operação.** Migrações SQL explícitas, com controle de checksum. O histórico usa um volume de PostgreSQL separado do volume de modelos. [Instruções locais](../README.md#histórico-local-com-postgresql).
 
 ## Modelo de decisão
 

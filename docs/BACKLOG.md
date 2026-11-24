@@ -73,10 +73,15 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-02 — Definir o primeiro release e persistir sessões e mensagens
 
-- **Estado:** Planejada.
+- **Estado:** Em andamento.
 - **Depende de:** M1-06 e ESM-01.
 - **Escopo:** definir o manifesto de release, a identidade do visitante e o esquema inicial. Resolver as escolhas de persistência e autenticação da [decisão 006](DECISOES.md#006--persistência-portátil-e-inferência-local).
 - **Aceite:** criar uma sessão com mensagens, consultar pela identidade proprietária, reiniciar a API, aplicar uma migração aditiva e verificar que os mesmos dados continuam disponíveis.
+- **Branch:** `feat/nest-mobile-foundation`.
+- **Progresso:** PostgreSQL no Compose, migrações de sessão e mensagem, salvamento explícito e histórico por visitante. O manifesto formal de primeiro release segue em preparação. [Decisão 008](DECISOES.md#008--histórico-de-visitante-no-postgresql).
+- **Evidências:** oito testes HTTP com PostgreSQL 17 passaram. Um registro criado antes da migração `002` continuou acessível. Uma sessão salva foi reaberta após reiniciar o NestJS, permaneceu isolada de outro visitante e teve as mensagens removidas na exclusão. As migrações locais passaram na primeira e na segunda execução.
+- **Interface:** lint, TypeScript e exportação web passaram. No Chrome, uma consulta permaneceu fora do histórico até o salvamento explícito. O registro salvo abriu após recarregar o navegador e desapareceu após a exclusão. O teste da interface usou PostgreSQL real e respostas simuladas de inferência.
+- **Próxima ação:** verificar a credencial do visitante em aparelhos Android e iOS e preparar o manifesto do primeiro release.
 
 ## ESM-03 — Conectar a Consulta ao Ollama
 
@@ -85,7 +90,8 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Escopo:** conectar as telas existentes ao `POST /api/chat`, usando persona da Madame Esmeralda e modelo configurável na API. O contexto recente fica em memória e pode ser enviado a cada mensagem. [Decisão 007](DECISOES.md#007--ollama-como-provedor-inicial-de-respostas).
 - **Aceite:** a resposta do provedor aparece na Consulta. Entrada inválida é rejeitada e falhas do provedor preservam a mensagem para nova tentativa.
 - **Evidências:** lint, tipos e seis testes HTTP aprovados. No Chrome, usando a exportação web e um substituto local do Ollama, passaram envio, resposta, contexto na mensagem seguinte, preservação do rascunho na falha e reenvio.
-- **Próxima ação:** validar com Ollama e um modelo real, medir tempo de resposta em português e integrar a persistência em ESM-02.
+- **Evidência com o modelo real (24/11/2026):** o Ollama 0.40.17 rodou em CPU no Docker Desktop. O Compose publicou a porta em `127.0.0.1:11434` e o modelo `qwen2.5:1.5b` (ID `65ec06548149`) continuou listado após recriar o container. Na Consulta exportada para web, o Chrome recebeu duas respostas em português pelo NestJS. A segunda recuperou o nome “Ipê Azul” da primeira mensagem. O tempo até exibir cada resposta foi de 35,8 s e 4,0 s em uma única conversa. A avaliação de qualidade e desempenho do beta segue pendente.
+- **Próxima ação:** integrar a persistência em ESM-02.
 
 ## Modelo de tarefa
 

@@ -2,13 +2,13 @@ import { BadRequestException } from '@nestjs/common';
 
 const topics = ['love', 'money', 'work', 'future', 'spirituality', 'general'] as const;
 
-export type ChatMessage = { role: 'user' | 'assistant'; content: string };
+type ChatMessage = { role: 'user' | 'assistant'; content: string; model?: string };
 
 function invalid(): never {
   throw new BadRequestException({ error: 'invalid_chat_request' });
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
+export function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
@@ -19,18 +19,27 @@ function readText(value: unknown, max: number) {
   return text;
 }
 
+export function readTopic(topic: unknown) {
+  const selectedTopic = topics.find((option) => option === topic);
+  if (!selectedTopic) invalid();
+  return selectedTopic;
+}
+
+export function readMessages(history: unknown, limit: number): ChatMessage[] {
+  if (!Array.isArray(history) || history.length > limit || history.length % 2 !== 0) invalid();
+  return history.map((entry: unknown, index): ChatMessage => {
+    const role = index % 2 === 0 ? 'user' : 'assistant';
+    if (!isObject(entry) || entry.role !== role) invalid();
+    const model = role === 'assistant' && typeof entry.model === 'string' && entry.model.length <= 200
+      ? entry.model : undefined;
+    return { role, content: readText(entry.content, role === 'user' ? 500 : 2000), model };
+  });
+}
+
 export function readChatInput(body: unknown) {
   if (!isObject(body)) invalid();
   const { locale, topic, message, history = [] } = body;
   if (locale !== 'pt-BR' && locale !== 'en-US') invalid();
-  const selectedTopic = topics.find((option) => option === topic);
-  if (!selectedTopic || !Array.isArray(history) || history.length > 8 || history.length % 2 !== 0) invalid();
-
-  const previous = history.map((entry: unknown, index): ChatMessage => {
-    const role = index % 2 === 0 ? 'user' : 'assistant';
-    if (!isObject(entry) || entry.role !== role) invalid();
-    return { role, content: readText(entry.content, role === 'user' ? 500 : 2000) };
-  });
-
-  return { locale, topic: selectedTopic, message: readText(message, 500), history: previous };
+  const previous = readMessages(history, 8).map(({ role, content }) => ({ role, content }));
+  return { locale, topic: readTopic(topic), message: readText(message, 500), history: previous };
 }

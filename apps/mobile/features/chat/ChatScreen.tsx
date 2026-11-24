@@ -1,8 +1,10 @@
+import { randomUUID } from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
+import { saveConversation, savedMessageLimit } from '../history/history-api';
 import { isTopic, type Topic } from '../tarot/domain';
 import { TopicPicker } from '../tarot/TopicPicker';
 import { requestReply, type ChatMessage } from './chat-api';
@@ -19,6 +21,9 @@ export default function ChatScreen() {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [pending, setPending] = useState('');
   const [failed, setFailed] = useState(false);
+  const [savedLength, setSavedLength] = useState(0);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'error'>('idle');
+  const sessionId = useRef<string | null>(null);
   const activeRequest = useRef<AbortController | null>(null);
 
   useEffect(() => () => activeRequest.current?.abort(), []);
@@ -32,18 +37,30 @@ export default function ChatScreen() {
     setFailed(false);
 
     try {
-      const reply = await requestReply({
+      const { reply, model } = await requestReply({
         locale: i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'pt-BR',
         topic, message, history: history.slice(-8),
       }, controller.signal);
       if (controller.signal.aborted) return;
-      setHistory([...history, { role: 'user', content: message }, { role: 'assistant', content: reply }]);
+      setHistory([...history, { role: 'user', content: message }, { role: 'assistant', content: reply, model }]);
       setQuestion('');
     } catch {
       if (!controller.signal.aborted) setFailed(true);
     } finally {
       activeRequest.current = null;
       if (!controller.signal.aborted) setPending('');
+    }
+  }
+
+  async function save() {
+    setSaveStatus('saving');
+    try {
+      sessionId.current ??= randomUUID();
+      await saveConversation(sessionId.current, topic, history);
+      setSavedLength(history.length);
+      setSaveStatus('idle');
+    } catch {
+      setSaveStatus('error');
     }
   }
 
@@ -72,6 +89,14 @@ export default function ChatScreen() {
       <View style={styles.action}><Button label={t('record')} secondary disabled /></View>
       <View style={styles.action}><Button label={t('send')} disabled={!!pending || !question.trim()} onPress={() => void send()} /></View>
     </View>
+    {history.length > 0 && <Panel>
+      <Copy>{t(history.length > savedMessageLimit ? 'conversationTooLong' : 'saveConversationPrivacy')}</Copy>
+      <Button label={t(history.length === savedLength ? 'conversationSaved' : 'saveConversation')} secondary
+        disabled={!!pending || saveStatus === 'saving' || history.length === savedLength || history.length > savedMessageLimit}
+        onPress={() => void save()} />
+      {saveStatus === 'saving' && <Copy>{t('savingConversation')}</Copy>}
+      {saveStatus === 'error' && <Copy>{t('saveConversationError')}</Copy>}
+    </Panel>}
     <Button label={t('threeCards')} secondary onPress={() => router.push({
       pathname: '/leituras/beta',
       params: { topic, from: 'chat' },
