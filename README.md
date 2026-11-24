@@ -42,6 +42,42 @@ Use `docker compose ps` para ver a saúde do container e `docker compose exec -T
 
 As próximas integrações de tarô usam `POST /api/tarot/draw` e `POST /api/tarot/interpret`.
 
+## Acompanhar a latência da Consulta
+
+Envie uma mensagem pela Consulta e veja o terminal do NestJS. O interceptor global mede as rotas que chegam aos controladores e devolve `X-Request-ID`. Procure o mesmo valor em `request_id` nos logs JSON:
+
+| Evento | O que mede |
+| --- | --- |
+| `http.request.completed` | `duration_ms` mede do início do interceptor até a resposta terminar. `status` informa o código final. Conexões encerradas antes da resposta ficam com `aborted: true` e `499` na telemetria. |
+| `ollama.chat.completed` | `duration_ms` cobre configuração, chamada ao Ollama e leitura da resposta pelo NestJS. O evento registra sucesso ou a categoria da falha. |
+
+Quando o Ollama fornece suas próprias medidas, o log também inclui `ollama_total_ms`, `model_load_ms`, `prompt_eval_ms` e `generation_ms`. O Ollama devolve essas medidas em nanossegundos. A API divide por um milhão para registrá-las em milissegundos. Como a Consulta espera o JSON completo, esses eventos permitem investigar a duração total. Para medir até a primeira palavra seria preciso receber partes da resposta. Os eventos registram metadados operacionais e deixam de fora o texto da conversa e as credenciais. [Resposta da API de chat do Ollama](https://docs.ollama.com/api/chat).
+
+O interceptor usa o template da rota, como `/api/history/:id`, e mantém o ID disponível durante a execução assíncrona. URL sem rota, JSON rejeitado pelo Express e outras falhas anteriores à execução do interceptor ficam fora desta instrumentação. [Interceptors no NestJS](https://docs.nestjs.com/interceptors).
+
+### Métricas no Prometheus
+
+```powershell
+docker compose up -d --wait prometheus
+```
+
+Defina `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:9090/api/v1/otlp/v1/metrics` em `apps/api/.env` e reinicie o NestJS. A API exporta métricas via OpenTelemetry a cada 10 segundos. O Prometheus fica em `http://127.0.0.1:9090` e armazena até sete dias em um volume próprio. Gere algumas consultas e cole as expressões abaixo na página de consultas. A janela de cinco minutos precisa de amostras suficientes para calcular taxas. [OpenTelemetry no Prometheus](https://prometheus.io/docs/guides/opentelemetry/).
+
+| Sinal | Consulta PromQL | Como ler |
+| --- | --- | --- |
+| Tráfego | `sum by (route, status_code) (rate(cigana_http_requests_total[5m]))` | Requisições concluídas por segundo, separadas por rota e status. |
+| Erros | `(sum(rate(cigana_http_requests_total{route="/api/chat",status_class="5xx"}[5m])) or vector(0)) / sum(rate(cigana_http_requests_total{route="/api/chat"}[5m]))` | Fração de falhas do servidor na Consulta. Sem tráfego, a razão fica indefinida. |
+| Latência | `histogram_quantile(0.95, sum by (route, le) (rate(cigana_http_request_duration_seconds_bucket{status_class="2xx"}[5m])))` | P95 em segundos por rota para respostas bem-sucedidas. O histograma estima o valor por faixa. |
+| Saturação | `sum(cigana_ollama_in_flight)` | Quantidade de chamadas abertas entre a API e o Ollama. Aumento sustentado com latência crescente pode indicar pressão na inferência. A série inclui processamento e espera, sem medir a fila interna do Ollama. |
+
+| Onde investigar | Séries complementares |
+| --- | --- |
+| API | `cigana_http_in_flight`, `cigana_api_event_loop_delay_p99_seconds` e `cigana_api_resident_memory_bytes` |
+| Ollama | `cigana_ollama_requests_total` e `cigana_ollama_request_duration_seconds_bucket` por resultado, `cigana_ollama_stage_duration_seconds_bucket` por etapa e `cigana_ollama_tokens_total` por tipo |
+| PostgreSQL | `cigana_history_database_operations_total` e `cigana_history_database_duration_seconds_bucket` por operação do histórico, `cigana_history_pool_connections` por estado e `cigana_history_pool_waiting` |
+
+Os rótulos são categorias operacionais. O `request_id` fica nos logs para localizar um atendimento específico.
+
 ## Histórico local com PostgreSQL
 
 ```powershell

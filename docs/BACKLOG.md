@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [M1-06 — Revisar a base NestJS e as telas mobile](#m1-06--revisar-a-base-nestjs-e-as-telas-mobile)
+**Próxima tarefa:** [ESM-04 — Medir latência e falhas na Consulta](#esm-04--medir-latência-e-falhas-na-consulta)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -92,6 +92,16 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Evidências:** lint, tipos e seis testes HTTP aprovados. No Chrome, usando a exportação web e um substituto local do Ollama, passaram envio, resposta, contexto na mensagem seguinte, preservação do rascunho na falha e reenvio.
 - **Evidência com o modelo real (24/11/2026):** o Ollama 0.40.17 rodou em CPU no Docker Desktop. O Compose publicou a porta em `127.0.0.1:11434` e o modelo `qwen2.5:1.5b` (ID `65ec06548149`) continuou listado após recriar o container. Na Consulta exportada para web, o Chrome recebeu duas respostas em português pelo NestJS. A segunda recuperou o nome “Ipê Azul” da primeira mensagem. O tempo até exibir cada resposta foi de 35,8 s e 4,0 s em uma única conversa. A avaliação de qualidade e desempenho do beta segue pendente.
 - **Próxima ação:** integrar a persistência em ESM-02.
+
+## ESM-04 — Medir latência e falhas na Consulta
+
+- **Estado:** Em revisão.
+- **Depende de:** ESM-03, integrado pelo [PR #3](https://github.com/elcioroberto95/minha-cigana/pull/3).
+- **Branch:** `feat/chat-observability`.
+- **Aceite:** correlacionar a resposta HTTP e os eventos do NestJS e do Ollama pelo `X-Request-ID`. Registrar status final e duração por rota, categoria de falha do provedor e tempo de cada etapa quando informado pelo Ollama.
+- **Escopo:** interceptor HTTP global e métricas de inferência, banco e processo via OpenTelemetry. Consultas de tráfego, falhas, latência e saturação disponíveis no Prometheus local.
+- **Evidências:** 12 testes da API passaram, incluindo correlação em requisições simultâneas, template da rota, desconexão do cliente e isolamento do histórico com PostgreSQL real. O ensaio no Prometheus real confirmou contadores HTTP, histogramas, tokens e etapas do Ollama, métricas do pool e das operações de histórico e memória e atraso do event loop. Para controlar as durações e falhas, o ensaio de métricas usou um Ollama simulado.
+- **Próxima ação:** observar uma janela de tráfego real para definir a linha de base e limites de alerta.
 
 ## Modelo de tarefa
 
