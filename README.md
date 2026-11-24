@@ -36,6 +36,14 @@ Em cada PR, o GitHub Actions monta a imagem da API, aplica as migrações em um 
 
 A VPS usa o [comando SSH restrito](deploy/ssh-hook.sh) instalado em `/usr/local/sbin/cigana-deploy-hook` e as credenciais do banco em `/etc/cigana/compose.env`. O [script de deploy](deploy/release.sh) cria ou atualiza o modelo, aplica as migrações antes de trocar a API e tenta restaurar a imagem anterior se a nova falhar na checagem. As migrações precisam manter compatibilidade com a versão anterior durante a troca.
 
+## Beta HTTPS na VPS
+
+O [Caddyfile](deploy/Caddyfile) serve o Expo Web e encaminha a API pelo IP da VPS, usando um certificado público de curta duração com renovação automática. O host define `CIGANA_PUBLIC_IP` em `/etc/cigana/public.env`. O Caddy, com rede do host, lê o site via bind mount de `/opt/cigana/web` em `/srv`. O pipeline publica a API e o Expo Web do commit aprovado na main.
+
+Para builds móveis do beta, use as variáveis públicas `EXPO_PUBLIC_API_URL=https://IP_DA_VPS` e `EXPO_PUBLIC_REQUIRE_BETA_INVITE=1`. Cada convidado recebe em privado um código aleatório de 32 caracteres hexadecimais. Gere códigos com `openssl rand -hex 16`, calcule o SHA-256 do código sem quebra de linha, e armazene somente o hash em `BETA_INVITE_HASHES` dentro de `/etc/cigana/compose.env`. Use vírgulas para separar hashes. Remova o hash e recrie a API para revogar um convite. Os códigos são reutilizáveis pelo convidado durante o beta.
+
+Cada convite tem até 90 chamadas por minuto e até seis gerações no mesmo intervalo. A API atende até duas inferências simultâneas. A identidade de visitante ou conta continua controlando a propriedade dos dados. Preserve a rotina de backup fora da VPS e comprove a restauração antes de ampliar o beta.
+
 ## Chat com Ollama
 
 Com o Docker Desktop iniciado em modo Linux, rode os comandos abaixo na raiz. O [Compose](compose.yaml) fixa a imagem do Ollama, guarda os modelos em volume persistente e publica a porta apenas na máquina local. O `qwen2.5:1.5b` é o modelo inicial de teste. [Docker e Ollama](https://docs.ollama.com/docker) · [Modelo no Ollama](https://ollama.com/library/qwen2.5:1.5b).

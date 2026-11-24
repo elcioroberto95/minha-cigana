@@ -169,6 +169,13 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Verificações:** o [CI do PR](https://github.com/elcioroberto95/minha-cigana/actions/runs/45469364139) aprovou lint, TypeScript, testes da API, exportação web, abertura no Chrome, migrações e subida da API isolada. No Expo Web local a Consulta respondeu pela API da VPS. O [deploy automático](https://github.com/elcioroberto95/minha-cigana/actions/runs/45469705717) publicou o commit 48401c5 e confirmou a saúde do contêiner da API.
 - **Próxima ação:** usar a VPS pelo túnel durante o desenvolvimento. Acesso externo fica para quando HTTPS e os controles do beta estiverem disponíveis.
 
+## ESM-10 — Abrir o beta HTTPS e melhorar a Consulta
+
+- **Estado:** Em andamento.
+- **Branch:** `esm-10/consulta-e-beta`.
+- **Aceite:** abrir a API no IP da VPS com certificado público, recusar convites inválidos, limitar geração por convite e entregar resposta empática ao cenário relatado. O app usa a mesma URL HTTPS no beta web e nas builds móveis.
+- **Próxima ação:** validar o Expo e a Consulta pelo acesso HTTPS e acompanhar o deploy.
+
 ## Modelo de tarefa
 
 Crie a tarefa com ID, estado, escopo e aceite. Preencha os demais campos conforme o trabalho avança. Atualize a mesma entrada na retomada. O Git conserva o histórico.

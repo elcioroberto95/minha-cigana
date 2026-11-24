@@ -1,0 +1,44 @@
+{
+	admin off
+}
+
+https://{$CIGANA_PUBLIC_IP} {
+	tls {
+		issuer acme {
+			profile shortlived
+		}
+	}
+	request_body {
+		max_size 64KB
+	}
+	header Cache-Control "no-store"
+	@api path /api/*
+	handle @api {
+		route {
+			@check not method OPTIONS
+			forward_auth @check 127.0.0.1:3000 {
+				uri /api/beta/access
+				header_up X-Cigana-Public 1
+			}
+			reverse_proxy 127.0.0.1:3000 {
+				header_up X-Cigana-Public 1
+				transport http {
+					response_header_timeout 100s
+				}
+			}
+		}
+	}
+	handle /health {
+		reverse_proxy 127.0.0.1:3000 {
+			header_up X-Cigana-Public 1
+			transport http {
+				response_header_timeout 100s
+			}
+		}
+	}
+	handle {
+		root * /srv/current
+		try_files {path} /index.html
+		file_server
+	}
+}

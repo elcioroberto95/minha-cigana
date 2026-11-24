@@ -10,6 +10,7 @@ services:
       DATABASE_URL: postgresql://cigana:${POSTGRES_PASSWORD:?Configure a senha no servidor}@postgres:5432/cigana
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: esmeralda
+      BETA_INVITE_HASHES: ${BETA_INVITE_HASHES:-}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081,http://127.0.0.1:8081}
     ports:
       - '127.0.0.1:3000:3000'

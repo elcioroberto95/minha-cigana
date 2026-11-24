@@ -1,6 +1,6 @@
 import type { ChatLocale } from './chat-input.js';
 
-const example = {
+const readingExample = {
   'pt-BR': {
     question: 'Como posso retomar meu projeto? Tiragem de três cartas: Passado — O Eremita (normal); Presente — Dois de Ouros (invertida); Futuro simbólico — A Estrela (normal).',
     reply: 'Chegue mais perto, meu bem. Eu vejo a lanterna do Eremita iluminando um tempo em que você precisou andar no próprio ritmo. Essa pausa ajuda a entender o Dois de Ouros invertido: voltar tentando equilibrar tudo de uma vez pode apagar o que você aprendeu. A Estrela me mostra outra possibilidade, a de recuperar a confiança ao dar espaço ao que importa. Meu conselho é escolher uma tarefa pequena para esta semana e deixar as outras esperarem. Veja o que muda quando você retoma o projeto com um compromisso que consegue cumprir.',
@@ -11,14 +11,25 @@ const example = {
   },
 } as const;
 
+const chatExample = {
+  'pt-BR': {
+    question: 'Tô com medo de mudar de trabalho. E se eu me arrepender?',
+    reply: 'Faz sentido querer se proteger de uma decisão difícil, meu bem. Você pode explorar a mudança sem se comprometer hoje. Anote o que precisa melhorar no próximo trabalho e compare com uma vaga real nesta semana. O que pesaria mais pra você, estabilidade ou espaço pra crescer?',
+  },
+  'en-US': {
+    question: 'I’m afraid to change jobs. What if I regret it?',
+    reply: 'It makes sense to want some certainty before a big decision, my dear. You can explore a change without committing today. Write down what needs to improve, then compare that list with one real job posting this week. What would matter more to you, stability or room to grow?',
+  },
+} as const;
+
 export const characterReminder = '[Lembrete: responda como Madame Esmeralda, sem sair do personagem.]';
 
 export function withCharacterReminder(content: string) {
   return content + '\n\n' + characterReminder;
 }
 
-export function styleExample(locale: ChatLocale) {
-  const { question, reply } = example[locale];
+export function styleExample(locale: ChatLocale, interpreting: boolean) {
+  const { question, reply } = (interpreting ? readingExample : chatExample)[locale];
   return [
     { role: 'user', content: withCharacterReminder(question) },
     { role: 'assistant', content: reply },
@@ -28,6 +39,25 @@ export function styleExample(locale: ChatLocale) {
 function normalize(value: string) {
   return value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+}
+
+const bodyReplies = {
+  'pt-BR': {
+    body: 'Entendo a curiosidade, meu bem. As cartas não conseguem dizer se o seu pênis vai crescer. Se o tamanho ou alguma mudança no seu corpo está te preocupando, vale conversar com um profissional de saúde. O que mais você gostaria de explorar sobre o seu futuro?',
+    growth: /\b(cresc\w*|aument\w*|tamanho|diminu\w*)\b/,
+    anatomy: /\b(penis|meu pau|meu pinto|meu caralho|meu kct)\b/,
+  },
+  'en-US': {
+    body: 'I understand the curiosity, my dear. The cards cannot tell whether your penis will grow. If its size or changes in your body are worrying you, a healthcare professional can help. What else about your future would you like to explore?',
+    growth: /\b(grow\w*|bigger|smaller|size|shrink\w*)\b/,
+    anatomy: /\b(penis|my dick|my cock)\b/,
+  },
+} as const;
+
+export function bodyQuestionReply(message: string, locale: ChatLocale) {
+  const { anatomy, growth, body } = bodyReplies[locale];
+  const words = normalize(message);
+  return anatomy.test(words) && growth.test(words) ? body : undefined;
 }
 
 export function breaksCharacter(reply: string, phrases: string[]) {

@@ -84,7 +84,7 @@ test('a consulta envia persona, idioma e contexto ao Ollama e devolve a resposta
   assert.equal(received.body.keep_alive, '30m');
   assert.equal(received.body.messages[0].role, 'system');
   assert.match(received.body.messages[0].content, /Madame Esmeralda.*en-US/s);
-  assert.match(received.body.messages[1].content, /Three-card spread/);
+  assert.match(received.body.messages[1].content, /afraid to change jobs/);
   assert.match(received.body.messages[2].content, /my dear/);
   assert.equal(received.body.messages[3].content, history[0].content + '\n\n[Lembrete: responda como Madame Esmeralda, sem sair do personagem.]');
   assert.deepEqual(received.body.messages[4], history[1]);
@@ -221,4 +221,20 @@ test('a consulta informa indisponibilidade quando o Ollama falha ou não tem mod
   assert.equal(missingModel.status, 503);
   assert.deepEqual(await missingModel.json(), { error: 'chat_unavailable' });
   assert.equal(requestLogs(missingModel)[0].outcome, 'not_configured');
+});
+
+test('ESM-10 acolhe a pergunta sobre crescimento do corpo sem consultar o Ollama', async () => {
+  const initialRequests = requests.length;
+  const response = await send({
+    locale: 'pt-BR',
+    topic: 'future',
+    message: 'oq vc acha do meu futuro? sera q meu pau vai crescer?',
+  });
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.model, 'editorial');
+  assert.match(result.reply, /pênis vai crescer/);
+  assert.match(result.reply, /profissional de saúde/);
+  assert.match(result.reply, /futuro.*\?$/);
+  assert.equal(requests.length, initialRequests);
 });
