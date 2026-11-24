@@ -1,4 +1,4 @@
-import { apiUrl } from '../../lib/api-url';
+import { apiFetch } from '../../lib/beta-access';
 import { clearSession, getAccountToken, storeSession } from '../../lib/session-token';
 import { getOrCreateVisitorToken, removeVisitorToken } from '../../lib/visitor-token';
 import type { Profile } from './profile-api';
@@ -7,7 +7,7 @@ type Credentials = { email: string; password: string };
 type AuthError = 'authInvalid' | 'authConflict' | 'authRejected' | 'authRateLimited';
 
 async function authenticate(path: 'register' | 'login', body: Credentials, visitor?: string): Promise<AuthError | undefined> {
-  const response = await fetch(apiUrl('/api/auth/' + path), {
+  const response = await apiFetch('/api/auth/' + path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...(visitor ? { Authorization: 'Bearer ' + visitor } : {}) },
     body: JSON.stringify(body),
@@ -34,7 +34,7 @@ export async function login(credentials: Credentials) {
 export async function logout() {
   const token = getAccountToken();
   if (!token) return;
-  const response = await fetch(apiUrl('/api/auth/logout'), {
+  const response = await apiFetch('/api/auth/logout', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + token },
   });

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { useSyncExternalStore } from 'react';
 import { Platform } from 'react-native';
-import { apiUrl } from './api-url';
+import { apiFetch } from './beta-access';
 import { getOrCreateVisitorToken, getVisitorToken, removeVisitorToken } from './visitor-token';
 
 const key = 'cigana.account.session';
@@ -95,7 +95,7 @@ export async function getOrCreateIdentityToken() {
 export async function identityFetch(path: string, credential: string | null, options: RequestInit = {}) {
   const headers = new Headers(options.headers);
   if (credential) headers.set('Authorization', 'Bearer ' + credential);
-  const response = await fetch(apiUrl(path), { ...options, headers });
+  const response = await apiFetch(path, { ...options, headers });
   if (response.status === 401 && credential && credential === token) {
     await clearSession(credential).catch(() => {});
   } else if (response.status === 401 && credential && !credential.startsWith('a_')) {
