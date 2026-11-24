@@ -27,7 +27,7 @@ Em outro terminal, rode `npm.cmd run dev:api`. A API escuta em `127.0.0.1:3000` 
 A API, o PostgreSQL e o Ollama são executados com [Compose](compose.vps.yaml). A API aceita conexões locais na VPS e o celular continua a depender de um acesso HTTPS autorizado. Para usar a API remota no Expo Web, abra um túnel no seu computador:
 
 ```powershell
-ssh -NT -o ExitOnForwardFailure=yes -i "$env:USERPROFILE/.ssh/cigana_hostinger_ed25519" -L 127.0.0.1:13000:127.0.0.1:3000 root@179.197.94.86
+ssh -NT -o ExitOnForwardFailure=yes -i "$env:USERPROFILE/.ssh/cigana_hostinger_ed25519" -L 127.0.0.1:13000:127.0.0.1:3000 root@IP_DA_VPS
 ```
 
 No arquivo local `apps/mobile/.env`, configure `EXPO_PUBLIC_API_URL=http://127.0.0.1:13000` e reinicie o Expo. Confira `http://127.0.0.1:13000/health` com o túnel aberto.

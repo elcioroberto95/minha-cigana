@@ -160,13 +160,14 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-09 — Subir a API e o Ollama na VPS
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Branch:** `esm-09/deploy-vps`.
 - **Dependências e decisões:** ESM-08 e [decisão 012](DECISOES.md#012--api-de-desenvolvimento-na-vps).
 - **Aceite:** consultar a API da VPS pelo Expo via túnel SSH, confirmar migrações e resposta do Ollama real, subir a API isolada para cada PR e publicar automaticamente o commit validado da `main`.
 - **Revisão:** [PR #7](https://github.com/elcioroberto95/minha-cigana/pull/7).
 - **Evidências na VPS (24/11/2026):** API, PostgreSQL e Ollama saudáveis em loopback. Seis migrações aplicadas. Pelo túnel, responderam o endpoint de saúde e a Carta do Dia. Duas tiragens de três cartas com Ollama real devolveram as cartas preservadas e interpretação em 10,56 s com carga do modelo e 4,05 s com o modelo carregado. A credencial do GitHub recusou um comando fora do formato de deploy.
-- **Próxima ação:** acompanhar a subida da API isolada no PR e verificar o deploy automático após a integração em main.
+- **Verificações:** o [CI do PR](https://github.com/elcioroberto95/minha-cigana/actions/runs/45469364139) aprovou lint, TypeScript, testes da API, exportação web, abertura no Chrome, migrações e subida da API isolada. No Expo Web local a Consulta respondeu pela API da VPS. O [deploy automático](https://github.com/elcioroberto95/minha-cigana/actions/runs/45469705717) publicou o commit 48401c5 e confirmou a saúde do contêiner da API.
+- **Próxima ação:** usar a VPS pelo túnel durante o desenvolvimento. Acesso externo fica para quando HTTPS e os controles do beta estiverem disponíveis.
 
 ## Modelo de tarefa
 
