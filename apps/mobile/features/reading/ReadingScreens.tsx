@@ -31,7 +31,8 @@ function Offer({ title, description, action, next }: {
   return <Screen backTo={title === 'dailyOffer' ? '/carta-do-dia' : '/tarot'}>
     <Title>{t(title)}</Title>
     <Panel><Copy>{t(description)}</Copy></Panel>
-    <Copy>{t(next ? 'readingUnavailable' : 'purchaseUnavailable')}</Copy>
+    {title === 'dailyOffer' && <Copy>{t('purchaseUnavailable')}</Copy>}
+    {title === 'personalityReading' && <Copy>{t('readingUnavailable')}</Copy>}
     <Button label={t(action)} disabled={!next} onPress={next ? () => router.push(next) : undefined} />
   </Screen>;
 }

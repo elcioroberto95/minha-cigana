@@ -52,7 +52,7 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 ## 007 — Ollama como provedor inicial de respostas
 
 - **Data e estado:** 2026-11-23, Aceita para a integração local.
-- **Decisão.** A Consulta pede respostas ao NestJS, que usa o Ollama com modelo configurado em `OLLAMA_MODEL`. O backend aplica a persona, o idioma e o contexto recente. A configuração do modelo pode mudar independentemente da interface.
+- **Decisão.** A Consulta pede respostas ao NestJS, que usa o Ollama com modelo configurado em `OLLAMA_MODEL`. O backend aplica a persona, o idioma e o contexto recente. A configuração do modelo pode mudar independentemente da interface. A Consulta solicita 30 minutos de retenção do modelo em memória por padrão, ajustáveis por `OLLAMA_KEEP_ALIVE` na API. O log do Ollama inclui `prompt_cached_tokens` quando o provedor informa a reutilização do prompt. [Documentação do Ollama](https://docs.ollama.com/faq#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately)
 - **Desenvolvimento.** O [Compose](../compose.yaml) fixa a imagem por digest e monta um volume de modelos. A porta é publicada apenas no loopback e os recursos de nuvem do Ollama estão desativados.
 - **Consequência.** Indisponibilidade é apresentada na Consulta e preserva o rascunho. A escolha do modelo do beta depende de avaliação de qualidade e latência. A [decisão 006](#006--persistência-portátil-e-inferência-local) segue em proposta quanto ao armazenamento.
 
@@ -77,6 +77,13 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Sessão:** `POST /api/auth/login` emite um token opaco por aparelho. O PostgreSQL guarda o hash do token e expira a sessão em 30 dias. `POST /api/auth/logout` revoga a sessão usada na chamada. Os Guards separam visitante e conta e aplicam a identidade ao perfil, check-in, histórico e Carta do Dia. O chat por texto pode operar sem identidade, mas valida a sessão quando recebe credencial.
 - **Senha e tentativas:** senha de pelo menos 15 caracteres, scrypt com salt individual e limite de tentativas por IP no login e cadastro. Erros de senha incorreta e conta inexistente têm a mesma resposta. [OWASP sobre senhas](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) · [OWASP sobre autenticação](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - **Cliente:** o app usa SecureStore em Android e iOS e armazenamento do navegador na versão web de desenvolvimento. Recuperação de senha e publicação externa ficam para etapas futuras.
+
+## 011 — Persona e tiragens da Esmeralda
+
+- **Data e estado:** 2026-11-24, aceita para desenvolvimento.
+- **Persona:** o `Modelfile` define a personagem e os parâmetros do modelo `esmeralda` baseado em `qwen2.5:1.5b`. O backend usa o mesmo bloco `SYSTEM`, mantém um exemplo de estilo e limita o histórico recente. Uma resposta com marcador reconhecido de quebra recebe uma tentativa de correção dentro do orçamento de tempo da requisição. Uma segunda quebra devolve indisponibilidade.
+- **Tiragens:** o código sorteia cartas distintas e orientações. O PostgreSQL guarda a seleção, a pergunta e a interpretação por identidade. As posições da Cruz Celta seguem a ordem de Waite. A montagem recupera do catálogo somente o significado da orientação de cada carta selecionada. [The Pictorial Key to the Tarot, de A. E. Waite](https://unesacra.com/en/read/esotericism/the-pictorial-key-to-the-tarot/)
+- **Interface:** o resultado busca as cartas antes da interpretação e preserva a tiragem caso o Ollama falhe.
 
 ## Modelo de decisão
 

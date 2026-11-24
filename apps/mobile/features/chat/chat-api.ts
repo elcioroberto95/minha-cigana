@@ -2,6 +2,8 @@ import { getIdentityToken, identityFetch } from '../../lib/session-token';
 import type { AppLocale } from '../../localization';
 import type { Topic } from '../tarot/domain';
 
+export const maxChatHistory = 24;
+
 export type ChatMessage = { role: 'user' | 'assistant'; content: string; model?: string | null };
 
 export async function requestReply(input: {
