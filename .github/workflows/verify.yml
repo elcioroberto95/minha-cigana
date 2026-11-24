@@ -42,7 +42,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:api
       - run: npm run build:web
-      - name: Abrir a tela inicial no Chrome
+      - name: Abrir a entrada da conta no Chrome
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 --directory apps/mobile/dist > "$RUNNER_TEMP/expo-web.log" 2>&1 &
           server_pid=$!

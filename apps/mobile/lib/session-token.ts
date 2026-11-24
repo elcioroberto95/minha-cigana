@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { useSyncExternalStore } from 'react';
 import { Platform } from 'react-native';
-import { apiFetch } from './beta-access';
+import { apiFetch } from './api-url';
 import { getOrCreateVisitorToken, getVisitorToken, removeVisitorToken } from './visitor-token';
 
 const key = 'cigana.account.session';

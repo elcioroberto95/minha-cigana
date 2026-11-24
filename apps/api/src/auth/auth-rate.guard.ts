@@ -19,7 +19,7 @@ export class AuthRateGuard implements CanActivate {
       this.windowEnd = now + windowMs;
     }
     const response = http.getResponse<Response>();
-    const ip = response.locals.betaInviteHash as string | undefined ?? request.socket.remoteAddress ?? 'unknown';
+    const ip = request.ip ?? request.socket.remoteAddress ?? 'unknown';
     const count = this.attempts.get(ip) ?? 0;
     if (count >= maxAttempts || (count === 0 && this.attempts.size >= 10_000)) {
       response.setHeader('Retry-After', Math.ceil((this.windowEnd - now) / 1000));

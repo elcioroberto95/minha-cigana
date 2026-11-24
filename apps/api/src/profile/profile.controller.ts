@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Post, Put, UseGuards, Header } from '@nestjs/common';
 import type { Identity } from '../auth/auth.service.js';
-import { CurrentIdentity, IdentityGuard } from '../auth/identity.guard.js';
+import { CurrentIdentity, IdentityGuard, IdentityMode } from '../auth/identity.guard.js';
 import { readCheckIn, readMemory, readProfile } from './profile-input.js';
 import { ProfileService } from './profile.service.js';
 
@@ -33,6 +33,19 @@ export class ProfileController {
   @Put('memory')
   setMemory(@Body() body: unknown, @CurrentIdentity() { owner }: Identity) {
     return this.profiles.setMemory(owner, readMemory(body));
+  }
+
+  @Get('memory/learning')
+  @IdentityMode('account')
+  @Header('Cache-Control', 'no-store')
+  learning(@CurrentIdentity() { owner }: Identity) {
+    return this.profiles.learning(owner);
+  }
+
+  @Put('memory/learning')
+  @IdentityMode('account')
+  setLearning(@Body() body: unknown, @CurrentIdentity() { owner }: Identity) {
+    return this.profiles.setLearning(owner, readMemory(body));
   }
 
   @Post('check-in/offer')

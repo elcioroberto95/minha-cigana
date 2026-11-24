@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import { once } from 'node:events';
+import { createServer } from 'node:http';
 import { test } from 'node:test';
 import { NestFactory } from '@nestjs/core';
 import { Client } from 'pg';
 import { AppModule } from '../dist/app.module.js';
+import { AuthService } from '../dist/auth/auth.service.js';
 import { migrate } from '../scripts/migrate.mjs';
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
@@ -16,13 +19,27 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
   const scopedUrl = new URL(databaseUrl);
   scopedUrl.searchParams.set('options', '-c search_path=' + schema);
   const previousUrl = process.env.DATABASE_URL;
+  const previousMode = process.env.REQUIRE_ACCOUNT;
   const visitor = randomBytes(32).toString('hex');
   const other = randomBytes(32).toString('hex');
   const id = randomUUID();
   const profile = { name: 'Ip√™ Azul', email: 'Ipe@example.test', sex: null };
-  const password = 'uma senha longa 1234';
+  const password = 'Senha123';
   let app;
   let schemaCreated = false;
+  const modelCalls = [];
+  const provider = createServer(async (req, res) => {
+    let body = '';
+    for await (const chunk of req) body += chunk;
+    const call = JSON.parse(body);
+    modelCalls.push(call);
+    const tool = call.tools?.find(({ function: fn }) => fn.name === 'remember_profile_fact');
+    const message = tool ? { content: '', tool_calls: [{ function: {
+      name: tool.function.name, arguments: { kind: 'occupation' },
+    } }] } : { content: 'Vamos pensar num pr√≥ximo passo.' };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ model: 'test', message }));
+  });
 
   async function startApi() {
     app = await NestFactory.create(AppModule, { logger: false });
@@ -58,7 +75,9 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     assert.equal((await request('/profile/memory', 'PUT', visitor, { enabled: true })).status, 200);
 
     assert.equal((await request('/auth/register', 'POST', null, { ...profile, password })).status, 401);
-    assert.equal((await request('/auth/register', 'POST', visitor, { ...profile, password: 'curta' })).status, 400);
+    for (const invalid of ['Senha12', 'Senha1234']) {
+      assert.equal((await request('/auth/register', 'POST', visitor, { ...profile, password: invalid })).status, 400);
+    }
     const registered = await request('/auth/register', 'POST', visitor, { ...profile, password });
     assert.equal(registered.status, 201);
     assert.equal(registered.headers.get('Cache-Control'), 'no-store');
@@ -101,6 +120,33 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     assert.notEqual(secondToken, firstToken);
     assert.equal((await (await request('/history/' + id, 'GET', secondToken)).json()).title, 'Pergunta de antes da conta');
 
+    process.env.REQUIRE_ACCOUNT = '1';
+    provider.listen(0, '127.0.0.1');
+    await once(provider, 'listening');
+    process.env.OLLAMA_MODEL = 'test';
+    process.env.OLLAMA_BASE_URL = 'http://127.0.0.1:' + provider.address().port;
+    assert.equal((await request('/chat', 'POST', undefined, chat)).status, 401);
+    assert.equal((await request('/chat', 'POST', other, chat)).status, 401);
+    assert.equal((await request('/tarot/daily', 'GET', other)).status, 401);
+    const jobQuestion = { ...chat, message: 'Trabalho como desenvolvedora. Quero refletir sobre a carreira.' };
+    assert.equal((await request('/chat', 'POST', secondToken, jobQuestion)).status, 200);
+    assert.ok(!modelCalls.at(-1).tools.some(({ function: fn }) => fn.name === 'remember_profile_fact'));
+    const learning = '/profile/memory/learning';
+    assert.deepEqual(await (await request(learning, 'GET', secondToken)).json(), { enabled: false, items: [] });
+    assert.equal((await request(learning, 'PUT', secondToken, { enabled: true })).status, 200);
+    const learned = await request('/chat', 'POST', secondToken, jobQuestion);
+    assert.deepEqual(await learned.json(), { reply: 'Vamos pensar num pr√≥ximo passo.', model: 'test' });
+    assert.equal(modelCalls.at(-1).messages.at(-1).tool_name, 'remember_profile_fact');
+    assert.deepEqual(await (await request(learning, 'GET', firstToken)).json(), {
+      enabled: true, items: [{ kind: 'occupation', value: 'desenvolvedora' }],
+    });
+    assert.equal((await request('/chat', 'POST', firstToken, chat)).status, 200);
+    assert.match(modelCalls.at(-1).messages[0].content, /"learned":\[\{"kind":"occupation","value":"desenvolvedora"\}\]/);
+    assert.equal((await request(learning, 'PUT', secondToken, { enabled: false })).status, 200);
+    assert.deepEqual(await (await request(learning, 'GET', secondToken)).json(), { enabled: false, items: [] });
+    assert.equal((await request('/chat', 'POST', firstToken, chat)).status, 200);
+    assert.doesNotMatch(modelCalls.at(-1).messages[0].content, /desenvolvedora/);
+
     const { rows: [account] } = await admin.query(`SELECT password_hash AS digest, password_salt AS salt FROM ${schema}.accounts`);
     assert.equal(account.digest.length, 64);
     assert.equal(account.salt.length, 16);
@@ -113,6 +159,10 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     await admin.query(`UPDATE ${schema}.account_sessions SET expires_at = now() - interval '1 day' WHERE token_hash = $1`, [secondHash]);
     assert.equal((await request('/profile', 'GET', secondToken)).status, 401);
 
+    const legacy = { ...profile, email: 'legacy@example.test', password: 'senha da pol√≠tica antiga' };
+    await app.get(AuthService).register(createHash('sha256').update(other).digest('hex'), legacy);
+    assert.equal((await request('/auth/login', 'POST', null, { email: legacy.email, password: legacy.password })).status, 200);
+
     let limited;
     for (let i = 0; i < 20; i++) {
       const attempt = await request('/auth/login', 'POST', null, { email: 'invalid', password: '' });
@@ -123,6 +173,12 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     assert.ok(Number(limited.headers.get('Retry-After')) > 0);
   } finally {
     await app?.close();
+    if (provider.listening) {
+      provider.closeAllConnections();
+      await new Promise(resolve => provider.close(resolve));
+    }
+    if (previousMode === undefined) delete process.env.REQUIRE_ACCOUNT;
+    else process.env.REQUIRE_ACCOUNT = previousMode;
     if (previousUrl === undefined) delete process.env.DATABASE_URL;
     else process.env.DATABASE_URL = previousUrl;
     try {

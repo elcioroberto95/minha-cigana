@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { setTimeout as wait } from 'node:timers/promises';
 
 const pageUrl = 'http://127.0.0.1:4173/';
-const headings = ['O que te trouxe aqui hoje?', 'What brings you here today?'];
+const accountOptions = [['Entrar', 'Criar conta'], ['Sign in', 'Create account']];
 const profile = await mkdtemp(join(process.env.RUNNER_TEMP || tmpdir(), 'expo-chrome-'));
 const signal = AbortSignal.timeout(60_000);
 const chrome = spawn(process.env.CHROME_BINARY || 'google-chrome', [
@@ -23,11 +23,11 @@ try {
   await once(socket, 'open', { signal });
   for (let id = 1; ; id++) {
     lastText = await pageText(socket, id);
-    if (headings.some((heading) => lastText.includes(heading))) break;
+    if (accountOptions.some((labels) => labels.every((label) => lastText.includes(label)))) break;
     await wait(250, undefined, { signal });
   }
 } catch (error) {
-  throw new Error('O Chrome não exibiu a tela inicial. Último texto: ' + lastText.slice(0, 300), { cause: error });
+  throw new Error('O Chrome não exibiu a entrada da conta. Último texto: ' + lastText.slice(0, 300), { cause: error });
 } finally {
   socket?.close();
   chrome.kill();

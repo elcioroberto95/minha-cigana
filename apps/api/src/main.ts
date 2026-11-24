@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs';
 import { ConsoleLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import { createBetaAccess } from './beta-access.js';
 
 async function bootstrap() {
   if (existsSync('.env')) process.loadEnvFile('.env');
@@ -18,7 +17,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
   const origins = (process.env.CORS_ORIGINS || '').split(',').map((origin) => origin.trim()).filter(Boolean);
   if (origins.length) app.enableCors({ origin: origins, exposedHeaders: ['X-Request-ID'] });
-  app.use('/api', createBetaAccess(process.env.BETA_INVITE_HASHES));
+  if (process.env.REQUIRE_ACCOUNT === '1') {
+    const express = app.getHttpAdapter().getInstance();
+    express.set('trust proxy', 1);
+    // Compatibilidade com a subrequisição de acesso do Caddy já instalado na VPS.
+    app.getHttpAdapter().get('/api/beta/access', (_request, response) => response.status(204).end());
+  }
   await app.listen(port, host);
 }
 

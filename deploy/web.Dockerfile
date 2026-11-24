@@ -7,6 +7,5 @@ RUN npm ci --workspace=@cigana/mobile --include-workspace-root=false
 COPY apps/mobile ./apps/mobile
 ARG EXPO_PUBLIC_API_URL
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
-ENV EXPO_PUBLIC_REQUIRE_BETA_INVITE=1
 ENV EXPO_NO_TELEMETRY=1
 RUN npm run build:web && mv apps/mobile/dist /web

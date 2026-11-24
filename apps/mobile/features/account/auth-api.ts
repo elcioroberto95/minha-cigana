@@ -1,4 +1,4 @@
-import { apiFetch } from '../../lib/beta-access';
+import { apiFetch } from '../../lib/api-url';
 import { clearSession, getAccountToken, storeSession } from '../../lib/session-token';
 import { getOrCreateVisitorToken, removeVisitorToken } from '../../lib/visitor-token';
 import type { Profile } from './profile-api';
