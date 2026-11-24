@@ -22,6 +22,23 @@ A tela inicial oferece **Português** e **English**. O app usa a escolha salva n
 
 Em outro terminal, rode `npm.cmd run dev:api`. A API escuta em `127.0.0.1:3000` e `GET /health` retorna `{"status":"ok"}`. Para mudar o endereço ou a porta, copie [apps/api/.env.example](apps/api/.env.example) para `apps/api/.env` e ajuste `HOST` e `PORT`. Use `npm.cmd run build:api` e `npm.cmd run start:api` para executar a versão compilada.
 
+## Evals da Consulta e do tarô
+
+Com o Ollama e o PostgreSQL locais ativos, aplique as migrações e inicie a API conforme as seções de desenvolvimento. Os casos usam perguntas fictícias e criam tiragens no banco de desenvolvimento. Use uma API local com um banco de teste.
+
+```powershell
+npm.cmd --silent run eval:ai -- chat-memoria-pt
+npm.cmd --silent run eval:ai > "$env:TEMP\cigana-evals.json"
+```
+
+Os IDs estão em [apps/api/evals/cases.ts](apps/api/evals/cases.ts). O runner usa `http://127.0.0.1:3000`. Defina `EVAL_API_URL` para apontar para outra porta local. Sem IDs, executa os dez casos em sequência. O JSON na saída padrão inclui perguntas, respostas, cartas, checks, latência por chamada e ID de requisição quando fornecido pela API.
+
+- `ready_for_review` significa que a resposta chegou e passou pelos checks aplicáveis. Use o campo `review` para avaliar idioma, tom, relevância e fidelidade às cartas e suas orientações.
+- `flagged` indica uma divergência automática. Os checks buscam nomes de cartas, nomes fictícios no histórico e um código que a personagem deve evitar. Abreviações ou paráfrases podem exigir revisão humana.
+- `error` indica falha de transporte, HTTP ou contrato. Confira `calls` para identificar a etapa e correlacionar o evento com os logs. O comando retorna código 2 se houve erro operacional, 1 se houve alerta sem erro e 0 se todos os casos ficaram prontos para revisão.
+
+Ao comparar configurações, registre modelo, commit e estado do Ollama antes da execução. Compare os mesmos IDs de chat e revise cada tiragem usando as cartas registradas no relatório, pois o sorteio é novo a cada rodada. Os percentis usam apenas chamadas de geração com resposta utilizável e incluem a espera pela API. Em amostras pequenas, olhe também os tempos individuais.
+
 ## API de desenvolvimento na VPS
 
 A API, o PostgreSQL e o Ollama são executados com [Compose](compose.vps.yaml). A API aceita conexões locais na VPS e o celular continua a depender de um acesso HTTPS autorizado. Para usar a API remota no Expo Web, abra um túnel no seu computador:

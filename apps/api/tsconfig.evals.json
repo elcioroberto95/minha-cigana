@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "evals",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["evals/**/*.ts"]
+}

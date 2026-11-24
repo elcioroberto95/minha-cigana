@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-05 — Implementar a Carta do Dia](#esm-05--implementar-a-carta-do-dia)
+**Próxima tarefa:** [ESM-11 — Avaliar as respostas da Esmeralda](#esm-11--avaliar-as-respostas-da-esmeralda)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -179,6 +179,17 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **CI e deploy:** [verificação do PR](https://github.com/elcioroberto95/minha-cigana/actions/runs/45471827456) e [publicação do commit 8424abd](https://github.com/elcioroberto95/minha-cigana/actions/runs/45472198662).
 - **Modelo do beta:** comparação manual de dois turnos sobre troca de emprego e negociação de horário na VPS. O Qwen 2.5 3B manteve o assunto e ofereceu passos mais concretos, em cerca de 10,7 s e 3,3 s. O 1,5B levou cerca de 3,7 s e 1,6 s, mas mencionou uma Carta do Dia que não estava na conversa.
 - **Próxima ação:** rodar o beta com convidados, avaliar mais conversas, testar builds nativas e definir a rotina de backup externo antes de ampliar o acesso.
+
+## ESM-11 — Avaliar as respostas da Esmeralda
+
+- **Estado:** Em revisão. A linha de base de qualidade com respostas reais continua pendente.
+- **Branch:** `esm-11/evals`.
+- **Dependências:** ESM-03, ESM-04, ESM-08 e ESM-10.
+- **Escopo:** montar uma suíte bilíngue com entradas fictícias para a Consulta e a tiragem. Usar as rotas reais de desenvolvimento e registrar verificações automáticas, critérios editoriais, latência e falhas por caso.
+- **Aceite:** executar a suíte ou um caso pelo ID, receber um relatório com as respostas e cartas reveladas, distinguir indisponibilidade de reprovação automática e registrar a primeira linha de base com Ollama real.
+- **Evidências:** lint, checagem de tipos dos dois workspaces e dos evals, compilação TypeScript da API e 22 testes da API com PostgreSQL real passaram. O ensaio das dez entradas com respostas HTTP controladas verificou os três resultados e os códigos de saída 0, 1 e 2. A validação reutilizou as dependências instaladas a partir do mesmo lockfile.
+- **Execução real (24/11/2026):** NestJS, PostgreSQL 17 e Ollama 0.40.17 no Docker Desktop em CPU, com o modelo local `esmeralda` baseado no Qwen 2.5 1,5B. `chat-trabalho-en` (90,23 s), `chat-memoria-pt` (90,02 s) e a interpretação de `tarot-sim-en` (90,05 s) devolveram HTTP 503. Os IDs das requisições confirmaram timeout de inferência nos três casos. A rota de sorteio revelou a carta em 291 ms e o relatório manteve essa evidência. A rodada mediu disponibilidade e tempos de falha.
+- **Próxima ação:** executar os dez casos em ambiente de desenvolvimento com o modelo de 3B usado no beta e revisar as respostas pelos critérios de cada caso.
 
 ## Modelo de tarefa
 
