@@ -143,6 +143,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Desempenho:** solicitar ao Ollama que mantenha o modelo em memória por 30 minutos por padrão e registrar tokens de prompt reutilizados quando o provedor informar.
 - **Evidências de desempenho:** os 16 testes da API passaram com PostgreSQL real. O substituto do Ollama confirmou `keep_alive: 30m` e o campo `prompt_cached_tokens` no log. No Ollama local, uma consulta curta com o modelo carregado respondeu em 7 s e `/api/ps` confirmou 30 minutos de retenção. O ensaio com duas perguntas do mesmo tema excedeu o tempo de medição. A API da prévia foi recompilada e reiniciada.
 - **Próxima ação:** medir o ganho por tema com mais amostras e revisar o indicador em Android e iOS.
+- **Revisão:** [PR #6](https://github.com/elcioroberto95/minha-cigana/pull/6).
 
 ## ESM-08 — Firmar a persona e interpretar tiragens
 
@@ -154,6 +155,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Prévia:** migração 006 aplicada. O Ollama local confirmou o modelo `esmeralda` com contexto 8192, temperatura 0,8, top-p 0,9 e penalidade 1,1. Os três formatos retornaram 3, 1 e 10 cartas distintas pela API local. No Chrome, a tiragem de três cartas revelou nomes, posições e orientações antes do carregamento da interpretação.
 - **Validação pendente:** o Ollama real em CPU excedeu 90 segundos nas duas tentativas de interpretação. As cartas ficaram guardadas e a interpretação permanece disponível para nova tentativa. A validação do texto com o modelo real e em Android e iOS segue pendente.
 - **Próxima ação:** validar a qualidade da interpretação com inferência real em um ambiente que conclua a geração no tempo da Consulta.
+- **Revisão:** [PR #6](https://github.com/elcioroberto95/minha-cigana/pull/6).
 
 ## Modelo de tarefa
 
