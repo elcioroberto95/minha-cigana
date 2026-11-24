@@ -33,6 +33,12 @@ export function createBetaAccess(configured = ''): RequestHandler {
       return;
     }
 
+    if (request.method === 'GET' && request.path === '/beta/access') {
+      response.status(204).end();
+      return;
+    }
+    response.locals.betaInviteHash = hash;
+
     const now = Date.now();
     if (now >= windowEnd) {
       usage.clear();
@@ -53,10 +59,6 @@ export function createBetaAccess(configured = ''): RequestHandler {
       entry.readings++;
       activeReadings++;
       response.once('close', () => { activeReadings--; });
-    }
-    if (request.method === 'GET' && request.path === '/beta/access') {
-      response.status(204).end();
-      return;
     }
     next();
   };

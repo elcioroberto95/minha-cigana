@@ -12,8 +12,23 @@ https://{$CIGANA_PUBLIC_IP} {
 		max_size 64KB
 	}
 	header Cache-Control "no-store"
-	@backend path /api/* /health
-	handle @backend {
+	@api path /api/*
+	handle @api {
+		route {
+			@check not method OPTIONS
+			forward_auth @check 127.0.0.1:3000 {
+				uri /api/beta/access
+				header_up X-Cigana-Public 1
+			}
+			reverse_proxy 127.0.0.1:3000 {
+				header_up X-Cigana-Public 1
+				transport http {
+					response_header_timeout 100s
+				}
+			}
+		}
+	}
+	handle /health {
 		reverse_proxy 127.0.0.1:3000 {
 			header_up X-Cigana-Public 1
 			transport http {

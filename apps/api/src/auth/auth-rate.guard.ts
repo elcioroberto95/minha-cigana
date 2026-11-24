@@ -18,10 +18,11 @@ export class AuthRateGuard implements CanActivate {
       this.attempts.clear();
       this.windowEnd = now + windowMs;
     }
-    const ip = request.socket.remoteAddress ?? 'unknown';
+    const response = http.getResponse<Response>();
+    const ip = response.locals.betaInviteHash as string | undefined ?? request.socket.remoteAddress ?? 'unknown';
     const count = this.attempts.get(ip) ?? 0;
     if (count >= maxAttempts || (count === 0 && this.attempts.size >= 10_000)) {
-      http.getResponse<Response>().setHeader('Retry-After', Math.ceil((this.windowEnd - now) / 1000));
+      response.setHeader('Retry-After', Math.ceil((this.windowEnd - now) / 1000));
       throw new HttpException({ error: 'auth_rate_limited' }, HttpStatus.TOO_MANY_REQUESTS);
     }
     this.attempts.set(ip, count + 1);
