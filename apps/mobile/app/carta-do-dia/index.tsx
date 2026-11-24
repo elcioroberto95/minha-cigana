@@ -1,1 +1,1 @@
-export { DailyScreen as default } from '../../features/reading/ReadingScreens';
+export { default } from '../../features/reading/DailyCardScreen';

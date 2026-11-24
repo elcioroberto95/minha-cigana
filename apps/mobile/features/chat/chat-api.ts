@@ -1,4 +1,5 @@
 import { apiUrl } from '../../lib/api-url';
+import { getVisitorToken } from '../../lib/visitor-token';
 import type { AppLocale } from '../../localization';
 import type { Topic } from '../tarot/domain';
 
@@ -9,10 +10,17 @@ export async function requestReply(input: {
   topic: Topic;
   message: string;
   history: ChatMessage[];
+  dailyCardId?: string;
 }, signal: AbortSignal): Promise<{ reply: string; model: string }> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (input.dailyCardId) {
+    const token = await getVisitorToken();
+    if (!token) throw new Error('Missing visitor for daily card');
+    headers.Authorization = 'Bearer ' + token;
+  }
   const response = await fetch(apiUrl('/api/chat'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     signal,
     body: JSON.stringify(input),
   });

@@ -1,8 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getRandomBytesAsync } from 'expo-crypto';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 import { apiUrl } from '../../lib/api-url';
+import { getOrCreateVisitorToken, getVisitorToken } from '../../lib/visitor-token';
 import type { ChatMessage } from '../chat/chat-api';
 import type { Topic } from '../tarot/domain';
 
@@ -10,28 +7,6 @@ export const savedMessageLimit = 40;
 
 export type SavedSession = { id: string; topic: Topic; title: string; updatedAt: string };
 export type SavedConversation = SavedSession & { messages: ChatMessage[] };
-
-const key = 'cigana.history.visitor';
-let provisioning: Promise<string> | undefined;
-
-function getVisitorToken() {
-  return Platform.OS === 'web' ? AsyncStorage.getItem(key) : SecureStore.getItemAsync(key);
-}
-
-async function createVisitorToken() {
-  const existing = await getVisitorToken();
-  if (existing) return existing;
-  const bytes = await getRandomBytesAsync(32);
-  const token = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
-  if (Platform.OS === 'web') await AsyncStorage.setItem(key, token);
-  else await SecureStore.setItemAsync(key, token);
-  return token;
-}
-
-async function visitorTokenForSave() {
-  provisioning ??= createVisitorToken().finally(() => { provisioning = undefined; });
-  return provisioning;
-}
 
 function historyRequest(path: string, token: string, options: RequestInit = {}) {
   return fetch(apiUrl('/api/history' + path), {
@@ -41,7 +16,7 @@ function historyRequest(path: string, token: string, options: RequestInit = {}) 
 }
 
 export async function saveConversation(id: string, topic: Topic, messages: ChatMessage[]) {
-  const response = await historyRequest('/' + id, await visitorTokenForSave(), {
+  const response = await historyRequest('/' + id, await getOrCreateVisitorToken(), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ topic, messages }),

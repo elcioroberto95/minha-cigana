@@ -40,7 +40,13 @@ Use `docker compose ps` para ver a saúde do container e `docker compose exec -T
 
 `POST /api/chat` recebe `locale`, `topic`, `message` e um `history` opcional de até quatro pares recentes. A resposta contém `reply` e `model`. Se o modelo estiver indisponível, a API retorna `503` e o app mantém o rascunho. `CHAT_PERSONA_FILE` pode apontar para um arquivo UTF-8 de configuração da persona no backend. Autenticação de conta, limites de uso e proteção de produção antecedem a publicação do endpoint.
 
-As próximas integrações de tarô usam `POST /api/tarot/draw` e `POST /api/tarot/interpret`.
+## Carta do Dia
+
+Rode `npm.cmd run migrate:api` com o PostgreSQL local disponível. No app, abra **Carta do Dia** e toque **Revelar minha carta**. A API reutiliza a credencial de visitante do app. `GET /api/tarot/daily` consulta a tiragem de hoje e `POST /api/tarot/daily` revela ou devolve a mesma tiragem. O dia de referência vira à meia-noite no horário de Brasília.
+
+A tiragem guarda a carta e o texto editorial em português e inglês. O botão **Conversar sobre esta carta** abre a Consulta com o ID da tiragem. O backend verifica a propriedade e recupera a carta salva antes de chamar o Ollama. O recorte inicial é gratuito.
+
+As próximas integrações de tiragens com múltiplas cartas usam `POST /api/tarot/draw` e `POST /api/tarot/interpret`.
 
 ## Acompanhar a latência da Consulta
 

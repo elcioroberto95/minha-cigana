@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import type { EditorialReading } from '../daily-card/daily-card-catalog.js';
 import { ApiMetrics } from '../observability/api-metrics.js';
 import { requestContext } from '../observability/request-context.js';
 import type { readChatInput } from './chat-input.js';
@@ -30,7 +31,7 @@ export class OllamaService {
 
   constructor(private readonly metrics: ApiMetrics) {}
 
-  async reply({ locale, topic, message, history }: ReturnType<typeof readChatInput>) {
+  async reply({ locale, topic, message, history }: ReturnType<typeof readChatInput>, daily?: EditorialReading) {
     const model = process.env.OLLAMA_MODEL?.trim();
     const startedAt = performance.now();
     const logContext = { event: 'ollama.chat.completed', request_id: requestContext.getStore(), model: model || undefined };
@@ -45,6 +46,9 @@ export class OllamaService {
       const persona = process.env.CHAT_PERSONA_FILE
         ? await readFile(process.env.CHAT_PERSONA_FILE, 'utf8')
         : defaultPersona;
+      const context = daily
+        ? `\nCarta do Dia já revelada: ${daily.title}. Reflexão editorial: ${daily.reflection} Use essa carta como contexto simbólico.`
+        : '';
       const url = new URL('/api/chat', base);
       outcome = 'connection_error';
       signal = AbortSignal.timeout(90_000);
@@ -59,7 +63,7 @@ export class OllamaService {
           stream: false,
           options: { num_predict: 256 },
           messages: [
-            { role: 'system', content: `${persona}\nIdioma da resposta: ${locale}. Tema sugerido: ${topic}.` },
+            { role: 'system', content: `${persona}\nIdioma da resposta: ${locale}. Tema sugerido: ${topic}.${context}` },
             ...history,
             { role: 'user', content: message },
           ],

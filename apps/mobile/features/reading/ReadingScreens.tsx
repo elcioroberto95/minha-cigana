@@ -2,26 +2,9 @@ import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
-import { CardBack } from '../tarot/CardBack';
 import { isTopic } from '../tarot/domain';
 
 const questions = ['personalityQuestion1', 'personalityQuestion2', 'personalityQuestion3'] as const;
-
-export function DailyScreen() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  return <Screen>
-    <Title>{t('dailyCard')}</Title>
-    <Copy>{t('dailyIntro')}</Copy>
-    <Panel>
-      <CardBack label={t('dailyCard')} />
-      <Copy>{t('dailyCadence')}</Copy>
-    </Panel>
-    <Copy>{t('readingUnavailable')}</Copy>
-    <Button label={t('openDaily')} disabled />
-    <Button label={t('dailyOffer')} secondary onPress={() => router.push('/carta-do-dia/oferta')} />
-  </Screen>;
-}
 
 export function DailyOfferScreen() {
   return <Offer title="dailyOffer" description="dailyOfferIntro" action="buy" />;

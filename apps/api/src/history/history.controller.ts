@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Param, Put } from '@nestjs/common';
-import { ownerHash, readSession, readSessionId } from './history-input.js';
+import { ownerHash } from '../visitor/visitor-identity.js';
+import { readSession, readSessionId } from './history-input.js';
 import { HistoryService } from './history.service.js';
 
 @Controller('api/history')

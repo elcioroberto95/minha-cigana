@@ -68,8 +68,10 @@ test('histórico mantém dados após migração e reinício, isola e exclui sess
 
     const migrations = [];
     await migrate(scopedUrl.toString(), undefined, (name) => migrations.push(name));
-    await migrate(scopedUrl.toString(), undefined, (name) => migrations.push(name));
-    assert.deepEqual(migrations, ['002_chat_message_model.sql']);
+    assert.ok(migrations.includes('002_chat_message_model.sql'));
+    const reapplied = [];
+    await migrate(scopedUrl.toString(), undefined, (name) => reapplied.push(name));
+    assert.deepEqual(reapplied, []);
 
     process.env.DATABASE_URL = scopedUrl.toString();
     app = await startApi();

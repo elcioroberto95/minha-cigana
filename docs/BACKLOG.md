@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-04 — Medir latência e falhas na Consulta](#esm-04--medir-latência-e-falhas-na-consulta)
+**Próxima tarefa:** [ESM-05 — Implementar a Carta do Dia](#esm-05--implementar-a-carta-do-dia)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -95,13 +95,27 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-04 — Medir latência e falhas na Consulta
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Depende de:** ESM-03, integrado pelo [PR #3](https://github.com/elcioroberto95/minha-cigana/pull/3).
 - **Branch:** `feat/chat-observability`.
 - **Aceite:** correlacionar a resposta HTTP e os eventos do NestJS e do Ollama pelo `X-Request-ID`. Registrar status final e duração por rota, categoria de falha do provedor e tempo de cada etapa quando informado pelo Ollama.
 - **Escopo:** interceptor HTTP global e métricas de inferência, banco e processo via OpenTelemetry. Consultas de tráfego, falhas, latência e saturação disponíveis no Prometheus local.
 - **Evidências:** 12 testes da API passaram, incluindo correlação em requisições simultâneas, template da rota, desconexão do cliente e isolamento do histórico com PostgreSQL real. O ensaio no Prometheus real confirmou contadores HTTP, histogramas, tokens e etapas do Ollama, métricas do pool e das operações de histórico e memória e atraso do event loop. Para controlar as durações e falhas, o ensaio de métricas usou um Ollama simulado.
 - **Próxima ação:** observar uma janela de tráfego real para definir a linha de base e limites de alerta.
+- **Integração:** [PR #4](https://github.com/elcioroberto95/minha-cigana/pull/4), com CI aprovado.
+
+## ESM-05 — Implementar a Carta do Dia
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-05/carta-do-dia`.
+- **Escopo proposto:** recorte gratuito para desenvolvimento. Reutilizar a credencial local de visitante e a tela existente. Sortear uma carta de um catálogo editorial pequeno, persistir a escolha no PostgreSQL e mostrar uma reflexão curta. O dia de referência segue `America/Sao_Paulo`.
+- **Aceite:** a primeira visita revela uma carta. Reabrir a tela ou reiniciar a API devolve o mesmo registro. Dois pedidos simultâneos geram uma única linha para o mesmo visitante e data. A virada do dia permite uma nova tiragem, inclusive quando o sorteio repetir a mesma carta.
+- **Primeira etapa:** definir o esquema com unicidade por visitante e data. Depois, implementar o endpoint e verificar requisições concorrentes com PostgreSQL real.
+- **Sequência:** ligar a tela ao endpoint e, em seguida, abrir a Consulta com a carta como contexto. Saldo e compra pertencem ao fluxo completo do [roteiro de aceite](CRITERIOS-DE-ACEITE.md#marco-posterior-da-carta-do-dia).
+- **Progresso:** migração `003_daily_draws.sql`, endpoints autenticados pela credencial de visitante, catálogo editorial em português e inglês e tela conectada à Consulta.
+- **Evidências:** migração aplicada no PostgreSQL local. Os 14 testes da API passaram em execução serial com PostgreSQL real. Oito pedidos simultâneos devolveram o mesmo registro. A tiragem reapareceu após reiniciar o NestJS e o teste simulado da meia-noite liberou outro registro. A Consulta rejeitou a tiragem de outro visitante.
+- **Interface:** lint, TypeScript e exportação web aprovados. No Chrome, passaram revelação, reabertura após recarregar, localização em inglês e envio da carta à Consulta com Ollama simulado.
+- **Próxima ação:** validar em aparelhos Android e iOS e colher evidência com Ollama real antes do beta em dispositivos.
 
 ## Modelo de tarefa
 
