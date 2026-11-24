@@ -171,10 +171,14 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-10 — Abrir o beta HTTPS e melhorar a Consulta
 
-- **Estado:** Em andamento.
+- **Estado:** Concluída.
 - **Branch:** `esm-10/consulta-e-beta`.
 - **Aceite:** abrir a API no IP da VPS com certificado público, recusar convites inválidos, limitar geração por convite e entregar resposta empática ao cenário relatado. O app usa a mesma URL HTTPS no beta web e nas builds móveis.
-- **Próxima ação:** validar o Expo e a Consulta pelo acesso HTTPS e acompanhar o deploy.
+- **Integração:** [PR #8](https://github.com/elcioroberto95/minha-cigana/pull/8).
+- **Evidências (24/11/2026):** certificado público validado pelo Chrome e cliente HTTP. O beta web abriu sem túnel, recusou convite inválido e aceitou o válido. A API devolveu 403 sem convite e 204 na validação do convite. O cenário relatado recebeu a resposta editorial acolhedora, e uma consulta sobre trabalho recebeu resposta do Ollama pela VPS. O banco foi copiado para fora da VPS e a restauração em banco separado confirmou seis migrações.
+- **CI e deploy:** [verificação do PR](https://github.com/elcioroberto95/minha-cigana/actions/runs/45471827456) e [publicação do commit 8424abd](https://github.com/elcioroberto95/minha-cigana/actions/runs/45472198662).
+- **Modelo do beta:** comparação manual de dois turnos sobre troca de emprego e negociação de horário na VPS. O Qwen 2.5 3B manteve o assunto e ofereceu passos mais concretos, em cerca de 10,7 s e 3,3 s. O 1,5B levou cerca de 3,7 s e 1,6 s, mas mencionou uma Carta do Dia que não estava na conversa.
+- **Próxima ação:** rodar o beta com convidados, avaliar mais conversas, testar builds nativas e definir a rotina de backup externo antes de ampliar o acesso.
 
 ## Modelo de tarefa
 

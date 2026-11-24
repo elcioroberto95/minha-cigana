@@ -1,4 +1,4 @@
-FROM qwen2.5:1.5b
+FROM qwen2.5:3b
 PARAMETER temperature 0.45
 PARAMETER top_p 0.9
 PARAMETER repeat_penalty 1.1
