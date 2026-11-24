@@ -190,6 +190,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Evidências:** lint, checagem de tipos dos dois workspaces e dos evals, compilação TypeScript da API e 22 testes da API com PostgreSQL real passaram. O ensaio das dez entradas com respostas HTTP controladas verificou os três resultados e os códigos de saída 0, 1 e 2. A validação reutilizou as dependências instaladas a partir do mesmo lockfile.
 - **Execução real (24/11/2026):** NestJS, PostgreSQL 17 e Ollama 0.40.17 no Docker Desktop em CPU, com o modelo local `esmeralda` baseado no Qwen 2.5 1,5B. `chat-trabalho-en` (90,23 s), `chat-memoria-pt` (90,02 s) e a interpretação de `tarot-sim-en` (90,05 s) devolveram HTTP 503. Os IDs das requisições confirmaram timeout de inferência nos três casos. A rota de sorteio revelou a carta em 291 ms e o relatório manteve essa evidência. A rodada mediu disponibilidade e tempos de falha.
 - **Próxima ação:** executar os dez casos em ambiente de desenvolvimento com o modelo de 3B usado no beta e revisar as respostas pelos critérios de cada caso.
+- **Revisão:** [PR #10](https://github.com/elcioroberto95/minha-cigana/pull/10).
 
 ## Modelo de tarefa
 
