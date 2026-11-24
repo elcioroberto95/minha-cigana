@@ -116,6 +116,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Evidências:** migração aplicada no PostgreSQL local. Os 14 testes da API passaram em execução serial com PostgreSQL real. Oito pedidos simultâneos devolveram o mesmo registro. A tiragem reapareceu após reiniciar o NestJS e o teste simulado da meia-noite liberou outro registro. A Consulta rejeitou a tiragem de outro visitante.
 - **Interface:** lint, TypeScript e exportação web aprovados. No Chrome, passaram revelação, reabertura após recarregar, localização em inglês e envio da carta à Consulta com Ollama simulado.
 - **Próxima ação:** validar em aparelhos Android e iOS e colher evidência com Ollama real antes do beta em dispositivos.
+- **Revisão:** [PR #5](https://github.com/elcioroberto95/minha-cigana/pull/5).
 
 ## ESM-06 — Cadastrar perfil e personalizar consultas com check-ins
 
@@ -130,6 +131,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Verificação da conta:** a migração 005 foi aplicada ao PostgreSQL local. Em dois contextos isolados do Chrome, passaram o cadastro sem confirmação, a restauração da sessão após recarregar, a rejeição de senha errada, o login em outro contexto, a abertura de uma conversa anterior ao cadastro e a saída de apenas uma sessão. O teste de API cobriu expiração, revogação, desativação da credencial original e limite de tentativas. A observabilidade HTTP registrou respostas 401 dos Guards com `X-Request-ID`.
 - **Validação pendente:** o Ollama local excedeu o limite de 90 s da API no carregamento a frio. Um pré-carregamento separado também excedeu 160 s. Isso impediu validar a resposta do modelo real nesta execução.
 - **Próxima ação:** testar em Android e iOS e repetir a consulta com o modelo real disponível antes do beta.
+- **Revisão:** [PR #5](https://github.com/elcioroberto95/minha-cigana/pull/5).
 
 ## Modelo de tarefa
 
