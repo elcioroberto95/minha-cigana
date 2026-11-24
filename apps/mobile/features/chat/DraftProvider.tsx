@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react';
+import { useIdentityRevision } from '../../lib/session-token';
 
 const DraftContext = createContext<{
   question: string;
@@ -8,9 +9,17 @@ const DraftContext = createContext<{
 } | null>(null);
 
 export function DraftProvider({ children }: { children: React.ReactNode }) {
-  const [question, setQuestion] = useState('');
-  const [readingQuestion, setReadingQuestion] = useState('');
-  return <DraftContext.Provider value={{ question, setQuestion, readingQuestion, setReadingQuestion }}>
+  const revision = useIdentityRevision();
+  const empty = { revision, question: '', readingQuestion: '' };
+  const [stored, setStored] = useState(empty);
+  const draft = stored.revision === revision ? stored : empty;
+
+  return <DraftContext.Provider value={{
+    question: draft.question,
+    readingQuestion: draft.readingQuestion,
+    setQuestion: (question) => setStored((previous) => ({ ...(previous.revision === revision ? previous : empty), question })),
+    setReadingQuestion: (readingQuestion) => setStored((previous) => ({ ...(previous.revision === revision ? previous : empty), readingQuestion })),
+  }}>
     {children}
   </DraftContext.Provider>;
 }

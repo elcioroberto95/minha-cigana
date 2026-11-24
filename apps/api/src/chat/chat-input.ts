@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { isVisitorRecordId } from '../visitor/visitor-identity.js';
 
 const topics = ['love', 'money', 'work', 'future', 'spirituality', 'general'] as const;
 
@@ -38,8 +39,10 @@ export function readMessages(history: unknown, limit: number): ChatMessage[] {
 
 export function readChatInput(body: unknown) {
   if (!isObject(body)) invalid();
-  const { locale, topic, message, history = [] } = body;
-  if (locale !== 'pt-BR' && locale !== 'en-US') invalid();
+  const { locale, topic, message, history = [], dailyCardId } = body;
+  const supportedLocale = (['pt-BR', 'en-US'] as const).find((value) => value === locale);
+  if (!supportedLocale) invalid();
+  if (dailyCardId !== undefined && !isVisitorRecordId(dailyCardId)) invalid();
   const previous = readMessages(history, 8).map(({ role, content }) => ({ role, content }));
-  return { locale, topic: readTopic(topic), message: readText(message, 500), history: previous };
+  return { locale: supportedLocale, topic: readTopic(topic), message: readText(message, 500), history: previous, dailyCardId };
 }

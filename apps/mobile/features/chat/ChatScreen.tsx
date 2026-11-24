@@ -1,3 +1,4 @@
+import { withIdentityScope } from '../../lib/identity-scope';
 import { randomUUID } from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -12,8 +13,9 @@ import { useQuestionDraft } from './DraftProvider';
 
 const portrait = require('../../assets/personagem.png');
 
-export default function ChatScreen() {
-  const params = useLocalSearchParams<{ topic?: string }>();
+function ChatScreenContent() {
+  const params = useLocalSearchParams<{ topic?: string; dailyCardId?: string }>();
+  const dailyCardId = typeof params.dailyCardId === 'string' ? params.dailyCardId : undefined;
   const [topic, setTopic] = useState<Topic>(isTopic(params.topic) ? params.topic : 'general');
   const { question, setQuestion } = useQuestionDraft();
   const { t, i18n } = useTranslation();
@@ -39,7 +41,7 @@ export default function ChatScreen() {
     try {
       const { reply, model } = await requestReply({
         locale: i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'pt-BR',
-        topic, message, history: history.slice(-8),
+        topic, message, history: history.slice(-8), dailyCardId,
       }, controller.signal);
       if (controller.signal.aborted) return;
       setHistory([...history, { role: 'user', content: message }, { role: 'assistant', content: reply, model }]);
@@ -72,6 +74,7 @@ export default function ChatScreen() {
         <Copy emphasis>Madame Esmeralda</Copy>
       </View>
       <Copy>{t('chatWelcome')}</Copy>
+      {dailyCardId && <Copy emphasis>{t('dailyChatContext')}</Copy>}
     </Panel>
     {history.map(({ role, content }, index) => <Panel key={index}>
       <Copy emphasis>{role === 'assistant' ? 'Madame Esmeralda' : t('chatYou')}</Copy>
@@ -110,3 +113,5 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', gap: 8 },
   action: { flex: 1 },
 });
+
+export default withIdentityScope(ChatScreenContent);

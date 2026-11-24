@@ -1,3 +1,4 @@
+import { withIdentityScope } from '../../lib/identity-scope';
 import { useIsFocused, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +7,7 @@ import { deleteConversation, getConversation, listConversations, type SavedConve
 
 const filters = ['allRecords', 'chat', 'spreads'] as const;
 
-export function HistoryScreen() {
+function HistoryScreenContent() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const isFocused = useIsFocused();
@@ -51,7 +52,7 @@ export function HistoryScreen() {
   </Screen>;
 }
 
-export function HistoryDetailScreen() {
+function HistoryDetailScreenContent() {
   const { t } = useTranslation();
   const router = useRouter();
   const isFocused = useIsFocused();
@@ -114,3 +115,7 @@ export function HistoryDetailScreen() {
     </>)}
   </Screen>;
 }
+
+export const HistoryScreen = withIdentityScope(HistoryScreenContent);
+
+export const HistoryDetailScreen = withIdentityScope(HistoryDetailScreenContent);

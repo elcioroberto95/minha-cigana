@@ -40,20 +40,26 @@ Use `docker compose ps` para ver a saúde do container e `docker compose exec -T
 
 `POST /api/chat` recebe `locale`, `topic`, `message` e um `history` opcional de até quatro pares recentes. A resposta contém `reply` e `model`. Se o modelo estiver indisponível, a API retorna `503` e o app mantém o rascunho. `CHAT_PERSONA_FILE` pode apontar para um arquivo UTF-8 de configuração da persona no backend. Autenticação de conta, limites de uso e proteção de produção antecedem a publicação do endpoint.
 
-As próximas integrações de tarô usam `POST /api/tarot/draw` e `POST /api/tarot/interpret`.
+## Carta do Dia
+
+Rode `npm.cmd run migrate:api` com o PostgreSQL local disponível. No app, abra **Carta do Dia** e toque **Revelar minha carta**. A API usa a sessão da conta ou a credencial de visitante do app. `GET /api/tarot/daily` consulta a tiragem de hoje e `POST /api/tarot/daily` revela ou devolve a mesma tiragem. O dia de referência vira à meia-noite no horário de Brasília.
+
+A tiragem guarda a carta e o texto editorial em português e inglês. O botão **Conversar sobre esta carta** abre a Consulta com o ID da tiragem. O backend verifica a propriedade e recupera a carta salva antes de chamar o Ollama. O recorte inicial é gratuito.
+
+As próximas integrações de tiragens com múltiplas cartas usam `POST /api/tarot/draw` e `POST /api/tarot/interpret`.
 
 ## Acompanhar a latência da Consulta
 
-Envie uma mensagem pela Consulta e veja o terminal do NestJS. O interceptor global mede as rotas que chegam aos controladores e devolve `X-Request-ID`. Procure o mesmo valor em `request_id` nos logs JSON:
+Envie uma mensagem pela Consulta e veja o terminal do NestJS. O middleware HTTP mede as requisições e devolve `X-Request-ID`. Procure o mesmo valor em `request_id` nos logs JSON:
 
 | Evento | O que mede |
 | --- | --- |
-| `http.request.completed` | `duration_ms` mede do início do interceptor até a resposta terminar. `status` informa o código final. Conexões encerradas antes da resposta ficam com `aborted: true` e `499` na telemetria. |
+| `http.request.completed` | `duration_ms` mede do início do middleware até a resposta terminar. `status` informa o código final. Conexões encerradas antes da resposta ficam com `aborted: true` e `499` na telemetria. |
 | `ollama.chat.completed` | `duration_ms` cobre configuração, chamada ao Ollama e leitura da resposta pelo NestJS. O evento registra sucesso ou a categoria da falha. |
 
 Quando o Ollama fornece suas próprias medidas, o log também inclui `ollama_total_ms`, `model_load_ms`, `prompt_eval_ms` e `generation_ms`. O Ollama devolve essas medidas em nanossegundos. A API divide por um milhão para registrá-las em milissegundos. Como a Consulta espera o JSON completo, esses eventos permitem investigar a duração total. Para medir até a primeira palavra seria preciso receber partes da resposta. Os eventos registram metadados operacionais e deixam de fora o texto da conversa e as credenciais. [Resposta da API de chat do Ollama](https://docs.ollama.com/api/chat).
 
-O interceptor usa o template da rota, como `/api/history/:id`, e mantém o ID disponível durante a execução assíncrona. URL sem rota, JSON rejeitado pelo Express e outras falhas anteriores à execução do interceptor ficam fora desta instrumentação. [Interceptors no NestJS](https://docs.nestjs.com/interceptors).
+O middleware usa o template da rota, como `/api/history/:id`, mesmo quando um Guard recusa a requisição. O ID fica disponível durante a execução assíncrona. Requisições sem template recebem o rótulo `unmatched`. A instrumentação começa depois do parser de corpo do Express.
 
 ### Métricas no Prometheus
 
@@ -87,7 +93,7 @@ npm.cmd run migrate:api
 
 Antes de migrar, copie a configuração de `DATABASE_URL` de [apps/api/.env.example](apps/api/.env.example) para `apps/api/.env`. Reinicie o NestJS depois de configurar o banco. As migrações ficam em `apps/api/migrations` e rodam pelo comando acima. O PostgreSQL de desenvolvimento escuta no loopback em `5433` e usa volume próprio. Em outro ambiente, forneça endereço e credenciais por configuração.
 
-Depois de receber uma resposta na Consulta, toque **Salvar esta conversa**. O histórico permite abrir ou excluir a conversa salva. O visitante usa uma credencial do aparelho ou navegador. O acesso é local a esse perfil de armazenamento. O histórico guarda até 20 pares por conversa e lista as 50 conversas mais recentes. A ativação de memória entre consultas e a conta autenticada ainda dependem de integração.
+Depois de receber uma resposta na Consulta, toque **Salvar esta conversa**. O histórico permite abrir ou excluir a conversa salva. O visitante usa uma credencial deste aparelho ou navegador. Em **Perfil**, crie uma conta com e-mail e senha para trazer os dados de visitante e acessar o histórico em outros aparelhos. Para reabrir a conta, escolha **Entrar**. O histórico guarda até 20 pares por conversa e lista as 50 conversas mais recentes. A memória entre consultas pode ser ativada em **Perfil → Privacidade**.
 
 Para testar a migração e o reinício com PostgreSQL real, defina `TEST_DATABASE_URL` apontando para um banco de desenvolvimento ou teste e rode `npm.cmd run test:api`. O teste cria e descarta um esquema próprio.
 

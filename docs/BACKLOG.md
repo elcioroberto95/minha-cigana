@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-04 — Medir latência e falhas na Consulta](#esm-04--medir-latência-e-falhas-na-consulta)
+**Próxima tarefa:** [ESM-05 — Implementar a Carta do Dia](#esm-05--implementar-a-carta-do-dia)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -95,13 +95,43 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-04 — Medir latência e falhas na Consulta
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Depende de:** ESM-03, integrado pelo [PR #3](https://github.com/elcioroberto95/minha-cigana/pull/3).
 - **Branch:** `feat/chat-observability`.
 - **Aceite:** correlacionar a resposta HTTP e os eventos do NestJS e do Ollama pelo `X-Request-ID`. Registrar status final e duração por rota, categoria de falha do provedor e tempo de cada etapa quando informado pelo Ollama.
 - **Escopo:** interceptor HTTP global e métricas de inferência, banco e processo via OpenTelemetry. Consultas de tráfego, falhas, latência e saturação disponíveis no Prometheus local.
 - **Evidências:** 12 testes da API passaram, incluindo correlação em requisições simultâneas, template da rota, desconexão do cliente e isolamento do histórico com PostgreSQL real. O ensaio no Prometheus real confirmou contadores HTTP, histogramas, tokens e etapas do Ollama, métricas do pool e das operações de histórico e memória e atraso do event loop. Para controlar as durações e falhas, o ensaio de métricas usou um Ollama simulado.
 - **Próxima ação:** observar uma janela de tráfego real para definir a linha de base e limites de alerta.
+- **Integração:** [PR #4](https://github.com/elcioroberto95/minha-cigana/pull/4), com CI aprovado.
+
+## ESM-05 — Implementar a Carta do Dia
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-05/carta-do-dia`.
+- **Escopo proposto:** recorte gratuito para desenvolvimento. Reutilizar a credencial local de visitante e a tela existente. Sortear uma carta de um catálogo editorial pequeno, persistir a escolha no PostgreSQL e mostrar uma reflexão curta. O dia de referência segue `America/Sao_Paulo`.
+- **Aceite:** a primeira visita revela uma carta. Reabrir a tela ou reiniciar a API devolve o mesmo registro. Dois pedidos simultâneos geram uma única linha para o mesmo visitante e data. A virada do dia permite uma nova tiragem, inclusive quando o sorteio repetir a mesma carta.
+- **Primeira etapa:** definir o esquema com unicidade por visitante e data. Depois, implementar o endpoint e verificar requisições concorrentes com PostgreSQL real.
+- **Sequência:** ligar a tela ao endpoint e, em seguida, abrir a Consulta com a carta como contexto. Saldo e compra pertencem ao fluxo completo do [roteiro de aceite](CRITERIOS-DE-ACEITE.md#marco-posterior-da-carta-do-dia).
+- **Progresso:** migração `003_daily_draws.sql`, endpoints autenticados pela credencial de visitante, catálogo editorial em português e inglês e tela conectada à Consulta.
+- **Evidências:** migração aplicada no PostgreSQL local. Os 14 testes da API passaram em execução serial com PostgreSQL real. Oito pedidos simultâneos devolveram o mesmo registro. A tiragem reapareceu após reiniciar o NestJS e o teste simulado da meia-noite liberou outro registro. A Consulta rejeitou a tiragem de outro visitante.
+- **Interface:** lint, TypeScript e exportação web aprovados. No Chrome, passaram revelação, reabertura após recarregar, localização em inglês e envio da carta à Consulta com Ollama simulado.
+- **Próxima ação:** validar em aparelhos Android e iOS e colher evidência com Ollama real antes do beta em dispositivos.
+- **Revisão:** [PR #5](https://github.com/elcioroberto95/minha-cigana/pull/5).
+
+## ESM-06 — Cadastrar perfil e personalizar consultas com check-ins
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-06/perfil-check-in-memoria`, baseada em ESM-05 para compartilhar a data de São Paulo.
+- **Escopo:** perfil, check-in diário de sentimento e tema com opção de pular, memória de consultas e conta com e-mail e senha.
+- **Dependências e decisões:** ESM-02, ESM-03 e ESM-05. [Decisão 009](DECISOES.md#009--perfil-do-visitante-e-check-in-diário).
+- **Aceite:** cadastrar sem confirmação, entrar em outro aparelho e manter o histórico. Isolar os dados por credencial, rejeitar sessões inválidas ou expiradas e revogar a sessão ao sair. Oferecer o check-in uma vez por identidade e por dia, aceitar pular e respeitar a preferência de memória e a exclusão de respostas.
+- **Evidências:** `npm run typecheck`, `npm run lint`, `npm run build:web` e os 16 testes de `npm run test:api` passaram. A migração 004 foi aplicada ao PostgreSQL local. No teste de integração, oito pedidos concorrentes geraram uma única oferta, a virada de dia liberou o check-in seguinte e a troca de credencial manteve os dados isolados. O substituto do Ollama confirmou o contexto enviado à IA antes e depois de ativar a memória ou apagar respostas.
+- **Interface:** no Chrome, passaram cadastro sem confirmação, persistência após recarregar, edição em inglês, pular sem repetir no mesmo dia, salvar e apagar respostas e alternar a memória. O botão de pular permaneceu acessível em 390 × 640.
+- **Autenticação:** cadastro e entrada com e-mail e senha, saída com revogação de sessão, Guards no NestJS e conversão do visitante com preservação do histórico. [Decisão 010](DECISOES.md#010--conta-por-e-mail-e-senha).
+- **Verificação da conta:** a migração 005 foi aplicada ao PostgreSQL local. Em dois contextos isolados do Chrome, passaram o cadastro sem confirmação, a restauração da sessão após recarregar, a rejeição de senha errada, o login em outro contexto, a abertura de uma conversa anterior ao cadastro e a saída de apenas uma sessão. O teste de API cobriu expiração, revogação, desativação da credencial original e limite de tentativas. A observabilidade HTTP registrou respostas 401 dos Guards com `X-Request-ID`.
+- **Validação pendente:** o Ollama local excedeu o limite de 90 s da API no carregamento a frio. Um pré-carregamento separado também excedeu 160 s. Isso impediu validar a resposta do modelo real nesta execução.
+- **Próxima ação:** testar em Android e iOS e repetir a consulta com o modelo real disponível antes do beta.
+- **Revisão:** [PR #5](https://github.com/elcioroberto95/minha-cigana/pull/5).
 
 ## Modelo de tarefa
 

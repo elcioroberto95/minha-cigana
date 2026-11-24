@@ -1,27 +1,20 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { Injectable, Logger } from '@nestjs/common';
-import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import type { Request, Response } from 'express';
-import { Observable } from 'rxjs';
+import type { NestMiddleware } from '@nestjs/common';
+import type { NextFunction, Request, Response } from 'express';
 import { ApiMetrics } from './api-metrics.js';
 import { requestContext } from './request-context.js';
 
 const httpMethods = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']);
 
 @Injectable()
-export class HttpObservabilityInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(HttpObservabilityInterceptor.name);
+export class HttpObservabilityMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(HttpObservabilityMiddleware.name);
 
   constructor(private readonly metrics: ApiMetrics) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    if (context.getType() !== 'http') return next.handle();
-    const http = context.switchToHttp();
-    const request = http.getRequest<Request>();
-    const response = http.getResponse<Response>();
-    const route = typeof request.route?.path === 'string'
-      ? request.route.path : `${context.getClass().name}.${context.getHandler().name}`;
+  use(request: Request, response: Response, next: NextFunction) {
     const method = httpMethods.has(request.method) ? request.method : 'OTHER';
     const requestId = randomUUID();
     const startedAt = performance.now();
@@ -33,6 +26,7 @@ export class HttpObservabilityInterceptor implements NestInterceptor {
     const complete = (aborted: boolean) => {
       if (completed) return;
       completed = true;
+      const route = typeof request.route?.path === 'string' ? request.route.path : 'unmatched';
       const elapsed = performance.now() - startedAt;
       const status = aborted ? 499 : response.statusCode;
       this.metrics.finishHttp(method, route, status, elapsed);
@@ -50,7 +44,6 @@ export class HttpObservabilityInterceptor implements NestInterceptor {
     response.once('finish', () => complete(false));
     response.once('close', () => complete(!response.writableFinished));
 
-    return new Observable((subscriber) =>
-      requestContext.run(requestId, () => next.handle().subscribe(subscriber)));
+    requestContext.run(requestId, next);
   }
 }

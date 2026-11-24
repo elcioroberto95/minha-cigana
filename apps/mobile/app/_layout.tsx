@@ -7,7 +7,9 @@ import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { ActivityIndicator, View } from 'react-native';
 import { colors } from '../components/ui';
+import { DailyCheckIn } from '../features/account/DailyCheckIn';
 import { DraftProvider } from '../features/chat/DraftProvider';
+import { restoreSession, watchSessionStorage } from '../lib/session-token';
 import { appI18n, initializeLocalization } from '../localization';
 
 export default function RootLayout() {
@@ -21,7 +23,8 @@ export default function RootLayout() {
     }
 
     appI18n.on('languageChanged', updateDocumentLocale);
-    void initializeLocalization().then(() => {
+    const stopWatchingSession = watchSessionStorage();
+    void Promise.all([initializeLocalization(), restoreSession().catch(() => {})]).then(() => {
       if (!mounted) return;
       updateDocumentLocale(appI18n.language);
       setLocalized(true);
@@ -29,6 +32,7 @@ export default function RootLayout() {
 
     return () => {
       mounted = false;
+      stopWatchingSession?.();
       appI18n.off('languageChanged', updateDocumentLocale);
     };
   }, []);
@@ -42,5 +46,6 @@ export default function RootLayout() {
     <DraftProvider>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
     </DraftProvider>
+    <DailyCheckIn />
   </I18nextProvider>;
 }
