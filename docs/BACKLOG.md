@@ -226,6 +226,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Idioma na entrada (UX-05):** o seletor fica em **Perfil → Configurações**. Lint, TypeScript e exportação web passaram. No Chrome a 360 × 800, verificados `en-GB` usando inglês, `fr-FR` usando português, ausência do seletor no login, cadastro e Início, escolha manual após recarregar e retorno ao idioma automático.
 - **Senha:** o cadastro exige oito caracteres. O teste com PostgreSQL aceitou oito, rejeitou sete e nove e confirmou o login de uma conta com senha mais longa já cadastrada.
 - **Próxima ação:** revisar a branch e confirmar login e cadastro pelo HTTPS após a publicação.
+- **Revisão:** [PR #12](https://github.com/elcioroberto95/minha-cigana/pull/12).
 
 ## ESM-15 — Registrar contexto declarado na Consulta
 
@@ -236,6 +237,7 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Evidências:** migração 008 aplicada ao PostgreSQL local. O teste integrado verificou opção inicialmente desligada, registro sem aviso no texto da conversa, reaproveitamento em outra sessão e remoção ao desativar. O teste de extração recusou perguntas, nomes em suspeitas e relatos sensíveis.
 - **Execução real (24/11/2026):** a tentativa com Esmeralda 1,5B em CPU retornou HTTP 503 após 90 s antes da chamada da ferramenta. A requisição `8c3274be-7d57-4015-bae8-dd555db5c293` deixou a memória vazia.
 - **Próxima ação:** rodar o exemplo de profissão com Esmeralda 3B em desenvolvimento e consultar a seção Memória do perfil.
+- **Revisão:** [PR #12](https://github.com/elcioroberto95/minha-cigana/pull/12).
 
 ## Modelo de tarefa
 
