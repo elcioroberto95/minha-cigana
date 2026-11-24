@@ -63,6 +63,21 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Consequência.** A Consulta existente segue usando Ollama. A abertura ou exclusão do histórico verifica o proprietário. A primeira entrega permite leitura e exclusão no mesmo aparelho ou navegador. Conta, sincronização, memória entre consultas e controles de publicação ficam para etapas futuras.
 - **Operação.** Migrações SQL explícitas, com controle de checksum. O histórico usa um volume de PostgreSQL separado do volume de modelos. [Instruções locais](../README.md#histórico-local-com-postgresql).
 
+## 009 — Perfil do visitante e check-in diário
+
+- **Data e estado:** 2026-11-24, aceita para o ambiente de desenvolvimento.
+- **Identidade:** o cadastro não envia código, não pede senha e usa a credencial da decisão 008. O e-mail informado é um dado de perfil, sem verificação de propriedade. O mesmo visitante mantém os dados já salvos. A [decisão 010](#010--conta-por-e-mail-e-senha) amplia este cadastro com login em outros aparelhos.
+- **Check-in:** o PostgreSQL registra a primeira oferta por visitante e data de São Paulo. Fechar ou pular mantém a marca do dia. Só as respostas salvas incluem tema e sentimento. Apagar respostas mantém a marca do dia atual.
+- **Personalização:** a Consulta pode usar as respostas de hoje. A opção no Perfil, desligada inicialmente, libera o nome de preferência, até três check-ins pertinentes e até duas perguntas de conversas salvas no mesmo tema, limitadas a 30 dias. E-mail e sexo ficam no cadastro. As conversas continuam dependendo de **Salvar esta conversa**.
+
+## 010 — Conta por e-mail e senha
+
+- **Data e estado:** 2026-11-24, aceita para o ambiente de desenvolvimento.
+- **Identidade:** `POST /api/auth/register` recebe a credencial de visitante como Bearer e cria a conta sem confirmação de e-mail. O e-mail de login é único, comparado sem distinguir maiúsculas e não é editável pelo endpoint de perfil. A conversão mantém o mesmo proprietário no banco e desativa a credencial de visitante. Assim, o perfil, as conversas, a Carta do Dia e as preferências continuam disponíveis.
+- **Sessão:** `POST /api/auth/login` emite um token opaco por aparelho. O PostgreSQL guarda o hash do token e expira a sessão em 30 dias. `POST /api/auth/logout` revoga a sessão usada na chamada. Os Guards separam visitante e conta e aplicam a identidade ao perfil, check-in, histórico e Carta do Dia. O chat por texto pode operar sem identidade, mas valida a sessão quando recebe credencial.
+- **Senha e tentativas:** senha de pelo menos 15 caracteres, scrypt com salt individual e limite de tentativas por IP no login e cadastro. Erros de senha incorreta e conta inexistente têm a mesma resposta. [OWASP sobre senhas](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) · [OWASP sobre autenticação](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- **Cliente:** o app usa SecureStore em Android e iOS e armazenamento do navegador na versão web de desenvolvimento. Recuperação de senha e publicação externa ficam para etapas futuras.
+
 ## Modelo de decisão
 
 ```markdown

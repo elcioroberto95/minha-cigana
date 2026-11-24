@@ -1,3 +1,4 @@
+import { withIdentityScope } from '../../lib/identity-scope';
 import { useIsFocused, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,7 @@ type ViewState =
   | { phase: 'loading' | 'revealing' | 'error' }
   | { phase: 'ready'; draw: DailyDraw | null; revisited: boolean };
 
-export default function DailyCardScreen() {
+function DailyCardScreenContent() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const focused = useIsFocused();
@@ -125,3 +126,5 @@ const styles = StyleSheet.create({
   star: { color: colors.gold, fontSize: 45 },
   status: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 });
+
+export default withIdentityScope(DailyCardScreenContent);

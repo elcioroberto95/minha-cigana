@@ -1,9 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { ApiMetrics } from './api-metrics.js';
-import { HttpObservabilityInterceptor } from './http-observability.interceptor.js';
+import { HttpObservabilityMiddleware } from './http-observability.middleware.js';
 
 @Global()
 @Module({
@@ -19,8 +19,11 @@ import { HttpObservabilityInterceptor } from './http-observability.interceptor.j
         return new ApiMetrics(reader);
       },
     },
-    { provide: APP_INTERCEPTOR, useClass: HttpObservabilityInterceptor },
   ],
   exports: [ApiMetrics],
 })
-export class ObservabilityModule {}
+export class ObservabilityModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpObservabilityMiddleware).forRoutes('{*path}');
+  }
+}

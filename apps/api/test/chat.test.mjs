@@ -107,7 +107,7 @@ test('a consulta rejeita papéis inválidos, mensagens vazias e idiomas fora do 
   }
 });
 
-test('o interceptor é global, usa o template da rota e ignora valores dos parâmetros', async () => {
+test('a observabilidade é global, usa o template da rota e ignora valores dos parâmetros', async () => {
   const response = await fetch(new URL('/api/history/private-id?token=private-value', url));
   assert.equal(response.status, 401);
   const [request] = requestLogs(response);
@@ -131,7 +131,7 @@ test('consultas concorrentes mantêm um identificador por requisição', async (
   assert.equal(ids.size, 2);
 });
 
-test('o interceptor registra uma vez a conexão encerrada pelo cliente', async () => {
+test('a observabilidade registra uma vez a conexão encerrada pelo cliente', async () => {
   let release;
   pauseResponse = new Promise((resolve) => { release = resolve; });
   const arrivals = new Promise((resolve) => provider.once('request', resolve));

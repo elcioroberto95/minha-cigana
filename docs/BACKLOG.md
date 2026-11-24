@@ -117,6 +117,20 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Interface:** lint, TypeScript e exportação web aprovados. No Chrome, passaram revelação, reabertura após recarregar, localização em inglês e envio da carta à Consulta com Ollama simulado.
 - **Próxima ação:** validar em aparelhos Android e iOS e colher evidência com Ollama real antes do beta em dispositivos.
 
+## ESM-06 — Cadastrar perfil e personalizar consultas com check-ins
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-06/perfil-check-in-memoria`, baseada em ESM-05 para compartilhar a data de São Paulo.
+- **Escopo:** perfil, check-in diário de sentimento e tema com opção de pular, memória de consultas e conta com e-mail e senha.
+- **Dependências e decisões:** ESM-02, ESM-03 e ESM-05. [Decisão 009](DECISOES.md#009--perfil-do-visitante-e-check-in-diário).
+- **Aceite:** cadastrar sem confirmação, entrar em outro aparelho e manter o histórico. Isolar os dados por credencial, rejeitar sessões inválidas ou expiradas e revogar a sessão ao sair. Oferecer o check-in uma vez por identidade e por dia, aceitar pular e respeitar a preferência de memória e a exclusão de respostas.
+- **Evidências:** `npm run typecheck`, `npm run lint`, `npm run build:web` e os 16 testes de `npm run test:api` passaram. A migração 004 foi aplicada ao PostgreSQL local. No teste de integração, oito pedidos concorrentes geraram uma única oferta, a virada de dia liberou o check-in seguinte e a troca de credencial manteve os dados isolados. O substituto do Ollama confirmou o contexto enviado à IA antes e depois de ativar a memória ou apagar respostas.
+- **Interface:** no Chrome, passaram cadastro sem confirmação, persistência após recarregar, edição em inglês, pular sem repetir no mesmo dia, salvar e apagar respostas e alternar a memória. O botão de pular permaneceu acessível em 390 × 640.
+- **Autenticação:** cadastro e entrada com e-mail e senha, saída com revogação de sessão, Guards no NestJS e conversão do visitante com preservação do histórico. [Decisão 010](DECISOES.md#010--conta-por-e-mail-e-senha).
+- **Verificação da conta:** a migração 005 foi aplicada ao PostgreSQL local. Em dois contextos isolados do Chrome, passaram o cadastro sem confirmação, a restauração da sessão após recarregar, a rejeição de senha errada, o login em outro contexto, a abertura de uma conversa anterior ao cadastro e a saída de apenas uma sessão. O teste de API cobriu expiração, revogação, desativação da credencial original e limite de tentativas. A observabilidade HTTP registrou respostas 401 dos Guards com `X-Request-ID`.
+- **Validação pendente:** o Ollama local excedeu o limite de 90 s da API no carregamento a frio. Um pré-carregamento separado também excedeu 160 s. Isso impediu validar a resposta do modelo real nesta execução.
+- **Próxima ação:** testar em Android e iOS e repetir a consulta com o modelo real disponível antes do beta.
+
 ## Modelo de tarefa
 
 Crie a tarefa com ID, estado, escopo e aceite. Preencha os demais campos conforme o trabalho avança. Atualize a mesma entrada na retomada. O Git conserva o histórico.

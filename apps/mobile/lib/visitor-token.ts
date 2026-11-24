@@ -28,3 +28,14 @@ export function getOrCreateVisitorToken() {
   }
   return provisioning;
 }
+
+export function removeVisitorToken(expected: string) {
+  async function remove() {
+    if (await getVisitorToken() !== expected) return false;
+    if (Platform.OS === 'web') await AsyncStorage.removeItem(key);
+    else await SecureStore.deleteItemAsync(key);
+    return true;
+  }
+  const locks = Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.locks : undefined;
+  return locks ? locks.request(key, remove) : remove();
+}

@@ -1,3 +1,4 @@
+import { withIdentityScope } from '../../lib/identity-scope';
 import { randomUUID } from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -12,7 +13,7 @@ import { useQuestionDraft } from './DraftProvider';
 
 const portrait = require('../../assets/personagem.png');
 
-export default function ChatScreen() {
+function ChatScreenContent() {
   const params = useLocalSearchParams<{ topic?: string; dailyCardId?: string }>();
   const dailyCardId = typeof params.dailyCardId === 'string' ? params.dailyCardId : undefined;
   const [topic, setTopic] = useState<Topic>(isTopic(params.topic) ? params.topic : 'general');
@@ -112,3 +113,5 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', gap: 8 },
   action: { flex: 1 },
 });
+
+export default withIdentityScope(ChatScreenContent);
