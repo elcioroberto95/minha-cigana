@@ -1,0 +1,14 @@
+*
+!package.json
+!package-lock.json
+!Modelfile
+!data
+!data/cartas.json
+!apps
+!apps/api
+!apps/api/**
+apps/api/.env*
+apps/api/dist
+apps/api/node_modules
+!apps/mobile
+!apps/mobile/package.json
