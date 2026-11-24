@@ -1,10 +1,12 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [M1-05 — Organizar app e API no monorepo](#m1-05--organizar-app-e-api-no-monorepo)
+**Próxima tarefa:** [M1-06 — Revisar a base NestJS e as telas mobile](#m1-06--revisar-a-base-nestjs-e-as-telas-mobile)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
 O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. Os [critérios de aceite](CRITERIOS-DE-ACEITE.md) detalham os cenários, resultados esperados e evidências para cada etapa.
+
+A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](DIAGNOSTICO-ESMERALDA.md) e segue pela tarefa ESM-02 após a fundação.
 
 - `Planejada` — depende de outra tarefa ou ainda precisa detalhar escopo ou aceite.
 - `Pronta` — pode entrar em execução.
@@ -42,12 +44,54 @@ O [plano do beta fechado](PLANO-DO-BETA.md) define o primeiro fluxo a entregar. 
 
 ## M1-05 — Organizar app e API no monorepo
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Depende de:** M1-01.
 - **Escopo:** mover Expo para `apps/mobile`, criar a base Node.js e TypeScript em `apps/api` e centralizar a instalação. Ver [decisão 003](DECISOES.md#003--monorepo-para-o-app-e-a-api).
 - **Aceite:** os comandos da raiz resolvem os workspaces, o Expo exporta a tela inicial e a API compilada responde com sucesso em `GET /health`. O CI verifica os dois apps.
 - **Branch:** `m1-05/monorepo-api`.
 - **Evidências:** no Node.js `26.10.0`, passaram lint do Expo, TypeScript dos dois workspaces, build da API, três testes HTTP e exportação web. A API compilada respondeu `{"status":"ok"}` e o Chrome renderizou a tela inicial exportada. O workflow foi atualizado para verificar os dois apps no próximo PR.
+- **Integração:** [PR #2](https://github.com/elcioroberto95/minha-cigana/pull/2).
+
+## M1-06 — Revisar a base NestJS e as telas mobile
+
+- **Estado:** Em revisão.
+- **Depende de:** M1-05.
+- **Escopo:** migrar o backend para NestJS e criar as rotas e páginas do mapa com navegação por abas e pilha. A [decisão 005](DECISOES.md#005--nestjs-na-api-e-navegação-mobile-por-áreas-do-produto) registra as fronteiras técnicas.
+- **Aceite:** preservar o contrato do `/health`, percorrer a Consulta com a categoria selecionada, preparar e selecionar cartas, abrir as prévias e navegar por Perfil e Histórico. As páginas usam português e inglês e indicam operações que aguardam integração.
+- **Branch:** `feat/nest-mobile-foundation`.
+- **Evidências:** no Chrome a 390 px, passaram a navegação pelas rotas, o preenchimento da tiragem com o tema e o rascunho da consulta, a seleção de três e dez cartas, a prévia de personalidade e a localização em inglês. A suíte HTTP passou no NestJS, incluindo `GET`, `HEAD`, método incompatível e rota inexistente. A API compilada respondeu pelo ponto de entrada de produção. O Expo exportou os bundles de web, Android e iOS. A execução em aparelhos fica em M1-04.
+- **Próxima ação:** revisar a navegação nas duas plataformas em M1-04 e conectar a consulta e a geração de leituras aos módulos de backend das próximas fases.
+- **Checagens de código:** lint do mobile e TypeScript dos dois workspaces aprovados.
+
+## ESM-01 — Diagnosticar a base para Madame Esmeralda
+
+- **Estado:** Em revisão.
+- **Escopo:** inventariar stack, configurações, dados, integrações e lacunas para produção.
+- **Evidências:** [diagnóstico técnico e ordem de entrega](DIAGNOSTICO-ESMERALDA.md). Revisados código, lockfile, CI e estado do Git. O ambiente local respondeu ao comando do Compose, com o daemon Docker indisponível durante a inspeção.
+- **Branch:** `feat/nest-mobile-foundation`.
+- **Próxima ação:** ESM-02.
+
+## ESM-02 — Definir o primeiro release e persistir sessões e mensagens
+
+- **Estado:** Em andamento.
+- **Depende de:** M1-06 e ESM-01.
+- **Escopo:** definir o manifesto de release, a identidade do visitante e o esquema inicial. Resolver as escolhas de persistência e autenticação da [decisão 006](DECISOES.md#006--persistência-portátil-e-inferência-local).
+- **Aceite:** criar uma sessão com mensagens, consultar pela identidade proprietária, reiniciar a API, aplicar uma migração aditiva e verificar que os mesmos dados continuam disponíveis.
+- **Branch:** `feat/nest-mobile-foundation`.
+- **Progresso:** PostgreSQL no Compose, migrações de sessão e mensagem, salvamento explícito e histórico por visitante. O manifesto formal de primeiro release segue em preparação. [Decisão 008](DECISOES.md#008--histórico-de-visitante-no-postgresql).
+- **Evidências:** oito testes HTTP com PostgreSQL 17 passaram. Um registro criado antes da migração `002` continuou acessível. Uma sessão salva foi reaberta após reiniciar o NestJS, permaneceu isolada de outro visitante e teve as mensagens removidas na exclusão. As migrações locais passaram na primeira e na segunda execução.
+- **Interface:** lint, TypeScript e exportação web passaram. No Chrome, uma consulta permaneceu fora do histórico até o salvamento explícito. O registro salvo abriu após recarregar o navegador e desapareceu após a exclusão. O teste da interface usou PostgreSQL real e respostas simuladas de inferência.
+- **Próxima ação:** verificar a credencial do visitante em aparelhos Android e iOS e preparar o manifesto do primeiro release.
+
+## ESM-03 — Conectar a Consulta ao Ollama
+
+- **Estado:** Em revisão.
+- **Branch:** `feat/nest-mobile-foundation`.
+- **Escopo:** conectar as telas existentes ao `POST /api/chat`, usando persona da Madame Esmeralda e modelo configurável na API. O contexto recente fica em memória e pode ser enviado a cada mensagem. [Decisão 007](DECISOES.md#007--ollama-como-provedor-inicial-de-respostas).
+- **Aceite:** a resposta do provedor aparece na Consulta. Entrada inválida é rejeitada e falhas do provedor preservam a mensagem para nova tentativa.
+- **Evidências:** lint, tipos e seis testes HTTP aprovados. No Chrome, usando a exportação web e um substituto local do Ollama, passaram envio, resposta, contexto na mensagem seguinte, preservação do rascunho na falha e reenvio.
+- **Evidência com o modelo real (24/11/2026):** o Ollama 0.40.17 rodou em CPU no Docker Desktop. O Compose publicou a porta em `127.0.0.1:11434` e o modelo `qwen2.5:1.5b` (ID `65ec06548149`) continuou listado após recriar o container. Na Consulta exportada para web, o Chrome recebeu duas respostas em português pelo NestJS. A segunda recuperou o nome “Ipê Azul” da primeira mensagem. O tempo até exibir cada resposta foi de 35,8 s e 4,0 s em uma única conversa. A avaliação de qualidade e desempenho do beta segue pendente.
+- **Próxima ação:** integrar a persistência em ESM-02.
 
 ## Modelo de tarefa
 

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { ActivityIndicator, View } from 'react-native';
 import { colors } from '../components/ui';
+import { DraftProvider } from '../features/chat/DraftProvider';
 import { appI18n, initializeLocalization } from '../localization';
 
 export default function RootLayout() {
@@ -38,6 +39,8 @@ export default function RootLayout() {
 
   return <I18nextProvider i18n={appI18n}>
     <StatusBar style="light" />
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
+    <DraftProvider>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
+    </DraftProvider>
   </I18nextProvider>;
 }

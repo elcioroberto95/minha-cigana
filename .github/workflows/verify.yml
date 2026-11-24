@@ -16,6 +16,21 @@ jobs:
     timeout-minutes: 10
     env:
       EXPO_NO_TELEMETRY: '1'
+      TEST_DATABASE_URL: postgresql://cigana:cigana-ci@127.0.0.1:5433/cigana
+    services:
+      postgres:
+        image: postgres:17-alpine@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73
+        env:
+          POSTGRES_DB: cigana
+          POSTGRES_USER: cigana
+          POSTGRES_PASSWORD: cigana-ci
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U cigana -d cigana"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -25,7 +40,6 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run build:api
       - run: npm run test:api
       - run: npm run build:web
       - name: Abrir a tela inicial no Chrome

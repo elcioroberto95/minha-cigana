@@ -36,6 +36,33 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Ordem do idioma:** preferência salva, idioma compatível do aparelho e, por fim, `pt-BR`. Os textos ficam em catálogos locais e `Intl` formata números e datas. A API recebe um `locale` validado nas consultas para orientar o idioma da resposta e manter os códigos de erro estáveis. [Guia de localização do Expo](https://docs.expo.dev/guides/localization/)
 - **Consequências:** a consulta, os nomes das cartas e o áudio acompanham o idioma escolhido conforme os recursos forem implementados. Usar português brasileiro como idioma padrão para idiomas indisponíveis. Testar espanhol com campanhas separadas no México e na Espanha antes de incluir o idioma na oferta pública. [Sinais de mercado](PESQUISA-DE-MERCADO.md#países-e-idiomas)
 
+## 005 — NestJS na API e navegação mobile por áreas do produto
+
+- **Decisão.** A API roda em NestJS com um módulo de saúde e mantém o contrato do `/health`. O Expo Router usa quatro abas e uma pilha para os fluxos de detalhe. Rotas ficam em `app/` e a lógica das telas em `features/`.
+- **Motivo.** As próximas entregas de chat, tarô e conta precisam de fronteiras de módulo no backend e caminhos de navegação que possam evoluir de forma independente no mobile.
+- **Referência.** [Arquitetura e entidades mobile](ARQUITETURA-MOBILE.md) e [mapa de rotas](MAPA-DE-ROTAS.md).
+
+## 006 — Persistência portátil e inferência local
+
+- **Data e estado:** 2026-11-23, Proposta.
+- **Proposta.** Manter Expo e NestJS, avaliar PostgreSQL para os dados de conta e chat e integrar Ollama por um módulo da API. Guardar as configurações da persona com revisão própria. O ambiente público deverá ter HTTPS, rede privada para dependências e backups externos com restauração demonstrada.
+- **Impacto.** A proposta revisa a persistência em Firestore citada no workflow. Identidade de visitante e autenticação de conta precisam ser decididas separadamente. O contrato do app pode permanecer estável durante trocas de modelo ou provedor.
+- **Validação.** Preservar sessões e mensagens após reiniciar a API, aplicar uma migração e restaurar dados em outro ambiente. Medir inferência e custo antes de escolher o plano de produção. [Diagnóstico e critérios](DIAGNOSTICO-ESMERALDA.md).
+
+## 007 — Ollama como provedor inicial de respostas
+
+- **Data e estado:** 2026-11-23, Aceita para a integração local.
+- **Decisão.** A Consulta pede respostas ao NestJS, que usa o Ollama com modelo configurado em `OLLAMA_MODEL`. O backend aplica a persona, o idioma e o contexto recente. A configuração do modelo pode mudar independentemente da interface.
+- **Desenvolvimento.** O [Compose](../compose.yaml) fixa a imagem por digest e monta um volume de modelos. A porta é publicada apenas no loopback e os recursos de nuvem do Ollama estão desativados.
+- **Consequência.** Indisponibilidade é apresentada na Consulta e preserva o rascunho. A escolha do modelo do beta depende de avaliação de qualidade e latência. A [decisão 006](#006--persistência-portátil-e-inferência-local) segue em proposta quanto ao armazenamento.
+
+## 008 — Histórico de visitante no PostgreSQL
+
+- **Data e estado:** 2026-11-24, Aceita para o ambiente de desenvolvimento.
+- **Decisão.** PostgreSQL guarda as sessões e mensagens quando o visitante seleciona **Salvar esta conversa**. A API separa proprietários por uma credencial aleatória do cliente e guarda seu hash. O aplicativo guarda a credencial no SecureStore nativo e no armazenamento do navegador na web.
+- **Consequência.** A Consulta existente segue usando Ollama. A abertura ou exclusão do histórico verifica o proprietário. A primeira entrega permite leitura e exclusão no mesmo aparelho ou navegador. Conta, sincronização, memória entre consultas e controles de publicação ficam para etapas futuras.
+- **Operação.** Migrações SQL explícitas, com controle de checksum. O histórico usa um volume de PostgreSQL separado do volume de modelos. [Instruções locais](../README.md#histórico-local-com-postgresql).
+
 ## Modelo de decisão
 
 ```markdown

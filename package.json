@@ -13,6 +13,7 @@
     "build:api": "npm run build --workspace=@cigana/api",
     "start:api": "npm run start --workspace=@cigana/api",
     "test:api": "npm run test --workspace=@cigana/api",
+    "migrate:api": "npm run migrate --workspace=@cigana/api",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces"
   }

@@ -1,7 +1,7 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const colors = {
@@ -9,19 +9,22 @@ export const colors = {
   gold: '#D8B66A', cream: '#F5D99B', text: '#E9DBEB', muted: '#BDAFC9', border: '#594166',
 };
 
-export function Screen({ children, back = true }: { children: ReactNode; back?: boolean }) {
+export function Screen({ children, back = true, backTo = '/' }: { children: ReactNode; back?: boolean; backTo?: Href }) {
   const router = useRouter();
   const { t } = useTranslation();
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.page}>
-          {back && <Pressable accessibilityRole="button" onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.back}>
-            <Copy>‹  {t('back')}</Copy>
-          </Pressable>}
-          {children}
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.safe} edges={back ? ['top', 'bottom', 'left', 'right'] : ['top', 'left', 'right']}>
+      <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.page}>
+            {back && <Pressable accessibilityRole="button" accessibilityLabel={t('back')}
+              onPress={() => router.canGoBack() ? router.back() : router.replace(backTo)} style={styles.back}>
+              <Copy>‹  {t('back')}</Copy>
+            </Pressable>}
+            {children}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -48,9 +51,12 @@ export function Button({ label, onPress, secondary = false, disabled = false, se
   </Pressable>;
 }
 
-export function DemoNotice() {
-  const { t } = useTranslation();
-  return <Copy>{t('demoNotice')}</Copy>;
+export function Field({ label, style, ...props }: TextInputProps & { label: string }) {
+  return <View style={styles.field}>
+    <Copy emphasis>{label}</Copy>
+    <TextInput {...props} accessibilityLabel={label}
+      style={[styles.input, props.multiline && styles.multiline, style]} />
+  </View>;
 }
 
 const styles = StyleSheet.create({
@@ -69,4 +75,8 @@ const styles = StyleSheet.create({
   faded: { opacity: 0.55 },
   buttonLabel: { fontFamily: 'DMSans_600SemiBold', textAlign: 'center', color: colors.background, fontSize: 16 },
   secondaryLabel: { color: colors.cream },
+  field: { gap: 6 },
+  input: { minHeight: 48, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: colors.border,
+    borderRadius: 12, color: colors.text, backgroundColor: colors.surface, fontFamily: 'DMSans_400Regular', fontSize: 16 },
+  multiline: { minHeight: 100, textAlignVertical: 'top' },
 });

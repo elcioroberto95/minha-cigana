@@ -1,6 +1,6 @@
 # Mapa de telas e rotas do Cigana do Destino
 
-Abra [Início](#01-início) para começar. Cada seção descreve a rota proposta, aponta para a tela na prancha e tem links para os destinos das ações. As rotas são nomes de referência para o layout. Estados como escolha de tema, áudio, amostra e confirmação podem ocupar a mesma tela.
+Abra [Início](#01-início) para começar. Cada seção descreve a rota proposta, aponta para a tela na prancha e tem links para os destinos das ações. As rotas descrevem o percurso de produto. A base Expo já oferece os caminhos das páginas numeradas, com indicação na interface para operações que dependem de integração. Os resultados têm prévias navegáveis com o ID `preview`. Confirmação de compra, cota do chat e próxima tiragem grátis dependem da loja ou do backend e entram como estados das telas de origem. Consulte a [arquitetura mobile](ARQUITETURA-MOBILE.md). Estados como escolha de tema, áudio, amostra e confirmação podem ocupar a mesma tela.
 
 **Pranchas** · [Conceito inicial](design/conceito-visual-v1.png) · [Conceito v2](design/conceito-visual-v2.png) · [Interações](design/fluxos-e-telas-v1.png) · [Beta e Personalidade](design/layouts-beta-personalidade-v1.png) · [Carta do Dia e Dez Cartas](design/layouts-carta-do-dia-e-dez-cartas-v1.png)
 
