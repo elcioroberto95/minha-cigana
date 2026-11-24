@@ -20,7 +20,7 @@ fi
 
 "${compose[@]}" run --rm --no-deps api node scripts/migrate.mjs
 previous_image="$(docker ps --filter label=com.docker.compose.project=minha-cigana \
-  --filter label=com.docker.compose.service=api --format '{{.Image}}')"
+  --filter health=healthy --filter label=com.docker.compose.service=api --format '{{.Image}}')"
 if ! "${compose[@]}" up -d --no-deps --wait --wait-timeout 75 api; then
   "${compose[@]}" logs --tail 60 api >&2 || true
   if [[ "$previous_image" == cigana-api:* && "$previous_image" != "cigana-api:$CIGANA_RELEASE" ]]; then

@@ -11,6 +11,7 @@ FROM node:26.10.0-bookworm-slim@sha256:3ffc19ea878019d9e9ae8971732ad4a03cda44f16
 WORKDIR /app
 ENV NODE_ENV=production
 COPY Modelfile ./
+COPY data/cartas.json ./data/
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/api/package.json ./apps/api/
 COPY --from=build /app/apps/api/dist ./apps/api/dist/

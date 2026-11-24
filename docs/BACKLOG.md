@@ -164,7 +164,8 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Branch:** `esm-09/deploy-vps`.
 - **Dependências e decisões:** ESM-08 e [decisão 012](DECISOES.md#012--api-de-desenvolvimento-na-vps).
 - **Aceite:** consultar a API da VPS pelo Expo via túnel SSH, confirmar migrações e resposta do Ollama real, subir a API isolada para cada PR e publicar automaticamente o commit validado da `main`.
-- **Próxima ação:** testar a Consulta pelo túnel, abrir o PR e verificar a execução da integração contínua.
+- **Revisão:** [PR #7](https://github.com/elcioroberto95/minha-cigana/pull/7).
+- **Próxima ação:** testar a Consulta pelo túnel e verificar a execução da integração contínua.
 
 ## Modelo de tarefa
 

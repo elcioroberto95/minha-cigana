@@ -2,6 +2,8 @@
 !package.json
 !package-lock.json
 !Modelfile
+!data
+!data/cartas.json
 !apps
 !apps/api
 !apps/api/**
