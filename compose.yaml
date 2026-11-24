@@ -33,6 +33,30 @@ services:
       timeout: 5s
       retries: 6
 
+  prometheus:
+    image: prom/prometheus:v3.5.5@sha256:332c2f43e7e389d74d3893b55bb02fbbd684208e681eeb604641d5d769c0fe2a
+    profiles: [observability]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-otlp-receiver
+    ports:
+      - '127.0.0.1:9090:9090'
+    volumes:
+      - prometheus-data:/prometheus
+    networks: [telemetry]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:9090/-/ready']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+networks:
+  telemetry:
+
 volumes:
   postgres-data:
   ollama-data:
+  prometheus-data:

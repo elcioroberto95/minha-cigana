@@ -1,6 +1,8 @@
+import { performance } from 'node:perf_hooks';
 import { ConflictException, HttpException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import type { OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
+import { ApiMetrics } from '../observability/api-metrics.js';
 import type { readSession } from './history-input.js';
 
 @Injectable()
@@ -10,27 +12,36 @@ export class HistoryService implements OnModuleDestroy {
     ? new Pool({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 5_000 })
     : undefined;
 
-  constructor() {
-    this.pool?.on('error', () => this.logger.warn('Conexão do histórico interrompida.'));
+  constructor(private readonly metrics: ApiMetrics) {
+    if (this.pool) {
+      this.metrics.observeHistoryPool(this.pool);
+      this.pool.on('error', () => this.logger.warn('Conexão do histórico interrompida.'));
+    }
   }
 
   onModuleDestroy() {
     return this.pool?.end();
   }
 
-  private async database<T>(operation: (pool: Pool) => Promise<T>) {
-    if (!this.pool) throw new ServiceUnavailableException({ error: 'history_unavailable' });
+  private async database<T>(operation: string, execute: (pool: Pool) => Promise<T>) {
+    const startedAt = performance.now();
+    let outcome = 'not_configured';
     try {
-      return await operation(this.pool);
+      if (!this.pool) throw new ServiceUnavailableException({ error: 'history_unavailable' });
+      outcome = 'ok';
+      return await execute(this.pool);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      outcome = 'database_error';
       this.logger.warn('Falha no acesso ao banco de histórico.');
       throw new ServiceUnavailableException({ error: 'history_unavailable' });
+    } finally {
+      this.metrics.recordHistory(operation, outcome, performance.now() - startedAt);
     }
   }
 
   list(owner: string) {
-    return this.database(async (pool) => {
+    return this.database('list', async (pool) => {
       const { rows } = await pool.query(
         `SELECT id, title, topic, updated_at AS "updatedAt"
          FROM chat_sessions WHERE owner_hash = $1 ORDER BY updated_at DESC, id LIMIT 50`,
@@ -41,7 +52,7 @@ export class HistoryService implements OnModuleDestroy {
   }
 
   detail(owner: string, id: string) {
-    return this.database(async (pool) => {
+    return this.database('detail', async (pool) => {
       const { rows: [session] } = await pool.query(
         `SELECT s.id, s.title, s.topic, s.updated_at AS "updatedAt", (
            SELECT json_agg(json_build_object('role', role, 'content', content, 'model', model) ORDER BY position)
@@ -56,7 +67,7 @@ export class HistoryService implements OnModuleDestroy {
   }
 
   save(owner: string, id: string, { topic, messages }: ReturnType<typeof readSession>) {
-    return this.database(async (pool) => {
+    return this.database('save', async (pool) => {
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
@@ -94,7 +105,7 @@ export class HistoryService implements OnModuleDestroy {
   }
 
   remove(owner: string, id: string) {
-    return this.database(async (pool) => {
+    return this.database('remove', async (pool) => {
       await pool.query('DELETE FROM chat_sessions WHERE owner_hash = $1 AND id = $2', [owner, id]);
     });
   }
