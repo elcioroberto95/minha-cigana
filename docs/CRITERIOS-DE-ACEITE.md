@@ -17,7 +17,7 @@ Use os IDs abaixo nas tarefas, nos PRs e nas evidências de teste. A base Expo, 
 | `UX-02` | Em [Tema e pergunta](MAPA-DE-ROTAS.md#05-tema-e-pergunta), escolher Trabalho, escrever uma pergunta e avançar. Repetir com Seguir sem pergunta. | O tema chega à tiragem nos dois casos. A pergunta só é encaminhada quando a pessoa escolhe avançar com ela. |
 | `UX-03` | Na [seleção](MAPA-DE-ROTAS.md#06-escolha-de-cartas), tocar duas vezes na mesma carta, completar três escolhas e desfazer a última. | A mesma carta conta uma vez. A confirmação só está disponível com três cartas distintas. Desfazer libera uma posição e atualiza a contagem. |
 | `UX-04` | Confirmar três cartas na demonstração e abrir o [resultado](MAPA-DE-ROTAS.md#07-resultado-de-três-cartas). | O resultado mostra as três cartas escolhidas nas posições de passado, presente e futuro simbólico. O conteúdo editorial de demonstração é identificado para a pessoa. |
-| `UX-05` | Trocar o idioma entre português e inglês, abrir a tela inicial e reiniciar o app. Repetir a primeira abertura com um idioma indisponível. | Os textos da tela inicial correspondem ao idioma escolhido e a preferência persiste. Na primeira abertura com idioma indisponível, os textos aparecem em português brasileiro. |
+| `UX-05` | Abrir a entrada com um idioma compatível, trocar manualmente em **Perfil → Configurações** e reiniciar o app. Selecionar **Usar idioma do dispositivo** e repetir com um idioma indisponível. | A entrada usa o idioma do dispositivo. A escolha manual persiste. A opção automática volta a seguir o dispositivo e usa português brasileiro como fallback. |
 
 ## Beta fechado
 

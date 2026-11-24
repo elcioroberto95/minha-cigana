@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { type AppLocale, saveLocale } from '../localization';
+import { type LocalePreference, readLocalePreference, saveLocale } from '../localization';
 import { Button, Copy } from './ui';
 
 const options = [
@@ -10,12 +10,19 @@ const options = [
 ] as const;
 
 export function LanguagePicker() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const [preference, setPreference] = useState<LocalePreference>();
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
   const savingRef = useRef(false);
 
-  async function select(locale: AppLocale) {
+  useEffect(() => {
+    let mounted = true;
+    void readLocalePreference().then((value) => { if (mounted) setPreference(value); });
+    return () => { mounted = false; };
+  }, []);
+
+  async function select(locale: LocalePreference) {
     if (savingRef.current) return;
 
     savingRef.current = true;
@@ -23,6 +30,7 @@ export function LanguagePicker() {
     setFailed(false);
     try {
       await saveLocale(locale);
+      setPreference(locale);
     } catch {
       setFailed(true);
     } finally {
@@ -35,10 +43,12 @@ export function LanguagePicker() {
     <Copy>{t('language')}</Copy>
     <View style={styles.options}>
       {options.map(({ locale, label }) => <View key={locale} style={styles.option}>
-        <Button label={label} secondary disabled={saving} selected={i18n.resolvedLanguage === locale}
+        <Button label={label} secondary disabled={saving || preference === undefined} selected={preference === locale}
           onPress={() => void select(locale)} />
       </View>)}
     </View>
+    <Button label={t('deviceLanguage')} secondary disabled={saving || preference === undefined}
+      selected={preference === 'device'} onPress={() => void select('device')} />
     {failed && <View accessibilityLiveRegion="polite"><Copy>{t('languageSaveError')}</Copy></View>}
   </View>;
 }

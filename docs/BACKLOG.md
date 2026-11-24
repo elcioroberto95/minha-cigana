@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-13 — Estruturar a interpretação de três cartas](#esm-13--estruturar-a-interpretação-de-três-cartas)
+**Próxima tarefa:** [ESM-14 — Trocar o convite por acesso com conta](#esm-14--trocar-o-convite-por-acesso-com-conta)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -214,6 +214,30 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Execução real (24/11/2026):** o sorteio no PostgreSQL respondeu com as três cartas. A interpretação com Esmeralda 1,5B em CPU atingiu o limite de 90 s e retornou HTTP 503. O log correlacionou o timeout com a requisição `55b61063-8b6d-498a-9af5-fcbf668cef9d`.
 - **Próxima ação:** rodar `npm.cmd --silent run eval:ai -- tarot-tres-pt` em desenvolvimento com Esmeralda 3B e revisar a fidelidade da interpretação às cartas e orientações.
 - **Revisão:** [PR #11](https://github.com/elcioroberto95/minha-cigana/pull/11).
+
+## ESM-14 — Trocar o convite por acesso com conta
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-14/conta-e-memoria`.
+- **Dependências e decisões:** ESM-06, ESM-10 e decisão 015.
+- **Aceite:** a entrada oferece login e cadastro por senha, com gênero opcional. A API pública protege as rotas do app por sessão e mantém limites de autenticação e geração. As contas existentes continuam acessíveis.
+- **Evidências:** lint, TypeScript, compilação da API, exportação web, configuração Compose e os 23 testes da API com PostgreSQL real passaram. No Chrome, com API e PostgreSQL locais, passaram cadastro sem código, acesso à tela inicial, saída e login com a conta criada. Os testes da API verificaram 401 em chat e tarô sem sessão válida e cotas separadas por conta.
+- **Inicialização no modo VPS:** o processo compilado retornou 204 na rota de compatibilidade do proxy e 401 no chat sem conta. O login sem convite chegou ao validador e retornou 400 para campos ausentes.
+- **Idioma na entrada (UX-05):** o seletor fica em **Perfil → Configurações**. Lint, TypeScript e exportação web passaram. No Chrome a 360 × 800, verificados `en-GB` usando inglês, `fr-FR` usando português, ausência do seletor no login, cadastro e Início, escolha manual após recarregar e retorno ao idioma automático.
+- **Senha:** o cadastro exige oito caracteres. O teste com PostgreSQL aceitou oito, rejeitou sete e nove e confirmou o login de uma conta com senha mais longa já cadastrada.
+- **Próxima ação:** revisar a branch e confirmar login e cadastro pelo HTTPS após a publicação.
+- **Revisão:** [PR #12](https://github.com/elcioroberto95/minha-cigana/pull/12).
+
+## ESM-15 — Registrar contexto declarado na Consulta
+
+- **Estado:** Em revisão. A chamada com geração real segue pendente.
+- **Branch:** `esm-14/conta-e-memoria`.
+- **Dependências e decisões:** ESM-06, ESM-12, ESM-14 e decisão 015.
+- **Aceite:** com a opção de memória do perfil ativada, o backend pode gravar profissão, situação de relacionamento e objetivos profissionais de declarações elegíveis. O chat segue normalmente. A preferência desativada impede gravação e elimina os dados aprendidos ao ser desligada.
+- **Evidências:** migração 008 aplicada ao PostgreSQL local. O teste integrado verificou opção inicialmente desligada, registro sem aviso no texto da conversa, reaproveitamento em outra sessão e remoção ao desativar. O teste de extração recusou perguntas, nomes em suspeitas e relatos sensíveis.
+- **Execução real (24/11/2026):** a tentativa com Esmeralda 1,5B em CPU retornou HTTP 503 após 90 s antes da chamada da ferramenta. A requisição `8c3274be-7d57-4015-bae8-dd555db5c293` deixou a memória vazia.
+- **Próxima ação:** rodar o exemplo de profissão com Esmeralda 3B em desenvolvimento e consultar a seção Memória do perfil.
+- **Revisão:** [PR #12](https://github.com/elcioroberto95/minha-cigana/pull/12).
 
 ## Modelo de tarefa
 

@@ -6,7 +6,8 @@ import { LanguagePicker } from '../../components/LanguagePicker';
 import { withIdentityScope } from '../../lib/identity-scope';
 import { useSignedIn } from '../../lib/session-token';
 import { login, logout, register } from './auth-api';
-import { deleteCheckIns, getMemory, getProfile, saveProfile, setMemory, sexes, type Profile } from './profile-api';
+import { deleteCheckIns, getLearning, getMemory, getProfile, saveProfile, setLearning, setMemory, sexes,
+  type LearningPreference, type Profile } from './profile-api';
 
 function ProfileScreenContent() {
   const { t } = useTranslation();
@@ -62,13 +63,21 @@ function ProfileScreenContent() {
         <Button label={t('signUp')} secondary onPress={() => router.push('/conta/criar')} />
       </>}
     </Panel>
-    <LanguagePicker />
+    <Button label={t('settings')} secondary onPress={() => router.push('/perfil/configuracoes')} />
     <Button label={t('voice')} secondary onPress={() => router.push('/perfil/voz')} />
     <Button label={t('privacy')} secondary onPress={() => router.push('/perfil/privacidade')} />
   </Screen>;
 }
 
 export const ProfileScreen = withIdentityScope(ProfileScreenContent);
+
+export function SettingsScreen() {
+  const { t } = useTranslation();
+  return <Screen backTo="/perfil">
+    <Title>{t('settings')}</Title>
+    <Panel><LanguagePicker /></Panel>
+  </Screen>;
+}
 
 export function AccountForm({ mode }: { mode: 'signUp' | 'edit' | 'signIn' | 'recover' }) {
   const { t } = useTranslation();
@@ -88,7 +97,14 @@ export function AccountForm({ mode }: { mode: 'signUp' | 'edit' | 'signIn' | 're
   return <ProfileForm editing={false} />;
 }
 
-function LoginForm() {
+export function AccountEntry() {
+  const [registering, setRegistering] = useState(false);
+  return registering
+    ? <ProfileForm editing={false} onSignIn={() => setRegistering(false)} />
+    : <LoginForm onSignUp={() => setRegistering(true)} />;
+}
+
+function LoginForm({ onSignUp }: { onSignUp?: () => void } = {}) {
   const { t } = useTranslation();
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -103,7 +119,7 @@ function LoginForm() {
     try {
       const problem = await login({ email, password });
       if (problem) setError(problem);
-      else router.dismissTo('/perfil');
+      else if (!onSignUp) router.dismissTo('/perfil');
     } catch {
       setError('authUnavailable');
     } finally {
@@ -111,7 +127,7 @@ function LoginForm() {
     }
   }
 
-  return <Screen backTo="/perfil">
+  return <Screen back={!onSignUp} backTo="/perfil">
     <Title>{t('signIn')}</Title>
     <Panel>
       <EmailField value={email} onChangeText={setEmail} editable={!saving} />
@@ -122,7 +138,7 @@ function LoginForm() {
     {error && <Copy>{t(error)}</Copy>}
     <Button label={t(saving ? 'signingIn' : 'signIn')}
       disabled={saving || !email.trim() || !password} onPress={() => void submit()} />
-    <Button label={t('signUp')} secondary onPress={() => router.replace('/conta/criar')} />
+    <Button label={t('signUp')} secondary onPress={onSignUp ?? (() => router.replace('/conta/criar'))} />
   </Screen>;
 }
 
@@ -133,19 +149,21 @@ function EmailField({ value, onChangeText, editable }: { value: string; onChange
 }
 
 const emptyProfile: Profile = { name: '', email: '', sex: null };
+const registrationPasswordLength = 8;
 
-function ProfileForm({ editing }: { editing: boolean }) {
+function ProfileForm({ editing, onSignIn }: { editing: boolean; onSignIn?: () => void }) {
   const { t } = useTranslation();
   const router = useRouter();
   const signedIn = useSignedIn();
   const [profile, setProfile] = useState(emptyProfile);
   const [password, setPassword] = useState('');
-  const [status, setStatus] = useState<'loading' | 'ready' | 'loadError'>('loading');
+  const [status, setStatus] = useState<'loading' | 'ready' | 'loadError'>(onSignIn ? 'ready' : 'loading');
   const [revision, setRevision] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<Awaited<ReturnType<typeof register>> | 'invalidProfile' | 'profileSaveError'>();
 
   useEffect(() => {
+    if (onSignIn) return;
     const controller = new AbortController();
     void getProfile(controller.signal).then((result) => {
       if (controller.signal.aborted) return;
@@ -153,9 +171,10 @@ function ProfileForm({ editing }: { editing: boolean }) {
       setStatus('ready');
     }).catch(() => { if (!controller.signal.aborted) setStatus(editing ? 'loadError' : 'ready'); });
     return () => controller.abort();
-  }, [editing, revision]);
+  }, [editing, onSignIn, revision]);
 
-  const incomplete = !profile.name.trim() || !profile.email.trim() || (!editing && Array.from(password).length < 15);
+  const incomplete = !profile.name.trim() || !profile.email.trim()
+    || (!editing && Array.from(password).length !== registrationPasswordLength);
 
   async function submit() {
     if (saving || incomplete) return;
@@ -166,7 +185,7 @@ function ProfileForm({ editing }: { editing: boolean }) {
         ? (await saveProfile(profile) ? undefined : 'invalidProfile')
         : await register(profile, password);
       if (problem) setError(problem);
-      else router.dismissTo('/perfil');
+      else if (!onSignIn) router.dismissTo('/perfil');
     } catch {
       setError('profileSaveError');
     } finally {
@@ -174,7 +193,7 @@ function ProfileForm({ editing }: { editing: boolean }) {
     }
   }
 
-  return <Screen backTo="/perfil">
+  return <Screen back={!onSignIn} backTo="/perfil">
     <Title>{t(editing ? 'editProfile' : 'signUp')}</Title>
     {!editing && <Copy>{t('registrationIntro')}</Copy>}
     {status === 'loading' && <Copy>{t('profileLoading')}</Copy>}
@@ -192,7 +211,7 @@ function ProfileForm({ editing }: { editing: boolean }) {
         <EmailField value={profile.email} editable={!saving && (!editing || !signedIn)}
           onChangeText={(email) => setProfile({ ...profile, email })} />
         {!editing && <>
-          <Field label={t('password')} value={password} maxLength={128} autoComplete="new-password"
+          <Field label={t('password')} value={password} maxLength={registrationPasswordLength * 2} autoComplete="new-password"
             secureTextEntry autoCapitalize="none" autoCorrect={false} editable={!saving} onChangeText={setPassword} />
           <Copy>{t('passwordHint')}</Copy>
         </>}
@@ -205,7 +224,7 @@ function ProfileForm({ editing }: { editing: boolean }) {
       {error && <Copy>{t(error)}</Copy>}
       <Button label={t(saving ? 'profileSaving' : editing ? 'saveProfile' : 'signUp')}
         disabled={saving || incomplete} onPress={() => void submit()} />
-      {!editing && <Button label={t('signIn')} secondary onPress={() => router.replace('/conta/entrar')} />}
+      {!editing && <Button label={t('signIn')} secondary onPress={onSignIn ?? (() => router.replace('/conta/entrar'))} />}
     </>}
   </Screen>;
 }
@@ -227,6 +246,7 @@ function PrivacyScreenContent() {
   const { t } = useTranslation();
   const router = useRouter();
   const [enabled, setEnabled] = useState<boolean>();
+  const [learning, setLearningState] = useState<LearningPreference>();
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
   const [revision, setRevision] = useState(0);
@@ -235,6 +255,9 @@ function PrivacyScreenContent() {
     const controller = new AbortController();
     void getMemory(controller.signal).then((result) => {
       if (!controller.signal.aborted) setEnabled(result);
+    }).catch(() => { if (!controller.signal.aborted) setFailed(true); });
+    void getLearning(controller.signal).then((result) => {
+      if (!controller.signal.aborted) setLearningState(result);
     }).catch(() => { if (!controller.signal.aborted) setFailed(true); });
     return () => controller.abort();
   }, [revision]);
@@ -246,6 +269,20 @@ function PrivacyScreenContent() {
     try {
       await setMemory(!enabled);
       setEnabled(!enabled);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function changeLearning() {
+    if (saving || !learning) return;
+    setSaving(true);
+    setFailed(false);
+    try {
+      await setLearning(!learning.enabled);
+      setLearningState({ enabled: !learning.enabled, items: [] });
     } catch {
       setFailed(true);
     } finally {
@@ -270,6 +307,21 @@ function PrivacyScreenContent() {
         {failed && <Copy>{t('profileSaveError')}</Copy>}
       </>}
       {failed && enabled === undefined && <Button label={t('tryAgain')} secondary onPress={() => {
+        setFailed(false);
+        setRevision((value) => value + 1);
+      }} />}
+    </Panel>
+    <Panel>
+      <Copy emphasis>{t('profileLearning')}</Copy>
+      <Copy>{t('profileLearningIntro')}</Copy>
+      {learning && <>
+        {learning.items.map(({ kind, value }) => <Copy key={kind}>
+          {t(`learned_${kind}`) + ' · ' + (kind === 'occupation' ? value : t(`learned_${value}`))}
+        </Copy>)}
+        <Button label={t(learning.enabled ? 'disableLearning' : 'enableLearning')} secondary disabled={saving}
+          onPress={() => void changeLearning()} />
+      </>}
+      {failed && !learning && <Button label={t('tryAgain')} secondary onPress={() => {
         setFailed(false);
         setRevision((value) => value + 1);
       }} />}

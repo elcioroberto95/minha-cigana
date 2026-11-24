@@ -4,6 +4,7 @@ import { ProfileService } from '../profile/profile.service.js';
 import type { Identity } from '../auth/auth.service.js';
 import { CurrentIdentity, IdentityGuard, IdentityMode } from '../auth/identity.guard.js';
 import { readChatInput } from './chat-input.js';
+import { memoryCandidate } from './memory-tool.js';
 import { OllamaService } from './ollama.service.js';
 
 @Controller('api/chat')
@@ -24,11 +25,18 @@ export class ChatController {
     if (input.dailyCardId && !owner) throw new UnauthorizedException({ error: 'visitor_required' });
     const card = input.dailyCardId && owner ? await this.daily.ownedCard(owner, input.dailyCardId) : undefined;
     const personal = owner ? await this.profiles.chatContext(owner, input.topic) : undefined;
+    const fact = identity?.kind === 'account' && memoryCandidate(input.message);
+    const learning = fact && identity
+      ? await this.profiles.learning(identity.owner).catch(() => undefined)
+      : undefined;
     return this.ollama.reply(input, {
       daily: card?.readings[input.locale],
       personal,
       lookupDailyCard: owner && !input.dailyCardId
         ? async () => (await this.daily.today(owner))?.card.readings[input.locale]
+        : undefined,
+      remember: fact && identity && learning?.enabled
+        ? { kind: fact.kind, save: () => this.profiles.remember(identity.owner, fact) }
         : undefined,
     });
   }

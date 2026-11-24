@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { LanguagePicker } from '../../components/LanguagePicker';
 import { Button, colors, Copy, Panel, Screen, Title } from '../../components/ui';
 import { TopicPicker } from '../tarot/TopicPicker';
 
@@ -18,7 +17,6 @@ export default function HomeScreen() {
       <View style={styles.mark}><Text style={styles.star}>✦</Text></View>
       <Copy emphasis>Cigana do Destino</Copy>
     </View>
-    <LanguagePicker />
     <View style={[styles.cover, { height: coverHeight }]}
       onLayout={({ nativeEvent }) => setCoverWidth(nativeEvent.layout.width)}>
       {coverWidth > 0 && <Image source={portrait} resizeMode="stretch"

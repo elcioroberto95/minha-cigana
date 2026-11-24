@@ -5,3 +5,7 @@ export function apiUrl(path: string) {
   const base = process.env.EXPO_PUBLIC_API_URL || `http://${defaultHost}:3000`;
   return new URL(path, base).toString();
 }
+
+export function apiFetch(path: string, options: RequestInit = {}) {
+  return fetch(apiUrl(path), options);
+}

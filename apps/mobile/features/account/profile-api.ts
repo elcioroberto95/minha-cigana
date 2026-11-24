@@ -68,6 +68,25 @@ export async function setMemory(enabled: boolean) {
   if (!response.ok) throw new Error('Unable to save memory setting');
 }
 
+type LearnedItem =
+  | { kind: 'occupation'; value: string }
+  | { kind: 'relationship'; value: 'married' | 'single' | 'divorced' }
+  | { kind: 'career_goal'; value: 'change_jobs' | 'find_job' | 'start_business' | 'promotion' };
+export type LearningPreference = { enabled: boolean; items: LearnedItem[] };
+
+export async function getLearning(signal: AbortSignal): Promise<LearningPreference> {
+  const token = await getIdentityToken();
+  if (!token) return { enabled: false, items: [] };
+  const response = await profileRequest('/memory/learning', token, 'GET', undefined, signal);
+  if (!response.ok) throw new Error('Unable to load profile memory');
+  return response.json();
+}
+
+export async function setLearning(enabled: boolean) {
+  const response = await profileRequest('/memory/learning', await getOrCreateIdentityToken(), 'PUT', { enabled });
+  if (!response.ok) throw new Error('Unable to save profile memory');
+}
+
 export async function deleteCheckIns() {
   const token = await getIdentityToken();
   if (!token) return;
