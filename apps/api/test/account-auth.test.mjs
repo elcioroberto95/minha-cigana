@@ -22,6 +22,7 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
   const previousUrl = process.env.DATABASE_URL;
   const previousMode = process.env.REQUIRE_ACCOUNT;
   const previousSpeech = process.env.SPEECH_TRANSCRIPTION_URL;
+  const previousSynthesis = process.env.SPEECH_SYNTHESIS_URL;
   const visitor = randomBytes(32).toString('hex');
   const other = randomBytes(32).toString('hex');
   const id = randomUUID();
@@ -33,6 +34,14 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
   const provider = createServer(async (req, res) => {
     let body = '';
     for await (const chunk of req) body += chunk;
+    if (req.url === '/v1/audio/speech') {
+      const input = JSON.parse(body);
+      assert.equal(input.voice, input.input === 'Hello.' ? 'af_heart' : 'pf_dora');
+      assert.equal(input.response_format, 'mp3');
+      res.writeHead(200, { 'Content-Type': 'audio/mpeg' });
+      res.end(Buffer.from('audio fixture'));
+      return;
+    }
     if (req.url === '/v1/audio/transcriptions') {
       assert.match(body, /name="file"; filename="question.webm"/);
       assert.match(body, /name="language"\r\n\r\npt/);
@@ -140,6 +149,14 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     process.env.OLLAMA_MODEL = 'test';
     process.env.OLLAMA_BASE_URL = 'http://127.0.0.1:' + provider.address().port;
     process.env.SPEECH_TRANSCRIPTION_URL = process.env.OLLAMA_BASE_URL + '/v1/audio/transcriptions';
+    process.env.SPEECH_SYNTHESIS_URL = process.env.OLLAMA_BASE_URL + '/v1/audio/speech';
+    assert.equal((await request('/speech/synthesize', 'POST', visitor, { text: 'Ol√°.', locale: 'pt-BR' })).status, 401);
+    for (const [locale, text] of [['pt-BR', 'Ol√°.'], ['en-US', 'Hello.']]) {
+      const spoken = await request('/speech/synthesize', 'POST', secondToken, { text, locale });
+      assert.equal(spoken.status, 200);
+      assert.match(spoken.headers.get('Content-Type'), /^audio\/mpeg/);
+      assert.equal(await spoken.text(), 'audio fixture');
+    }
     assert.equal((await request('/speech', 'GET', visitor)).status, 401);
     assert.deepEqual(await (await request('/speech', 'GET', secondToken)).json(), { transcription: true });
     const clip = new FormData();
@@ -203,6 +220,8 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
   } finally {
     if (previousSpeech === undefined) delete process.env.SPEECH_TRANSCRIPTION_URL;
     else process.env.SPEECH_TRANSCRIPTION_URL = previousSpeech;
+    if (previousSynthesis === undefined) delete process.env.SPEECH_SYNTHESIS_URL;
+    else process.env.SPEECH_SYNTHESIS_URL = previousSynthesis;
     await app?.close();
     if (provider.listening) {
       provider.closeAllConnections();

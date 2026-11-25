@@ -1,5 +1,5 @@
 import { useRouter, type Href } from 'expo-router';
-import type { ReactNode } from 'react';
+import type { ComponentRef, ReactNode, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,13 +9,15 @@ export const colors = {
   gold: '#D8B66A', cream: '#F5D99B', text: '#E9DBEB', muted: '#C7B9D0', border: '#554063',
 };
 
-export function Screen({ children, back = true, backTo = '/' }: { children: ReactNode; back?: boolean; backTo?: Href }) {
+export function Screen({ children, back = true, backTo = '/', footer, scrollRef }: {
+  children: ReactNode; back?: boolean; backTo?: Href; footer?: ReactNode; scrollRef?: Ref<ComponentRef<typeof ScrollView>>;
+}) {
   const router = useRouter();
   const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safe} edges={back ? ['top', 'bottom', 'left', 'right'] : ['top', 'left', 'right']}>
       <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.page}>
             {back && <Pressable accessibilityRole="button" accessibilityLabel={t('back')}
               onPress={() => router.canGoBack() ? router.back() : router.replace(backTo)} style={styles.back}>
@@ -24,6 +26,7 @@ export function Screen({ children, back = true, backTo = '/' }: { children: Reac
             {children}
           </View>
         </ScrollView>
+        {footer}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -51,9 +54,9 @@ export function Button({ label, onPress, secondary = false, disabled = false, se
   </Pressable>;
 }
 
-export function Field({ label, style, ...props }: TextInputProps & { label: string }) {
+export function Field({ label, hideLabel, style, ...props }: TextInputProps & { label: string; hideLabel?: boolean }) {
   return <View style={styles.field}>
-    <Copy emphasis>{label}</Copy>
+    {!hideLabel && <Copy emphasis>{label}</Copy>}
     <TextInput {...props} accessibilityLabel={label}
       style={[styles.input, props.multiline && styles.multiline, style]} />
   </View>;

@@ -7,6 +7,7 @@ import { OllamaService } from '../chat/ollama.service.js';
 import { requestContext } from '../observability/request-context.js';
 import { localizedCards, readingPrompt, shuffleSelection, type SelectedCard } from './deck.js';
 import { readStructuredReading, structuredReadingSchema, type StructuredReading } from './structured-reading.js';
+import { createThreeCardGraph } from './three-card-graph.js';
 import type { readDraw } from './tarot-input.js';
 
 type Input = ReturnType<typeof readDraw>;
@@ -33,8 +34,10 @@ export class TarotService implements OnModuleDestroy {
     ? new Pool({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 5_000, max: 4 })
     : undefined;
   private readonly inFlight = new Map<string, Promise<Draw>>();
+  private readonly threeCardGraph: ReturnType<typeof createThreeCardGraph>;
 
   constructor(private readonly ollama: OllamaService) {
+    this.threeCardGraph = createThreeCardGraph((prompt, schema, signal) => this.ollama.interpretStructured(prompt, schema, signal));
     this.pool?.on('error', () => this.logger.warn('Conexão da tiragem interrompida.'));
   }
 
@@ -100,16 +103,22 @@ export class TarotService implements OnModuleDestroy {
   private async generate(owner: string, draw: Draw) {
     const { id, format, locale, topic, question, cards } = draw;
     const schema = format === 'tres-cartas' ? structuredReadingSchema(cards) : undefined;
+    const prompt = { locale, topic, message: readingPrompt(format, cards, locale, question) };
+    const graph = schema && process.env.TAROT_INTERPRETER === 'langgraph';
     const started = performance.now();
-    const { reply, model } = await this.ollama.interpret({ locale, topic, message: readingPrompt(format, cards, locale, question) }, schema);
+    const generated = graph ? await this.threeCardGraph(prompt, cards)
+      : await this.ollama.interpret(prompt, schema).then((result) => ({
+        ...result, structuredReading: schema ? readStructuredReading(result.reply, cards) : undefined,
+      }));
+    if (!generated || (schema && !generated.structuredReading)) {
+      this.logger.warn({ event: 'tarot.structured_reading.invalid', request_id: requestContext.getStore(),
+        interpreter: graph ? 'langgraph' : 'http' });
+      throw new ServiceUnavailableException({ error: 'tarot_unavailable' });
+    }
+    const { reply, model, structuredReading } = generated;
     const generationMs = Math.round(performance.now() - started);
     const hourlyRate = Number(process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL);
     const cost = Number.isFinite(hourlyRate) && hourlyRate > 0 ? generationMs / 3_600_000 * hourlyRate : null;
-    const structuredReading = schema ? readStructuredReading(reply, cards) : undefined;
-    if (schema && !structuredReading) {
-      this.logger.warn({ event: 'tarot.structured_reading.invalid', request_id: requestContext.getStore() });
-      throw new ServiceUnavailableException({ error: 'tarot_unavailable' });
-    }
     const reading = structuredReading
       ? [
         ...localizedCards(format, cards, locale).map(({ card, position }, index) =>

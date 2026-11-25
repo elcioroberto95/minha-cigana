@@ -48,7 +48,7 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
   return <Screen backTo="/tarot">
     <Title>{t(spreadLabels[format])}</Title>
     {draw?.reading && <>
-      <Button label={t(voice.speaking ? 'stopSpeech' : 'listenSpeech')} secondary
+      <Button label={t(voice.preparing ? 'speechPreparing' : voice.speaking ? 'stopSpeech' : 'listenSpeech')} secondary
         onPress={() => voice.speaking ? voice.stop() : voice.speak(draw.reading!, () => void recordReadingAudio(draw.id).catch(() => {}))} />
       {voice.speechFailed && <Copy>{t('speechPlaybackError')}</Copy>}
       <Button label={t('discussSpread')} onPress={() => router.push({

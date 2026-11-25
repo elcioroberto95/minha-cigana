@@ -135,3 +135,14 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - O Tarô é dono da tiragem persistida. A Consulta recebe uma referência, verifica o dono pelo adaptador do Tarô e usa o tema, as cartas e as posições carregados pelo backend. Mantemos a integração de Ollama compartilhada sem depender do módulo HTTP da Consulta.
 - O upload de áudio requer conta e passa por um transcritor configurado no backend. O app permite descartar a gravação, preserva a opção de texto e usa a voz disponível no dispositivo para narrar a resposta. A preferência fica no dispositivo.
 - Os eventos do piloto medem as etapas da leitura sem copiar conteúdo. A estimativa de custo depende de uma tarifa configurada e fica vazia quando não há tarifa.
+
+## 018 — Experimento de orquestração na tiragem
+
+- O adaptador `ChatOllama` pede o JSON nativo do Ollama e devolve o conteúdo bruto à validação do Tarô. O Tarô continua responsável por selecionar as cartas, validar correspondência e ordem, e persistir a leitura aceita.
+- `TAROT_INTERPRETER=langgraph` seleciona o grafo para três cartas. O grafo limita a correção a uma nova tentativa após uma saída inválida, dentro do prazo total de geração. Uma falha de transporte é devolvida pela API e permite tentar de novo pela tela da mesma tiragem.
+- A comparação fixa cartas, orientações, perguntas e modelo para os dois caminhos. Qualidade de idioma e tom simbólico pedem revisão das respostas. O relatório desta amostra não define uma meta de latência.
+
+## 019 — Composição da Consulta e narração neural
+
+- A Consulta separa as mensagens do compositor fixo. Tema, preferências e ações de sessão ficam no painel Opções. Ouvir e interromper ficam na resposta correspondente.
+- A API solicita MP3 a um serviço privado de síntese. Dora (`pf_dora`) é a voz padrão em português brasileiro e Heart (`af_heart`) em inglês. O app descarta o áudio temporário ao parar, finalizar ou sair da tela. O texto da resposta continua disponível se a síntese falhar.

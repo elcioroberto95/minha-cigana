@@ -3,8 +3,34 @@ import { HttpException, HttpStatus, Injectable, ServiceUnavailableException, Unp
 @Injectable()
 export class SpeechService {
   private active = 0;
+  private activeSynthesis = 0;
 
   available() { return Boolean(process.env.SPEECH_TRANSCRIPTION_URL); }
+
+  async synthesize(text: string, locale: 'pt-BR' | 'en-US') {
+    const endpoint = process.env.SPEECH_SYNTHESIS_URL;
+    if (!endpoint) throw new ServiceUnavailableException({ error: 'synthesis_unavailable' });
+    if (this.activeSynthesis >= 2) throw new HttpException({ error: 'synthesis_busy' }, HttpStatus.TOO_MANY_REQUESTS);
+    this.activeSynthesis++;
+    try {
+      const key = process.env.SPEECH_SYNTHESIS_KEY;
+      const voice = locale === 'pt-BR' ? process.env.SPEECH_VOICE_PT || 'pf_dora' : process.env.SPEECH_VOICE_EN || 'af_heart';
+      const response = await fetch(endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...(key && { Authorization: `Bearer ${key}` }) },
+        body: JSON.stringify({ model: process.env.SPEECH_SYNTHESIS_MODEL || 'speaches-ai/Kokoro-82M-v1.0-ONNX',
+          input: text, voice, response_format: 'mp3', speed: 0.96 }),
+        redirect: 'error', signal: AbortSignal.timeout(45_000),
+      });
+      if (!response.ok || !response.headers.get('Content-Type')?.startsWith('audio/')) throw new Error('Invalid speech response');
+      const audio = Buffer.from(await response.arrayBuffer());
+      if (!audio.length || audio.length > 4 * 1024 * 1024) throw new Error('Invalid speech size');
+      return audio;
+    } catch {
+      throw new ServiceUnavailableException({ error: 'synthesis_unavailable' });
+    } finally {
+      this.activeSynthesis--;
+    }
+  }
 
   async transcribe(bytes: Buffer, mime: string, extension: string, language: 'pt' | 'en') {
     const endpoint = process.env.SPEECH_TRANSCRIPTION_URL;

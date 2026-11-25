@@ -58,7 +58,9 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
   const calls = [];
   let app;
   let providerOutcome = 'unavailable';
+  let invalidFirstResponse = false;
   let createdSchema = false;
+  const previousInterpreter = process.env.TAROT_INTERPRETER;
   const provider = createServer(async (request, response) => {
     let data = '';
     for await (const chunk of request) data += chunk;
@@ -68,14 +70,19 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     if (call.format && providerOutcome !== 'plain') {
       const { cartas } = JSON.parse(call.messages.at(-1).content.split('\n')[1]);
       const cards = cartas.map(({ cardId }, index) => ({ cardId, interpretation: 'Reflexão ' + (index + 1) + '.' }));
-      if (providerOutcome === 'duplicate') cards[1].cardId = cards[0].cardId;
+      if (providerOutcome === 'duplicate' || invalidFirstResponse) {
+        invalidFirstResponse = false;
+        cards[1].cardId = cards[0].cardId;
+      }
       if (providerOutcome === 'reordered') cards.reverse();
       if (providerOutcome === 'invented') cards[0].cardId = 'outra-carta';
       if (providerOutcome === 'missing') cards.pop();
       content = JSON.stringify({ cards, summary: 'Conecte experiência e possibilidade.', advice: 'Comece com um passo simples.' });
     }
-    response.writeHead(providerOutcome === 'unavailable' ? 500 : 200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify({ model: 'esmeralda', message: { content } }));
+    response.writeHead(providerOutcome === 'unavailable' ? 500 : 200, {
+      'Content-Type': call.stream ? 'application/x-ndjson' : 'application/json',
+    });
+    response.end(JSON.stringify({ model: 'esmeralda', message: { role: 'assistant', content }, done: true }) + '\n');
   });
 
   async function start() {
@@ -100,6 +107,7 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     process.env.OLLAMA_BASE_URL = 'http://127.0.0.1:' + provider.address().port;
     process.env.OLLAMA_MODEL = 'esmeralda';
     process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL = '12';
+    delete process.env.TAROT_INTERPRETER;
     await start();
 
     const input = { id, format: 'tres-cartas', locale: 'pt-BR', topic: 'work', question: 'Como retomar?', slots: [3, 0, 6] };
@@ -205,8 +213,33 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     const { rows: [cost] } = await admin.query(`SELECT generation_ms, estimated_compute_cost_brl FROM ${schema}.tarot_draws WHERE id = $1`, [id]);
     assert.notEqual(cost.estimated_compute_cost_brl, null);
     assert.ok(cost.generation_ms >= 0 && Number(cost.estimated_compute_cost_brl) >= 0);
+
+    process.env.TAROT_INTERPRETER = 'langgraph';
+    const graphId = randomUUID();
+    const graphDraw = await (await request('draw', 'POST', visitor, { ...input, id: graphId })).json();
+    invalidFirstResponse = true;
+    const beforeGraph = calls.length;
+    const interpreted = await request('interpret/' + graphId, 'POST', visitor);
+    assert.equal(interpreted.status, 200);
+    const graphResult = await interpreted.json();
+    assert.deepEqual(graphResult.cards, graphDraw.cards);
+    assert.equal(calls.length, beforeGraph + 2);
+    assert.deepEqual(graphResult.structuredReading.cards.map(({ cardId }) => cardId), graphDraw.cards.map(({ card }) => card.id));
+    assert.deepEqual(calls[beforeGraph].format, calls[beforeGraph + 1].format);
+    assert.match(calls[beforeGraph + 1].messages.at(-1).content, /resposta anterior foi rejeitada/);
+    assert.deepEqual(await (await request('interpret/' + graphId, 'POST', visitor)).json(), graphResult);
+    assert.equal(calls.length, beforeGraph + 2);
+
+    const invalidId = randomUUID();
+    assert.equal((await request('draw', 'POST', visitor, { ...input, id: invalidId })).status, 200);
+    providerOutcome = 'duplicate';
+    assert.equal((await request('interpret/' + invalidId, 'POST', visitor)).status, 503);
+    assert.equal(calls.length, beforeGraph + 4);
+    assert.equal((await (await request('draw/' + invalidId, 'GET', visitor)).json()).reading, null);
   } finally {
     delete process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL;
+    if (previousInterpreter === undefined) delete process.env.TAROT_INTERPRETER;
+    else process.env.TAROT_INTERPRETER = previousInterpreter;
     await app?.close();
     if (provider.listening) {
       provider.closeAllConnections();

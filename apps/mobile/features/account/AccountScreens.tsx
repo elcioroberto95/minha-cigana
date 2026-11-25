@@ -304,7 +304,7 @@ export function VoiceScreen() {
     <Title>{t('voice')}</Title>
     <Panel>
       <Copy>{t('voiceSampleLine')}</Copy>
-      <Button label={t(voice.speaking ? 'stopSpeech' : 'voiceSample')} secondary
+      <Button label={t(voice.preparing ? 'speechPreparing' : voice.speaking ? 'stopSpeech' : 'voiceSample')} secondary
         onPress={() => voice.speaking ? voice.stop() : voice.speak(t('voiceSampleLine'))} />
       {voice.speechFailed && <Copy>{t('speechPlaybackError')}</Copy>}
     </Panel>
