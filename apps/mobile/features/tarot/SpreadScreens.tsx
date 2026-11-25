@@ -1,13 +1,16 @@
 import { randomUUID } from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { withIdentityScope } from '../../lib/identity-scope';
 import { StyleSheet, View } from 'react-native';
 import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
+import { RitualLoader } from '../../components/RitualLoader';
+import { useCardSound } from '../../components/MysticSound';
 import { useQuestionDraft } from '../chat/DraftProvider';
 import { CardBack } from './CardBack';
 import { isSpread, isTopic, spreadSizes, type Spread, type Topic } from './domain';
+import { ShuffleDeck } from './ShuffleDeck';
 import { TopicPicker } from './TopicPicker';
 import { createDraw } from './tarot-api';
 
@@ -100,6 +103,9 @@ function SelectSpread({ spread, topic }: { spread: Spread; topic: Topic }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const [selected, setSelected] = useState<number[]>([]);
+  const [deckReady, setDeckReady] = useState(false);
+  const finishShuffle = useCallback(() => setDeckReady(true), []);
+  const playCue = useCardSound();
   const { readingQuestion } = useQuestionDraft();
   const count = spreadSizes[spread];
   const [pending, setPending] = useState(false);
@@ -122,7 +128,10 @@ function SelectSpread({ spread, topic }: { spread: Spread; topic: Topic }) {
         id: previousDraw.current.id, format: spread, locale: i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'pt-BR',
         topic, question: readingQuestion, slots: selected,
       }, controller.signal);
-      if (!controller.signal.aborted) router.push({ pathname: resultRoutes[spread], params: { id: draw.id } });
+      if (!controller.signal.aborted) {
+        playCue('reveal');
+        router.push({ pathname: resultRoutes[spread], params: { id: draw.id } });
+      }
     } catch {
       if (!controller.signal.aborted) setFailed(true);
     } finally {
@@ -135,22 +144,28 @@ function SelectSpread({ spread, topic }: { spread: Spread; topic: Topic }) {
     <Title>{t('pickCards')}</Title>
     <Copy>{t(topic)} · {selected.length}/{count}</Copy>
     {readingQuestion && <Copy>{t('questionReady')}</Copy>}
-    <View style={styles.cards}>
-      {Array.from({ length: count + 4 }, (_, index) => {
-        const position = selected.indexOf(index);
-        return <View key={index} style={styles.card}>
-          <CardBack label={t(position < 0 ? 'cardChoice' : 'cardSelected', { number: position < 0 ? index + 1 : position + 1 })}
-            selected={position >= 0} disabled={pending || (position < 0 && selected.length === count)}
-            onPress={() => setSelected((current) => current.includes(index)
-              ? current.filter((item) => item !== index)
-              : current.length < count ? [...current, index] : current)} />
-        </View>;
-      })}
-    </View>
-    <Button label={t('undoLastCard')} secondary disabled={pending || !selected.length} onPress={() => setSelected((current) => current.slice(0, -1))} />
-    {failed && <View role="status" accessibilityLiveRegion="polite"><Copy>{t('drawError')}</Copy></View>}
-    <Button label={t(pending ? 'revealingSpread' : 'revealSpread')}
-      disabled={pending || selected.length !== count} onPress={() => void reveal()} />
+    {!deckReady ? <ShuffleDeck onDone={finishShuffle} /> : <>
+      <View style={styles.cards}>
+        {Array.from({ length: count + 4 }, (_, index) => {
+          const position = selected.indexOf(index);
+          return <View key={index} style={styles.card}>
+            <CardBack label={t(position < 0 ? 'cardChoice' : 'cardSelected', { number: position < 0 ? index + 1 : position + 1 })}
+              selected={position >= 0} disabled={pending || (position < 0 && selected.length === count)}
+              onPress={() => {
+                playCue('select');
+                setSelected((current) => current.includes(index)
+                  ? current.filter((item) => item !== index)
+                  : current.length < count ? [...current, index] : current);
+              }} />
+          </View>;
+        })}
+      </View>
+      <Button label={t('undoLastCard')} secondary disabled={pending || !selected.length} onPress={() => setSelected((current) => current.slice(0, -1))} />
+      {failed && <View role="status" accessibilityLiveRegion="polite"><Copy>{t('drawError')}</Copy></View>}
+      {pending && <RitualLoader label={t('revealingSpread')} mode="cards" />}
+      <Button label={t(pending ? 'revealingSpread' : 'revealSpread')}
+        disabled={pending || selected.length !== count} onPress={() => void reveal()} />
+    </>}
   </Screen>;
 }
 
@@ -165,7 +180,7 @@ function MissingSpread() {
 
 const styles = StyleSheet.create({
   cards: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  card: { flexBasis: '30%', flexGrow: 1 },
+  card: { flexBasis: '31%' },
 });
 
 export const PrepareSpreadScreen = withIdentityScope(PrepareSpreadContent);

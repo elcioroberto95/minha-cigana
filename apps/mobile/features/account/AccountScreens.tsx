@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
 import { LanguagePicker } from '../../components/LanguagePicker';
+import { MysticSoundToggle } from '../../components/MysticSound';
 import { withIdentityScope } from '../../lib/identity-scope';
 import { useSignedIn } from '../../lib/session-token';
 import { login, logout, register } from './auth-api';
@@ -76,6 +77,7 @@ export function SettingsScreen() {
   return <Screen backTo="/perfil">
     <Title>{t('settings')}</Title>
     <Panel><LanguagePicker /></Panel>
+    <Panel><MysticSoundToggle /></Panel>
   </Screen>;
 }
 

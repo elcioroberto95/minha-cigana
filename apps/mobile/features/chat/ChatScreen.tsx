@@ -3,8 +3,9 @@ import { randomUUID } from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
-import { Button, colors, Copy, Field, Panel, Screen, Title } from '../../components/ui';
+import { Image, StyleSheet, View } from 'react-native';
+import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
+import { RitualLoader } from '../../components/RitualLoader';
 import { saveConversation, savedMessageLimit } from '../history/history-api';
 import { isTopic, type Topic } from '../tarot/domain';
 import { TopicPicker } from '../tarot/TopicPicker';
@@ -87,13 +88,10 @@ function ChatScreenContent() {
     <TopicPicker value={topic} onSelect={setTopic} />
     <Field label={t('question')} value={question} onChangeText={setQuestion} editable={!pending} multiline maxLength={500} />
     <View>
-      <View accessibilityLiveRegion="polite" role="status" style={pending || failed ? styles.requestStatus : undefined}>
-        {!!pending && <View style={styles.loading}>
-          <ActivityIndicator size="small" color={colors.gold} accessible={false} aria-hidden />
-          <View style={styles.loadingText}><Copy>{t('chatThinking')}</Copy></View>
-        </View>}
-        {failed && <Copy>{t('chatUnavailable')}</Copy>}
-      </View>
+      {!!pending && <View style={styles.requestStatus}><RitualLoader label={t('chatThinking')} mode="consultation" /></View>}
+      {failed && <View accessibilityLiveRegion="polite" role="status" style={styles.requestStatus}>
+        <Copy>{t('chatUnavailable')}</Copy>
+      </View>}
       <View style={styles.actions}>
         <View style={styles.action}><Button label={t('record')} secondary disabled /></View>
         <View style={styles.action}><Button label={t('send')} disabled={!!pending || !question.trim()} onPress={() => void send()} /></View>
@@ -119,8 +117,6 @@ const styles = StyleSheet.create({
   guide: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 53, height: 53, borderRadius: 27 },
   requestStatus: { marginBottom: 8 },
-  loading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  loadingText: { flexShrink: 1 },
   actions: { flexDirection: 'row', gap: 8 },
   action: { flex: 1 },
 });
