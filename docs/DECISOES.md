@@ -128,3 +128,10 @@ Use IDs sequenciais para decisões que afetam mais de uma tarefa, como runtime, 
 - **Motivo do recorte:** o registro era decidido no controller e executado pelo serviço do modelo. Essas decisões mudam por motivos diferentes do protocolo HTTP, do formato de tool calling ou do SQL. O caso de uso da Consulta depende do contrato de Memória e recebe os adaptadores pelas portas que declara. Os módulos NestJS conectam a implementação.
 - **Garantia:** o repositório mantém a verificação atômica de ativação na escrita para respeitar uma desativação durante a geração. A checagem de arquitetura protege domínio, aplicação e o controller da Consulta. O teste do caso de uso usa portas em memória. Os testes HTTP e de integração continuam validando os adaptadores.
 - **Checagem no CI:** o [dependency-cruiser](../apps/api/.dependency-cruiser.cjs) verifica as fronteiras do recorte, incluindo imports usados só como tipo, e rejeita ciclos na API. Um script complementar rejeita caminhos de import calculados nas camadas protegidas, pois eles não aparecem no grafo estático.
+
+## 017 — Entrada, voz e medição do beta
+
+- A entrada direciona a pessoa para senha ou cadastro pelo e-mail informado, conforme a decisão de usar conta sem código. O endpoint devolve somente a próxima etapa, com limite compartilhado por IP e sem cache.
+- O Tarô é dono da tiragem persistida. A Consulta recebe uma referência, verifica o dono pelo adaptador do Tarô e usa o tema, as cartas e as posições carregados pelo backend. Mantemos a integração de Ollama compartilhada sem depender do módulo HTTP da Consulta.
+- O upload de áudio requer conta e passa por um transcritor configurado no backend. O app permite descartar a gravação, preserva a opção de texto e usa a voz disponível no dispositivo para narrar a resposta. A preferência fica no dispositivo.
+- Os eventos do piloto medem as etapas da leitura sem copiar conteúdo. A estimativa de custo depende de uma tarifa configurada e fica vazia quando não há tarifa.

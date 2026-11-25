@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima verificação:** [validar a apresentação e o áudio em Android e iOS](#esm-17--dar-identidade-visual-e-sonora-às-leituras).
+**Próxima tarefa:** [ESM-18 — Fechar o fluxo principal do beta](#esm-18--fechar-o-fluxo-principal-do-beta).
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -183,14 +183,15 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-11 — Avaliar as respostas da Esmeralda
 
-- **Estado:** Em revisão. A linha de base de qualidade com respostas reais continua pendente.
+- **Estado:** Em revisão. Linha de base executada na VPS com Esmeralda real.
 - **Branch:** `esm-11/evals`.
 - **Dependências:** ESM-03, ESM-04, ESM-08 e ESM-10.
 - **Escopo:** montar uma suíte bilíngue com entradas fictícias para a Consulta e a tiragem. Usar as rotas reais de desenvolvimento e registrar verificações automáticas, critérios editoriais, latência e falhas por caso.
 - **Aceite:** executar a suíte ou um caso pelo ID, receber um relatório com as respostas e cartas reveladas, distinguir indisponibilidade de reprovação automática e registrar a primeira linha de base com Ollama real.
 - **Evidências:** lint, checagem de tipos dos dois workspaces e dos evals, compilação TypeScript da API e 22 testes da API com PostgreSQL real passaram. O ensaio das dez entradas com respostas HTTP controladas verificou os três resultados e os códigos de saída 0, 1 e 2. A validação reutilizou as dependências instaladas a partir do mesmo lockfile.
 - **Execução real (24/11/2026):** NestJS, PostgreSQL 17 e Ollama 0.40.17 no Docker Desktop em CPU, com o modelo local `esmeralda` baseado no Qwen 2.5 1,5B. `chat-trabalho-en` (90,23 s), `chat-memoria-pt` (90,02 s) e a interpretação de `tarot-sim-en` (90,05 s) devolveram HTTP 503. Os IDs das requisições confirmaram timeout de inferência nos três casos. A rota de sorteio revelou a carta em 291 ms e o relatório manteve essa evidência. A rodada mediu disponibilidade e tempos de falha.
-- **Próxima ação:** executar os dez casos em ambiente de desenvolvimento com o modelo de 3B usado no beta e revisar as respostas pelos critérios de cada caso.
+- **Linha de base na VPS:** em 25/11/2026, API do commit `476d781` em contêiner com PostgreSQL descartável e o Ollama da VPS. Dez casos executados, sem erros nem alertas automáticos. Mediana de geração de 3,0 s na Consulta e 9,4 s nas tiragens. A revisão encontrou mistura de idiomas em casos apresentados em inglês e certeza excessiva em uma resposta sobre o futuro. A tiragem estruturada de três cartas preservou as posições e os nomes sorteados na amostra.
+- **Próxima ação:** incluir checagens de idioma e certeza categórica e repetir a medição após os ajustes de qualidade.
 - **Revisão:** [PR #10](https://github.com/elcioroberto95/minha-cigana/pull/10).
 
 ## ESM-12 — Consultar a Carta do Dia com tool calling
@@ -260,6 +261,16 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Embaralhamento e espera:** no Chrome em 360 × 800, o baralho se abriu e se juntou antes da escolha. Uma tiragem na API local validou os sons de embaralhar, selecionar três cartas e revelar. Com movimento reduzido, a grade abriu sem o embaralhamento animado. Uma resposta de teste com atraso confirmou a rotação de três frases e o desaparecimento do carregador ao chegar a resposta.
 - **Revisão:** [PR #14](https://github.com/elcioroberto95/minha-cigana/pull/14).
 - **Próxima ação:** revisar a apresentação e o áudio em Android e iOS antes da distribuição do app.
+
+## ESM-18 — Fechar o fluxo principal do beta
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-18/entrada-e-beta`.
+- **Decisão:** [017 — Entrada, voz e medição do beta](DECISOES.md#017--entrada-voz-e-medição-do-beta).
+- **Escopo:** entrada por e-mail, consulta em voz ou texto, continuidade da tiragem, métricas do piloto e Evals na VPS.
+- **Aceite:** e-mail decide entrada ou cadastro; áudio pode ser enviado para transcrição e as respostas podem ser ouvidas; Consulta recupera a tiragem do proprietário; eventos e custos são mensuráveis sem conteúdo de mensagens. Builds nativas ficam para o fechamento.
+- **Evidências:** lint, TypeScript, checagem de arquitetura e 27 testes da API passaram com PostgreSQL local. Os testes verificaram roteamento por e-mail, acesso à tiragem do proprietário, eventos idempotentes e cálculo com tarifa configurada. No Chrome em 360 × 800, o cadastro começou com um único campo de e-mail. O áudio gravado no navegador a partir de uma amostra de teste foi transcrito pelo Whisper real na VPS. Uma resposta simulada confirmou o acionamento da síntese no modo áudio e a ausência de narração automática no modo texto.
+- **Próxima ação:** revisar a branch, configurar transcritor privado e tarifa da VPS na publicação e validar a voz do dispositivo nas builds nativas ao fechar o beta. A primeira linha de base do Ollama na VPS está na ESM-11.
 
 ## Modelo de tarefa
 

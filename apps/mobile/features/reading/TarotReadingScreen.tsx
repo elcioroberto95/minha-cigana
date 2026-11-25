@@ -5,9 +5,10 @@ import { View } from 'react-native';
 import { Button, Copy, Panel, Screen, Title } from '../../components/ui';
 import { RitualLoader } from '../../components/RitualLoader';
 import { withIdentityScope } from '../../lib/identity-scope';
+import { useSpeechPlayback } from '../chat/speech';
 import { spreadLabels, type Spread } from '../tarot/domain';
 import { CardReveal } from '../tarot/CardReveal';
-import { interpretDraw, readDraw, type TarotDraw } from '../tarot/tarot-api';
+import { interpretDraw, readDraw, recordReadingAudio, type TarotDraw } from '../tarot/tarot-api';
 import { ReadingResult } from './ReadingScreens';
 
 function TarotReadingContent({ format }: { format: Spread }) {
@@ -17,7 +18,8 @@ function TarotReadingContent({ format }: { format: Spread }) {
 }
 
 function TarotResult({ id, format }: { id: string; format: Spread }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const voice = useSpeechPlayback(i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'pt-BR');
   const router = useRouter();
   const [draw, setDraw] = useState<TarotDraw>();
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -45,6 +47,14 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
 
   return <Screen backTo="/tarot">
     <Title>{t(spreadLabels[format])}</Title>
+    {draw?.reading && <>
+      <Button label={t(voice.speaking ? 'stopSpeech' : 'listenSpeech')} secondary
+        onPress={() => voice.speaking ? voice.stop() : voice.speak(draw.reading!, () => void recordReadingAudio(draw.id).catch(() => {}))} />
+      {voice.speechFailed && <Copy>{t('speechPlaybackError')}</Copy>}
+      <Button label={t('discussSpread')} onPress={() => router.push({
+        pathname: '/consulta', params: { drawId: draw.id, topic: draw.topic },
+      })} />
+    </>}
     {status === 'loading' && <RitualLoader label={t(draw ? 'interpretingSpread' : 'revealingSpread')}
       mode={draw ? 'reading' : 'cards'} />}
     {draw?.cards.map(({ card, position, orientation }, index) => {

@@ -1,6 +1,8 @@
 import { HttpException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import type { OnModuleDestroy } from '@nestjs/common';
+import { performance } from 'node:perf_hooks';
 import { Pool } from 'pg';
+import type { ChatLocale } from '../chat/domain/consultation.js';
 import { OllamaService } from '../chat/ollama.service.js';
 import { requestContext } from '../observability/request-context.js';
 import { localizedCards, readingPrompt, shuffleSelection, type SelectedCard } from './deck.js';
@@ -58,6 +60,31 @@ export class TarotService implements OnModuleDestroy {
     return present(await this.find(owner, id));
   }
 
+  async consultationContext(owner: string, id: string, locale: ChatLocale) {
+    const draw = await this.find(owner, id);
+    await this.recordPilotEvent(owner, id, 'chat_continued').catch(() => {});
+    return {
+      topic: draw.topic, question: draw.question,
+      cards: localizedCards(draw.format, draw.cards, locale).map(({ card, position, orientation }) => ({ name: card.name, position, orientation })),
+    };
+  }
+
+  async recordPilotEvent(owner: string, id: string, event: 'audio_started' | 'chat_continued') {
+    await this.database(async (pool) => {
+      await pool.query(
+        `INSERT INTO tarot_pilot_events (draw_id, event)
+         SELECT id, $3 FROM tarot_draws WHERE owner_hash = $1 AND id = $2 AND reading IS NOT NULL
+         ON CONFLICT DO NOTHING`, [owner, id, event],
+      );
+    });
+  }
+
+  async recordPilotStart(owner: string, id: string) {
+    await this.database(async (pool) => {
+      await pool.query('INSERT INTO tarot_pilot_attempts (id, owner_hash) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, owner]);
+    });
+  }
+
   async interpret(owner: string, id: string) {
     const key = owner + ':' + id;
     let pending = this.inFlight.get(key);
@@ -73,7 +100,11 @@ export class TarotService implements OnModuleDestroy {
   private async generate(owner: string, draw: Draw) {
     const { id, format, locale, topic, question, cards } = draw;
     const schema = format === 'tres-cartas' ? structuredReadingSchema(cards) : undefined;
+    const started = performance.now();
     const { reply, model } = await this.ollama.interpret({ locale, topic, message: readingPrompt(format, cards, locale, question) }, schema);
+    const generationMs = Math.round(performance.now() - started);
+    const hourlyRate = Number(process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL);
+    const cost = Number.isFinite(hourlyRate) && hourlyRate > 0 ? generationMs / 3_600_000 * hourlyRate : null;
     const structuredReading = schema ? readStructuredReading(reply, cards) : undefined;
     if (schema && !structuredReading) {
       this.logger.warn({ event: 'tarot.structured_reading.invalid', request_id: requestContext.getStore() });
@@ -89,10 +120,11 @@ export class TarotService implements OnModuleDestroy {
       : reply;
     return this.database(async (pool) => {
       const { rows: [updated] } = await pool.query<Draw>(
-        `UPDATE tarot_draws SET reading = $3, model = $4, structured_reading = $5::jsonb
+        `UPDATE tarot_draws SET reading = $3, model = $4, structured_reading = $5::jsonb,
+         pilot_completed_at = now(), generation_ms = $6, estimated_compute_cost_brl = $7
          WHERE owner_hash = $1 AND id = $2 AND reading IS NULL
          RETURNING id, format, locale, topic, question, cards, reading, structured_reading AS "structuredReading", model`,
-        [owner, id, reading, model, structuredReading ?? null],
+        [owner, id, reading, model, structuredReading ?? null, generationMs, cost],
       );
       return updated ?? this.find(owner, id);
     });

@@ -12,10 +12,11 @@ export async function requestReply(input: {
   message: string;
   history: ChatMessage[];
   dailyCardId?: string;
+  drawId?: string;
 }, signal: AbortSignal): Promise<{ reply: string; model: string }> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const token = await getOrCreateIdentityToken().catch(() => null);
-  if (input.dailyCardId && !token) throw new Error('Missing visitor for daily card');
+  if ((input.dailyCardId || input.drawId) && !token) throw new Error('Missing session for reading');
   const response = await identityFetch('/api/chat', token, {
     method: 'POST',
     headers,

@@ -40,3 +40,13 @@ export async function interpretDraw(id: string, signal: AbortSignal) {
   if (!token) throw new Error('Missing visitor');
   return tarotRequest('interpret/' + encodeURIComponent(id), token, { method: 'POST', signal });
 }
+
+export async function recordReadingAudio(id: string) {
+  const token = await getIdentityToken();
+  if (token) await identityFetch('/api/tarot/draw/' + encodeURIComponent(id) + '/audio-started', token, { method: 'POST' });
+}
+
+export async function recordReadingStart(id: string, signal: AbortSignal) {
+  const token = await getIdentityToken();
+  if (token && !signal.aborted) await identityFetch('/api/tarot/pilot/' + encodeURIComponent(id) + '/start', token, { method: 'POST', signal });
+}

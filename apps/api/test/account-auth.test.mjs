@@ -21,6 +21,7 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados Ã  sessÃ
   scopedUrl.searchParams.set('options', '-c search_path=' + schema);
   const previousUrl = process.env.DATABASE_URL;
   const previousMode = process.env.REQUIRE_ACCOUNT;
+  const previousSpeech = process.env.SPEECH_TRANSCRIPTION_URL;
   const visitor = randomBytes(32).toString('hex');
   const other = randomBytes(32).toString('hex');
   const id = randomUUID();
@@ -32,6 +33,13 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados Ã  sessÃ
   const provider = createServer(async (req, res) => {
     let body = '';
     for await (const chunk of req) body += chunk;
+    if (req.url === '/v1/audio/transcriptions') {
+      assert.match(body, /name="file"; filename="question.webm"/);
+      assert.match(body, /name="language"\r\n\r\npt/);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ text: 'Quero conversar sobre trabalho.' }));
+      return;
+    }
     const call = JSON.parse(body);
     modelCalls.push(call);
     const tool = call.tools?.find(({ function: fn }) => fn.name === 'remember_profile_fact');
@@ -79,10 +87,15 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados Ã  sessÃ
     for (const invalid of ['Senha12', 'Senha1234']) {
       assert.equal((await request('/auth/register', 'POST', visitor, { ...profile, password: invalid })).status, 400);
     }
+    const beforeRegistration = await request('/auth/email', 'POST', undefined, { email: profile.email });
+    assert.equal(beforeRegistration.headers.get('Cache-Control'), 'no-store');
+    assert.deepEqual(await beforeRegistration.json(), { next: 'register' });
     const registered = await request('/auth/register', 'POST', visitor, { ...profile, password });
     assert.equal(registered.status, 201);
     assert.equal(registered.headers.get('Cache-Control'), 'no-store');
     const { token: firstToken } = await registered.json();
+    const afterRegistration = await request('/auth/email', 'POST', undefined, { email: ' ' + profile.email.toUpperCase() + ' ' });
+    assert.deepEqual(await afterRegistration.json(), { next: 'login' });
     assert.match(firstToken, /^a_[a-f0-9]{64}$/);
     assert.equal((await request('/auth/register', 'POST', other, { ...profile, email: profile.email.toUpperCase(), password })).status, 409);
     assert.equal((await request('/auth/register', 'POST', firstToken, { ...profile, password })).status, 401);
@@ -126,6 +139,17 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados Ã  sessÃ
     await once(provider, 'listening');
     process.env.OLLAMA_MODEL = 'test';
     process.env.OLLAMA_BASE_URL = 'http://127.0.0.1:' + provider.address().port;
+    process.env.SPEECH_TRANSCRIPTION_URL = process.env.OLLAMA_BASE_URL + '/v1/audio/transcriptions';
+    assert.equal((await request('/speech', 'GET', visitor)).status, 401);
+    assert.deepEqual(await (await request('/speech', 'GET', secondToken)).json(), { transcription: true });
+    const clip = new FormData();
+    clip.append('locale', 'pt-BR');
+    clip.append('audio', new Blob(['fake audio fixture'], { type: 'audio/webm' }), 'recording.webm');
+    const transcript = await fetch((await app.getUrl()) + '/api/speech/transcribe', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + secondToken }, body: clip,
+    });
+    assert.equal(transcript.status, 200);
+    assert.deepEqual(await transcript.json(), { text: 'Quero conversar sobre trabalho.' });
     assert.equal((await request('/chat', 'POST', undefined, chat)).status, 401);
     assert.equal((await request('/chat', 'POST', other, chat)).status, 401);
     assert.equal((await request('/tarot/daily', 'GET', other)).status, 401);
@@ -177,6 +201,8 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados Ã  sessÃ
     assert.equal(limited?.status, 429);
     assert.ok(Number(limited.headers.get('Retry-After')) > 0);
   } finally {
+    if (previousSpeech === undefined) delete process.env.SPEECH_TRANSCRIPTION_URL;
+    else process.env.SPEECH_TRANSCRIPTION_URL = previousSpeech;
     await app?.close();
     if (provider.listening) {
       provider.closeAllConnections();

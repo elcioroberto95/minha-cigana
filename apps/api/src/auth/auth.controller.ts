@@ -1,5 +1,5 @@
 import { Body, Controller, Header, HttpCode, Post, UseGuards } from '@nestjs/common';
-import { readCredentials, readRegistration } from './auth-input.js';
+import { readAccountEmail, readCredentials, readRegistration } from './auth-input.js';
 import { AuthRateGuard } from './auth-rate.guard.js';
 import { AuthService, type Identity } from './auth.service.js';
 import { CurrentIdentity, IdentityGuard, IdentityMode } from './identity.guard.js';
@@ -7,6 +7,14 @@ import { CurrentIdentity, IdentityGuard, IdentityMode } from './identity.guard.j
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
+
+  @Post('email')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  @UseGuards(AuthRateGuard)
+  async email(@Body() body: unknown) {
+    return { next: await this.auth.hasAccount(readAccountEmail(body)) ? 'login' : 'register' };
+  }
 
   @Post('register')
   @Header('Cache-Control', 'no-store')

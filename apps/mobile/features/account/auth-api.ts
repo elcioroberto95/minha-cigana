@@ -6,6 +6,18 @@ import type { Profile } from './profile-api';
 type Credentials = { email: string; password: string };
 type AuthError = 'authInvalid' | 'authConflict' | 'authRejected' | 'authRateLimited';
 
+export async function nextAccountStep(email: string, signal: AbortSignal) {
+  const response = await apiFetch('/api/auth/email', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }), signal,
+  });
+  if (response.status === 400) return 'authInvalid';
+  if (response.status === 429) return 'authRateLimited';
+  if (!response.ok) throw new Error('Account lookup unavailable');
+  const { next } = await response.json();
+  if (next !== 'login' && next !== 'register') throw new Error('Invalid account lookup');
+  return next as 'login' | 'register';
+}
+
 async function authenticate(path: 'register' | 'login', body: Credentials, visitor?: string): Promise<AuthError | undefined> {
   const response = await apiFetch('/api/auth/' + path, {
     method: 'POST',

@@ -21,3 +21,8 @@ export function readCredentials(body: unknown) {
   if (!isObject(body)) throw new BadRequestException({ error: 'invalid_auth_request' });
   return { email: readEmail(body.email).toLowerCase(), password: readPassword(body.password) };
 }
+
+export function readAccountEmail(body: unknown) {
+  if (!isObject(body)) throw new BadRequestException({ error: 'invalid_auth_request' });
+  return readEmail(body.email).toLowerCase();
+}

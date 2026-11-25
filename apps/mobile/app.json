@@ -18,7 +18,7 @@
         }
       ],
       "expo-secure-store",
-      ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false, "enableBackgroundPlayback": false }]
+      ["expo-audio", { "microphonePermission": "Permita que o Cigana do Destino grave sua pergunta quando você escolher enviar áudio.", "enableBackgroundPlayback": false }]
     ],
     "web": {
       "output": "single"
