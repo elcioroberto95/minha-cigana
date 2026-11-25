@@ -247,7 +247,8 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Aceite:** testar Consulta e Memória sem NestJS, PostgreSQL ou Ollama. Preservar o contrato HTTP e os fluxos existentes. O CI deve detectar dependências proibidas no recorte.
 - **Evidências:** `npm run lint`, `npm run typecheck`, `npm run build:api` e `node --test --test-concurrency=1 test/*.test.mjs` passaram com PostgreSQL local e respostas do modelo simuladas (27 testes, 4 novos com portas em memória). A integração confirmou que desativar aprendizado após a proposta impede a escrita.
 - **Checagem de arquitetura:** `npm run check:architecture` passou com dependency-cruiser (62 módulos). Cenários isolados confirmaram que a checagem rejeita `import type` proibido no domínio, acesso do controller ao Ollama, acesso a módulos privados de outro contexto, ciclos na API e imports com caminhos calculados nas camadas protegidas.
-- **Próxima ação:** revisar a branch no worktree atual e integrar após a revisão.
+- **Revisão:** [PR #13](https://github.com/elcioroberto95/minha-cigana/pull/13).
+- **Próxima ação:** revisar o PR e integrar após a aprovação das verificações do CI.
 
 ## Modelo de tarefa
 
