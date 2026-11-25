@@ -7,6 +7,7 @@ import { NestFactory } from '@nestjs/core';
 import { Client } from 'pg';
 import { AppModule } from '../dist/app.module.js';
 import { AuthService } from '../dist/auth/auth.service.js';
+import { ConsultationMemory } from '../dist/profile/application/consultation-memory.js';
 import { migrate } from '../scripts/migrate.mjs';
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
@@ -142,7 +143,11 @@ test('ESM-06 cadastra, autentica em outro aparelho e restringe os dados √† sess√
     });
     assert.equal((await request('/chat', 'POST', firstToken, chat)).status, 200);
     assert.match(modelCalls.at(-1).messages[0].content, /"learned":\[\{"kind":"occupation","value":"desenvolvedora"\}\]/);
+    const owner = createHash('sha256').update(visitor).digest('hex');
+    const pending = await app.get(ConsultationMemory).propose(owner, 'Quero mudar de emprego.');
+    assert.equal(pending?.kind, 'career_goal');
     assert.equal((await request(learning, 'PUT', secondToken, { enabled: false })).status, 200);
+    assert.equal(await pending.accept(), false);
     assert.deepEqual(await (await request(learning, 'GET', secondToken)).json(), { enabled: false, items: [] });
     assert.equal((await request('/chat', 'POST', firstToken, chat)).status, 200);
     assert.doesNotMatch(modelCalls.at(-1).messages[0].content, /desenvolvedora/);

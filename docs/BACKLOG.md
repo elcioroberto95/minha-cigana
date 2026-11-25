@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-14 — Trocar o convite por acesso com conta](#esm-14--trocar-o-convite-por-acesso-com-conta)
+**Próxima tarefa:** [ESM-16 — Delimitar Consulta e Memória](#esm-16--delimitar-consulta-e-memória)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -238,6 +238,16 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Execução real (24/11/2026):** a tentativa com Esmeralda 1,5B em CPU retornou HTTP 503 após 90 s antes da chamada da ferramenta. A requisição `8c3274be-7d57-4015-bae8-dd555db5c293` deixou a memória vazia.
 - **Próxima ação:** rodar o exemplo de profissão com Esmeralda 3B em desenvolvimento e consultar a seção Memória do perfil.
 - **Revisão:** [PR #12](https://github.com/elcioroberto95/minha-cigana/pull/12).
+
+## ESM-16 — Delimitar Consulta e Memória
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-16/consulta-e-memoria-hexagonais`.
+- **Dependências e decisões:** ESM-12, ESM-15 e decisão 016.
+- **Aceite:** testar Consulta e Memória sem NestJS, PostgreSQL ou Ollama. Preservar o contrato HTTP e os fluxos existentes. O CI deve detectar dependências proibidas no recorte.
+- **Evidências:** `npm run lint`, `npm run typecheck`, `npm run build:api` e `node --test --test-concurrency=1 test/*.test.mjs` passaram com PostgreSQL local e respostas do modelo simuladas (27 testes, 4 novos com portas em memória). A integração confirmou que desativar aprendizado após a proposta impede a escrita.
+- **Checagem de arquitetura:** `npm run check:architecture` passou com dependency-cruiser (62 módulos). Cenários isolados confirmaram que a checagem rejeita `import type` proibido no domínio, acesso do controller ao Ollama, acesso a módulos privados de outro contexto, ciclos na API e imports com caminhos calculados nas camadas protegidas.
+- **Próxima ação:** revisar a branch no worktree atual e integrar após a revisão.
 
 ## Modelo de tarefa
 

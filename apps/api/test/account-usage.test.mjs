@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { AccountUsage } from '../dist/auth/account-usage.js';
-import { memoryCandidate, readMemoryCall } from '../dist/chat/memory-tool.js';
+import { readMemoryCall } from '../dist/chat/memory-tool.js';
+import { memoryCandidate } from '../dist/profile/domain/learned-fact.js';
 
 test('ESM-14 limita gerações por conta e distingue leituras simples', () => {
   const limiter = new AccountUsage();

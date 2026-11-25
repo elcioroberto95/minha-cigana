@@ -1,4 +1,4 @@
-import type { ChatLocale } from './chat-input.js';
+import { normalizedWords, type ChatLocale } from './domain/consultation.js';
 
 const readingExample = {
   'pt-BR': {
@@ -36,34 +36,10 @@ export function styleExample(locale: ChatLocale, interpreting: boolean) {
   ] as const;
 }
 
-function normalize(value: string) {
-  return value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
-}
-
-const bodyReplies = {
-  'pt-BR': {
-    body: 'Entendo a curiosidade, meu bem. As cartas não conseguem dizer se o seu pênis vai crescer. Se o tamanho ou alguma mudança no seu corpo está te preocupando, vale conversar com um profissional de saúde. O que mais você gostaria de explorar sobre o seu futuro?',
-    growth: /\b(cresc\w*|aument\w*|tamanho|diminu\w*)\b/,
-    anatomy: /\b(penis|meu pau|meu pinto|meu caralho|meu kct)\b/,
-  },
-  'en-US': {
-    body: 'I understand the curiosity, my dear. The cards cannot tell whether your penis will grow. If its size or changes in your body are worrying you, a healthcare professional can help. What else about your future would you like to explore?',
-    growth: /\b(grow\w*|bigger|smaller|size|shrink\w*)\b/,
-    anatomy: /\b(penis|my dick|my cock)\b/,
-  },
-} as const;
-
-export function bodyQuestionReply(message: string, locale: ChatLocale) {
-  const { anatomy, growth, body } = bodyReplies[locale];
-  const words = normalize(message);
-  return anatomy.test(words) && growth.test(words) ? body : undefined;
-}
-
 export function breaksCharacter(reply: string, phrases: string[]) {
-  const normalized = ' ' + normalize(reply) + ' ';
+  const normalized = ' ' + normalizedWords(reply) + ' ';
   return phrases.some((phrase) => {
-    const words = normalize(phrase);
+    const words = normalizedWords(phrase);
     return words && normalized.includes(' ' + words + ' ');
   });
 }

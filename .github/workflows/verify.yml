@@ -40,6 +40,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run check:architecture
       - run: npm run test:api
       - run: npm run build:web
       - name: Abrir a entrada da conta no Chrome

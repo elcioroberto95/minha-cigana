@@ -16,6 +16,7 @@
     "eval:ai": "node apps/api/evals/run.ts",
     "migrate:api": "npm run migrate --workspace=@cigana/api",
     "lint": "npm run lint --workspaces --if-present",
+    "check:architecture": "npm run check:architecture --workspace=@cigana/api",
     "typecheck": "npm run typecheck --workspaces"
   }
 }
