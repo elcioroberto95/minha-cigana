@@ -2,9 +2,12 @@ import { withIdentityScope } from '../../lib/identity-scope';
 import { useIsFocused, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, AppState, StyleSheet, Text, View } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { Button, colors, Copy, Panel, Screen, Title } from '../../components/ui';
+import { RitualLoader } from '../../components/RitualLoader';
+import { useCardSound } from '../../components/MysticSound';
 import { CardBack } from '../tarot/CardBack';
+import { CardReveal } from '../tarot/CardReveal';
 import { getDailyCard, revealDailyCard, type DailyDraw } from './daily-card-api';
 
 type ViewState =
@@ -15,6 +18,7 @@ function DailyCardScreenContent() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const focused = useIsFocused();
+  const playCue = useCardSound();
   const [state, setState] = useState<ViewState>({ phase: 'loading' });
   const [revision, setRevision] = useState(0);
   const activeRead = useRef<AbortController | null>(null);
@@ -56,7 +60,10 @@ function DailyCardScreenContent() {
     setState({ phase: 'revealing' });
     try {
       const draw = await revealDailyCard(controller.signal);
-      if (!controller.signal.aborted) setState({ phase: 'ready', draw, revisited: false });
+      if (!controller.signal.aborted) {
+        playCue('reveal');
+        setState({ phase: 'ready', draw, revisited: false });
+      }
     } catch {
       if (!controller.signal.aborted) setState({ phase: 'error' });
     } finally {
@@ -68,7 +75,7 @@ function DailyCardScreenContent() {
     <Title>{t('dailyCard')}</Title>
     {state.phase === 'ready' && state.draw ? <>
       {state.revisited && <Copy>{t('dailyAlreadyOpened')}</Copy>}
-      <DailyResult draw={state.draw} locale={locale} />
+      <DailyResult draw={state.draw} locale={locale} animate={!state.revisited} />
       <Button label={t('discussDailyCard')} onPress={() => router.push({
         pathname: '/consulta',
         params: { dailyCardId: state.draw?.id },
@@ -80,10 +87,8 @@ function DailyCardScreenContent() {
         <Copy>{t('dailyCadence')}</Copy>
       </Panel>
       {state.phase === 'ready' && <Button label={t('revealDailyCard')} onPress={() => void reveal()} />}
-      {(state.phase === 'loading' || state.phase === 'revealing') && <View accessibilityLiveRegion="polite" style={styles.status}>
-        <ActivityIndicator color={colors.gold} />
-        <Copy>{t(state.phase === 'loading' ? 'dailyLoading' : 'dailyRevealing')}</Copy>
-      </View>}
+      {(state.phase === 'loading' || state.phase === 'revealing') && <RitualLoader mode="cards"
+        label={t(state.phase === 'loading' ? 'dailyLoading' : 'dailyRevealing')} />}
       {state.phase === 'error' && <>
         <Copy>{t('dailyError')}</Copy>
         <Button label={t('tryAgain')} onPress={() => {
@@ -95,7 +100,7 @@ function DailyCardScreenContent() {
   </Screen>;
 }
 
-function DailyResult({ draw, locale }: { draw: DailyDraw; locale: 'pt-BR' | 'en-US' }) {
+function DailyResult({ draw, locale, animate }: { draw: DailyDraw; locale: 'pt-BR' | 'en-US'; animate: boolean }) {
   const { t } = useTranslation();
   const reading = draw.card.readings[locale];
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' })
@@ -104,8 +109,8 @@ function DailyResult({ draw, locale }: { draw: DailyDraw; locale: 'pt-BR' | 'en-
   return <>
     <View style={styles.face}>
       <View style={styles.border}>
+        <CardReveal id={draw.card.key} animate={animate} large />
         <Copy>{draw.card.numeral}</Copy>
-        <Text accessible={false} style={styles.star}>✦</Text>
         <Title>{reading.title}</Title>
         <Copy emphasis>{reading.theme}</Copy>
       </View>
@@ -122,9 +127,7 @@ function DailyResult({ draw, locale }: { draw: DailyDraw; locale: 'pt-BR' | 'en-
 
 const styles = StyleSheet.create({
   face: { padding: 8, borderWidth: 1, borderColor: colors.gold, borderRadius: 20, backgroundColor: colors.surface },
-  border: { alignItems: 'center', padding: 24, gap: 8, borderWidth: 1, borderColor: colors.border, borderRadius: 12 },
-  star: { color: colors.gold, fontSize: 45 },
-  status: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  border: { alignItems: 'center', padding: 16, gap: 8, borderWidth: 1, borderColor: colors.border, borderRadius: 12 },
 });
 
 export default withIdentityScope(DailyCardScreenContent);

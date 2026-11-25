@@ -1,10 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Button, colors, Copy, Panel, Screen, Title } from '../../components/ui';
+import { View } from 'react-native';
+import { Button, Copy, Panel, Screen, Title } from '../../components/ui';
+import { RitualLoader } from '../../components/RitualLoader';
 import { withIdentityScope } from '../../lib/identity-scope';
 import { spreadLabels, type Spread } from '../tarot/domain';
+import { CardReveal } from '../tarot/CardReveal';
 import { interpretDraw, readDraw, type TarotDraw } from '../tarot/tarot-api';
 import { ReadingResult } from './ReadingScreens';
 
@@ -43,10 +45,13 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
 
   return <Screen backTo="/tarot">
     <Title>{t(spreadLabels[format])}</Title>
-    {draw?.cards.map(({ card, position, orientation }) => {
+    {status === 'loading' && <RitualLoader label={t(draw ? 'interpretingSpread' : 'revealingSpread')}
+      mode={draw ? 'reading' : 'cards'} />}
+    {draw?.cards.map(({ card, position, orientation }, index) => {
       const interpretation = structured?.cards.find(({ cardId }) => cardId === card.id)?.interpretation;
       return <Panel key={card.id}>
         <Copy>{position}</Copy>
+        <CardReveal id={card.id} inverted={orientation === 'invertida'} index={index} />
         <Copy emphasis>{card.name}</Copy>
         {orientation === 'invertida' && <Copy>{t('reversedCard')}</Copy>}
         {interpretation && <Copy>{interpretation}</Copy>}
@@ -62,10 +67,6 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
       <Copy emphasis>Madame Esmeralda</Copy>
       <Copy>{draw.reading}</Copy>
     </Panel>}
-    {status === 'loading' && <View role="status" accessibilityLiveRegion="polite" style={styles.status}>
-      <ActivityIndicator color={colors.gold} accessible={false} aria-hidden />
-      <Copy>{t(draw ? 'interpretingSpread' : 'revealingSpread')}</Copy>
-    </View>}
     {status === 'error' && <>
       <View role="status" accessibilityLiveRegion="polite"><Copy>{t(draw ? 'interpretationError' : 'drawError')}</Copy></View>
       <Button label={t('tryAgain')} onPress={() => {
@@ -77,9 +78,5 @@ function TarotResult({ id, format }: { id: string; format: Spread }) {
     <Copy>{t('entertainmentNotice')}</Copy>
   </Screen>;
 }
-
-const styles = StyleSheet.create({
-  status: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-});
 
 export const TarotReadingScreen = withIdentityScope(TarotReadingContent);

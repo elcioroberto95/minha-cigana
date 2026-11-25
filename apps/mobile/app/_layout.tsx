@@ -1,5 +1,6 @@
-import { DMSans_400Regular, DMSans_600SemiBold } from '@expo-google-fonts/dm-sans';
-import { DMSerifText_400Regular } from '@expo-google-fonts/dm-serif-text';
+import { Cinzel_600SemiBold } from '@expo-google-fonts/cinzel/600SemiBold';
+import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
+import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -7,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { ActivityIndicator, View } from 'react-native';
 import { colors } from '../components/ui';
+import { MysticSoundProvider } from '../components/MysticSound';
 import { AccountEntry } from '../features/account/AccountScreens';
 import { DailyCheckIn } from '../features/account/DailyCheckIn';
 import { DraftProvider } from '../features/chat/DraftProvider';
@@ -14,7 +16,7 @@ import { restoreSession, useSignedIn, watchSessionStorage } from '../lib/session
 import { appI18n, initializeLocalization } from '../localization';
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({ DMSans_400Regular, DMSans_600SemiBold, DMSerifText_400Regular });
+  const [loaded, error] = useFonts({ DMSans_400Regular, DMSans_600SemiBold, Cinzel_600SemiBold });
   const [localized, setLocalized] = useState(false);
   const signedIn = useSignedIn();
 
@@ -45,11 +47,11 @@ export default function RootLayout() {
 
   return <I18nextProvider i18n={appI18n}>
     <StatusBar style="light" />
-    {!signedIn ? <AccountEntry /> : <>
+    {!signedIn ? <AccountEntry /> : <MysticSoundProvider>
     <DraftProvider>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
     </DraftProvider>
     <DailyCheckIn />
-    </>}
+    </MysticSoundProvider>}
   </I18nextProvider>;
 }

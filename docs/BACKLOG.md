@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-16 — Delimitar Consulta e Memória](#esm-16--delimitar-consulta-e-memória)
+**Próxima tarefa:** [ESM-17 — Dar identidade visual e sonora às leituras](#esm-17--dar-identidade-visual-e-sonora-às-leituras)
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -241,13 +241,24 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-16 — Delimitar Consulta e Memória
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Branch:** `esm-16/consulta-e-memoria-hexagonais`.
 - **Dependências e decisões:** ESM-12, ESM-15 e decisão 016.
 - **Aceite:** testar Consulta e Memória sem NestJS, PostgreSQL ou Ollama. Preservar o contrato HTTP e os fluxos existentes. O CI deve detectar dependências proibidas no recorte.
 - **Evidências:** `npm run lint`, `npm run typecheck`, `npm run build:api` e `node --test --test-concurrency=1 test/*.test.mjs` passaram com PostgreSQL local e respostas do modelo simuladas (27 testes, 4 novos com portas em memória). A integração confirmou que desativar aprendizado após a proposta impede a escrita.
 - **Checagem de arquitetura:** `npm run check:architecture` passou com dependency-cruiser (62 módulos). Cenários isolados confirmaram que a checagem rejeita `import type` proibido no domínio, acesso do controller ao Ollama, acesso a módulos privados de outro contexto, ciclos na API e imports com caminhos calculados nas camadas protegidas.
-- **Próxima ação:** revisar a branch no worktree atual e integrar após a revisão.
+- **Revisão:** [PR #13](https://github.com/elcioroberto95/minha-cigana/pull/13).
+
+## ESM-17 — Dar identidade visual e sonora às leituras
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-17/ritual-visual`.
+- **Escopo:** tipografia display, ambientação da tela inicial, trilha opcional, arte, mensagens de espera, embaralhamento, seleção e revelação das cartas.
+- **Aceite:** mostrar as cartas devolvidas pela API, manter o texto legível e a trilha sob controle do usuário, respeitar a preferência de movimento reduzido e validar o app Expo web.
+- **Direção visual:** títulos em Cinzel, fundo ameixa, dourado antigo e gravuras botânicas. As imagens foram criadas com ImageGen a partir de três instruções artísticas: verso ornamentado com fases da Lua e observatório, atlas com as cenas simbólicas dos arcanos maiores e os emblemas de Copas, Espadas e Ouros, e um bastão dourado em céu violeta para Paus. A trilha sintetizada usa sinos suaves e notas graves.
+- **Evidências:** lint, TypeScript e `npm run build:web` passaram. No Chrome em 360 × 800 com API e PostgreSQL locais, o áudio ligou e pausou pelo controle do Início, a Carta do Dia exibiu a gravura correspondente após a virada e a tiragem de três cartas manteve a grade uniforme e revelou as artes sem giro com movimento reduzido.
+- **Embaralhamento e espera:** no Chrome em 360 × 800, o baralho se abriu e se juntou antes da escolha. Uma tiragem na API local validou os sons de embaralhar, selecionar três cartas e revelar. Com movimento reduzido, a grade abriu sem o embaralhamento animado. Uma resposta de teste com atraso confirmou a rotação de três frases e o desaparecimento do carregador ao chegar a resposta.
+- **Próxima ação:** revisar a apresentação e o áudio em Android e iOS antes de integrar.
 
 ## Modelo de tarefa
 

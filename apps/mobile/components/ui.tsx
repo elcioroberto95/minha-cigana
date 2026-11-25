@@ -5,8 +5,8 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const colors = {
-  background: '#160D25', surface: '#29163D', selected: '#4B345E',
-  gold: '#D8B66A', cream: '#F5D99B', text: '#E9DBEB', muted: '#BDAFC9', border: '#594166',
+  background: '#120C20', surface: '#251632', selected: '#493053',
+  gold: '#D8B66A', cream: '#F5D99B', text: '#E9DBEB', muted: '#C7B9D0', border: '#554063',
 };
 
 export function Screen({ children, back = true, backTo = '/' }: { children: ReactNode; back?: boolean; backTo?: Href }) {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: 22, paddingVertical: 18 },
   page: { width: '100%', maxWidth: 540, alignSelf: 'center', gap: 14, paddingBottom: 24 },
   back: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
-  title: { fontFamily: 'DMSerifText_400Regular', fontSize: 35, lineHeight: 42, color: colors.cream },
+  title: { fontFamily: 'Cinzel_600SemiBold', fontSize: 30, lineHeight: 38, color: colors.cream },
   copy: { fontFamily: 'DMSans_400Regular', fontSize: 16, lineHeight: 24, color: colors.muted },
   emphasis: { fontFamily: 'DMSans_600SemiBold', fontSize: 17, lineHeight: 24, color: colors.text },
   panel: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: 18, gap: 9, padding: 16 },
