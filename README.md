@@ -60,9 +60,21 @@ A VPS usa o [comando SSH restrito](deploy/ssh-hook.sh) instalado em `/usr/local/
 
 O [Caddyfile](deploy/Caddyfile) serve o Expo Web e encaminha a API pelo IP da VPS, usando um certificado público de curta duração com renovação automática. O host define `CIGANA_PUBLIC_IP` em `/etc/cigana/public.env`. O Caddy, com rede do host, lê o site via bind mount de `/opt/cigana/web` em `/srv`. O pipeline publica a API e o Expo Web do commit aprovado na main.
 
-Para apontar o app à VPS, use `EXPO_PUBLIC_API_URL=https://IP_DA_VPS`. Na abertura, use **Entrar** ou **Criar conta**. O cadastro pede e-mail, nome, senha de oito caracteres e gênero opcional. O cadastro não envia código. A recuperação por e-mail ainda está indisponível.
+Para apontar o app à VPS, use `EXPO_PUBLIC_API_URL=https://IP_DA_VPS`. Na abertura, informe o e-mail e toque em **Continuar**. A API retorna a próxima etapa, senha para conta existente ou formulário com nome, senha de oito caracteres e gênero opcional para e-mail novo. A consulta de e-mail compartilha o limite por IP do login e do cadastro. O cadastro não envia código. A recuperação por e-mail ainda está indisponível.
 
 Na VPS, `REQUIRE_ACCOUNT=1` exige sessão nas rotas do app e aplica até 90 chamadas e seis gerações por conta por minuto, com até duas inferências simultâneas. O cadastro e o login têm limite por IP. O modo de desenvolvimento da API sem essa variável mantém acesso por visitante para testes e evals locais. A rota de compatibilidade do Caddy instalado só devolve um status. Os guards continuam verificando a sessão nas rotas do app.
+
+## Voz na Consulta e na tiragem
+
+Na Consulta, selecione **Texto** ou **Áudio** para definir como receber as próximas respostas no dispositivo. Aplique **Ouvir** e **Parar áudio** para controlar a narração do resultado da tiragem. A narração usa a voz de português ou inglês disponível no dispositivo, com ritmo mais calmo. O texto permanece disponível. [Expo Speech](https://docs.expo.dev/versions/v58.0.0/sdk/speech/)
+
+Para habilitar **Gravar áudio**, configure `SPEECH_TRANSCRIPTION_URL` com o endpoint completo `/v1/audio/transcriptions`, `SPEECH_TRANSCRIPTION_MODEL` com o ID do modelo e, se necessário, `SPEECH_TRANSCRIPTION_KEY`. O Compose da VPS lê essas variáveis do ambiente de deploy. Um servidor privado compatível como Speaches pode executar o modelo multilíngue `Systran/faster-whisper-base` na CPU. O app limita a gravação a 30 segundos e a API limita o envio a 1 MiB. A API encaminha o arquivo em memória ao transcritor e não grava a mídia no PostgreSQL. Sem transcritor configurado, a Consulta continua disponível por texto. [Speaches](https://github.com/speaches-ai/speaches)
+
+## Medição do piloto
+
+A migração `009_tarot_pilot_metrics.sql` registra a abertura da seleção em `tarot_pilot_attempts`. Em `tarot_draws`, `pilot_started_at` marca a confirmação das cartas e `pilot_completed_at` marca a primeira interpretação salva. `tarot_pilot_events` conta uma reprodução e uma continuação na Consulta por tiragem. Os eventos têm IDs, tipos e datas e não repetem perguntas ou respostas. Filtre por data e por `format = 'tres-cartas'` ao comparar o funil.
+
+`generation_ms` mede a chamada que gerou a leitura salva. Com `PILOT_COMPUTE_COST_PER_HOUR_BRL` definido, `estimated_compute_cost_brl` estima o custo pela duração vezes a tarifa horária. Sem tarifa, o campo fica vazio. Trata-se de uma estimativa por leitura concluída, com o custo fixo da VPS e as tentativas malsucedidas contabilizados à parte. A narração do dispositivo não gera uma chamada de áudio faturável pelo backend.
 
 Depois de aplicar as migrações, em **Perfil → Privacidade**, ative a **Memória do perfil** para permitir que a Consulta guarde fatos elegíveis declarados pela própria pessoa. Experimente `Trabalho como desenvolvedora. Quero refletir sobre a carreira.` A tela de Privacidade mostra o que foi registrado. Profissão e estado de relacionamento ficam até que a preferência seja desativada. Objetivos profissionais deixam de ser usados depois de 30 dias. Desativar apaga os fatos aprendidos.
 

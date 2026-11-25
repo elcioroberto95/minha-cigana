@@ -44,7 +44,7 @@ export function Panel({ children }: { children: ReactNode }) {
 export function Button({ label, onPress, secondary = false, disabled = false, selected }: {
   label: string; onPress?: () => void; secondary?: boolean; disabled?: boolean; selected?: boolean;
 }) {
-  return <Pressable accessibilityRole="button" accessibilityState={{ disabled, selected }} disabled={disabled}
+  return <Pressable accessibilityRole="button" accessibilityState={{ disabled, selected }} aria-pressed={selected} disabled={disabled}
     onPress={onPress} style={({ pressed }) => [styles.button, secondary && styles.secondary, selected && styles.selected,
       (pressed || disabled) && styles.faded]}>
     <Text style={[styles.buttonLabel, secondary && styles.secondaryLabel]}>{label}</Text>

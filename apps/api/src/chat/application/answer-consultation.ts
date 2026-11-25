@@ -1,8 +1,9 @@
 import type { ConsultationMemoryPort, MemoryProposal, PersonalContext } from '../../profile/application/consultation-memory.js';
 import { bodyQuestionReply } from '../domain/editorial-reply.js';
-import type { ChatLocale, ConsultationPrompt } from '../domain/consultation.js';
+import type { ChatLocale, ChatTopic, ConsultationPrompt } from '../domain/consultation.js';
 
 type DailyReflection = { title: string; reflection: string };
+type SpreadContext = { topic: ChatTopic; question: string; cards: { name: string; position: string; orientation: string }[] };
 type ConsultationReply = { reply: string; model: string };
 export type ConsultationIdentity = { owner: string; kind: 'visitor' | 'account' };
 
@@ -21,6 +22,7 @@ export type ConsultationTools = {
 
 export type GenerateConsultationOptions = {
   daily?: DailyReflection;
+  spread?: SpreadContext;
   personal?: PersonalContext;
   tools?: ConsultationTools;
 };
@@ -28,6 +30,7 @@ export type GenerateConsultationOptions = {
 type AnswerConsultationPorts = {
   generate: (input: ConsultationPrompt, options: GenerateConsultationOptions) => Promise<ConsultationReply>;
   memory: ConsultationMemoryPort;
+  spreads: (owner: string, id: string, locale: ChatLocale) => Promise<SpreadContext>;
   dailyCards: {
     byId: (owner: string, id: string, locale: ChatLocale) => Promise<DailyReflection>;
     today: (owner: string, locale: ChatLocale) => Promise<DailyReflection | undefined>;
@@ -39,17 +42,19 @@ export class MissingConsultationIdentity extends Error {}
 export class AnswerConsultation {
   constructor(private readonly ports: AnswerConsultationPorts) {}
 
-  async execute({ dailyCardId, ...input }: ConsultationPrompt & { dailyCardId?: string }, identity?: ConsultationIdentity) {
-    if (dailyCardId && !identity) throw new MissingConsultationIdentity();
-    const { generate, memory, dailyCards } = this.ports;
+  async execute({ dailyCardId, drawId, ...input }: ConsultationPrompt & { dailyCardId?: string; drawId?: string }, identity?: ConsultationIdentity) {
+    if ((dailyCardId || drawId) && !identity) throw new MissingConsultationIdentity();
+    const { generate, memory, dailyCards, spreads } = this.ports;
     const daily = dailyCardId && identity ? await dailyCards.byId(identity.owner, dailyCardId, input.locale) : undefined;
-    const personal = identity ? await memory.context(identity.owner, input.topic) : undefined;
+    const spread = drawId && identity ? await spreads(identity.owner, drawId, input.locale) : undefined;
+    const topic = spread?.topic ?? input.topic;
+    const personal = identity ? await memory.context(identity.owner, topic) : undefined;
     const editorial = bodyQuestionReply(input.message, input.locale);
     if (editorial) return { reply: editorial, model: 'editorial' };
 
     const proposal = identity?.kind === 'account' ? await memory.propose(identity.owner, input.message) : undefined;
-    const tools = identity ? this.tools(identity.owner, input.locale, !dailyCardId, proposal) : undefined;
-    return generate(input, { daily, personal, tools });
+    const tools = identity ? this.tools(identity.owner, input.locale, !dailyCardId && !drawId, proposal) : undefined;
+    return generate({ ...input, topic }, { daily, spread, personal, tools });
   }
 
   private tools(owner: string, locale: ChatLocale, dailyCard: boolean, memory?: MemoryProposal): ConsultationTools {

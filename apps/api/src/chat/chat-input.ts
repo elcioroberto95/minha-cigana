@@ -41,10 +41,11 @@ export function readMessages(history: unknown, limit: number): ChatMessage[] {
 
 export function readChatInput(body: unknown) {
   if (!isObject(body)) invalid();
-  const { locale, topic, message, history = [], dailyCardId } = body;
+  const { locale, topic, message, history = [], dailyCardId, drawId } = body;
   const supportedLocale = (['pt-BR', 'en-US'] as const).find((value) => value === locale);
   if (!supportedLocale) invalid();
   if (dailyCardId !== undefined && !isVisitorRecordId(dailyCardId)) invalid();
+  if (drawId !== undefined && (!isVisitorRecordId(drawId) || dailyCardId !== undefined)) invalid();
   const previous = readMessages(history, maxChatHistory).map(({ role, content }) => ({ role, content }));
-  return { locale: supportedLocale, topic: readTopic(topic), message: readText(message, 500), history: previous, dailyCardId };
+  return { locale: supportedLocale, topic: readTopic(topic), message: readText(message, 500), history: previous, dailyCardId, drawId };
 }

@@ -9,6 +9,12 @@ import { TarotService } from './tarot.service.js';
 export class TarotController {
   constructor(private readonly tarot: TarotService) {}
 
+  @Post('pilot/:id/start')
+  @HttpCode(204)
+  startPilot(@CurrentIdentity() { owner }: Identity, @Param('id') id: string) {
+    return this.tarot.recordPilotStart(owner, drawId(id));
+  }
+
   @Post('draw')
   @HttpCode(200)
   @Header('Cache-Control', 'no-store')
@@ -20,6 +26,12 @@ export class TarotController {
   @Header('Cache-Control', 'no-store')
   get(@CurrentIdentity() { owner }: Identity, @Param('id') id: string) {
     return this.tarot.get(owner, drawId(id));
+  }
+
+  @Post('draw/:id/audio-started')
+  @HttpCode(204)
+  audioStarted(@CurrentIdentity() { owner }: Identity, @Param('id') id: string) {
+    return this.tarot.recordPilotEvent(owner, drawId(id), 'audio_started');
   }
 
   @Post('interpret/:id')

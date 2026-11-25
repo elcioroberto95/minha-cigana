@@ -54,6 +54,7 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
   const visitor = randomBytes(32).toString('hex');
   const other = randomBytes(32).toString('hex');
   const id = randomUUID();
+  const attempt = randomUUID();
   const calls = [];
   let app;
   let providerOutcome = 'unavailable';
@@ -98,9 +99,11 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     process.env.DATABASE_URL = scoped.toString();
     process.env.OLLAMA_BASE_URL = 'http://127.0.0.1:' + provider.address().port;
     process.env.OLLAMA_MODEL = 'esmeralda';
+    process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL = '12';
     await start();
 
     const input = { id, format: 'tres-cartas', locale: 'pt-BR', topic: 'work', question: 'Como retomar?', slots: [3, 0, 6] };
+    for (let retry = 0; retry < 2; retry++) assert.equal((await request('pilot/' + attempt + '/start', 'POST', visitor)).status, 204);
     assert.equal((await request('draw', 'POST', undefined, input)).status, 401);
     assert.equal((await request('draw', 'POST', visitor, { ...input, slots: [0, 0, 1] })).status, 400);
     const response = await request('draw', 'POST', visitor, input);
@@ -178,7 +181,32 @@ test('ESM-08 registra, protege e interpreta a mesma tiragem após falha', {
     assert.equal(yesNo.reading, 'Meu bem, vejo um caminho que pede calma.');
     assert.equal(yesNo.structuredReading, undefined);
     assert.equal(calls.at(-1).format, undefined);
+
+    const related = { drawId: id, locale: 'pt-BR', topic: 'love', message: 'Quero falar sobre essa leitura.' };
+    const chatUrl = (await app.getUrl()) + '/api/chat';
+    const chat = (token) => fetch(chatUrl, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(related),
+    });
+    const callsBeforeChat = calls.length;
+    assert.equal((await chat(other)).status, 404);
+    assert.equal(calls.length, callsBeforeChat);
+    assert.equal((await chat(visitor)).status, 200);
+    const promptContext = calls.at(-1).messages[0].content;
+    assert.match(promptContext, /Tema sugerido: work/);
+    assert.ok(promptContext.includes('Como retomar?'));
+    for (const { card, position, orientation } of draw.cards) {
+      assert.ok(promptContext.includes(JSON.stringify({ name: card.name, position, orientation })));
+    }
+    for (const token of [other, visitor, visitor]) assert.equal((await request('draw/' + id + '/audio-started', 'POST', token)).status, 204);
+    const { rows: attempts } = await admin.query(`SELECT id FROM ${schema}.tarot_pilot_attempts`);
+    assert.deepEqual(attempts, [{ id: attempt }]);
+    const { rows: events } = await admin.query(`SELECT event FROM ${schema}.tarot_pilot_events WHERE draw_id = $1 ORDER BY event`, [id]);
+    assert.deepEqual(events, [{ event: 'audio_started' }, { event: 'chat_continued' }]);
+    const { rows: [cost] } = await admin.query(`SELECT generation_ms, estimated_compute_cost_brl FROM ${schema}.tarot_draws WHERE id = $1`, [id]);
+    assert.notEqual(cost.estimated_compute_cost_brl, null);
+    assert.ok(cost.generation_ms >= 0 && Number(cost.estimated_compute_cost_brl) >= 0);
   } finally {
+    delete process.env.PILOT_COMPUTE_COST_PER_HOUR_BRL;
     await app?.close();
     if (provider.listening) {
       provider.closeAllConnections();

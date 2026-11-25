@@ -12,7 +12,7 @@ import { CardBack } from './CardBack';
 import { isSpread, isTopic, spreadSizes, type Spread, type Topic } from './domain';
 import { ShuffleDeck } from './ShuffleDeck';
 import { TopicPicker } from './TopicPicker';
-import { createDraw } from './tarot-api';
+import { createDraw, recordReadingStart } from './tarot-api';
 
 const resultRoutes = {
   'tres-cartas': '/leituras/[id]/tres-cartas',
@@ -104,6 +104,7 @@ function SelectSpread({ spread, topic }: { spread: Spread; topic: Topic }) {
   const router = useRouter();
   const [selected, setSelected] = useState<number[]>([]);
   const [deckReady, setDeckReady] = useState(false);
+  const [attemptId] = useState(() => randomUUID());
   const finishShuffle = useCallback(() => setDeckReady(true), []);
   const playCue = useCardSound();
   const { readingQuestion } = useQuestionDraft();
@@ -114,6 +115,12 @@ function SelectSpread({ spread, topic }: { spread: Spread; topic: Topic }) {
   const previousDraw = useRef<{ id: string; selection: string } | null>(null);
 
   useEffect(() => () => active.current?.abort(), []);
+  useEffect(() => {
+    if (spread !== 'tres-cartas') return;
+    const controller = new AbortController();
+    void recordReadingStart(attemptId, controller.signal).catch(() => {});
+    return () => controller.abort();
+  }, [attemptId, spread]);
 
   async function reveal() {
     if (active.current || selected.length !== count) return;

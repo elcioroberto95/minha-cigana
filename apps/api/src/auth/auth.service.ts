@@ -31,6 +31,13 @@ export class AuthService implements OnModuleDestroy {
     return this.pool?.end();
   }
 
+  hasAccount(email: string) {
+    return this.database(async (pool) => {
+      const result = await pool.query('SELECT 1 FROM accounts WHERE email = $1', [email]);
+      return result.rowCount === 1;
+    });
+  }
+
   register(owner: string, { name, email, sex, password }: ReturnType<typeof readRegistration>) {
     return this.database(async (pool) => {
       const salt = randomBytes(16);

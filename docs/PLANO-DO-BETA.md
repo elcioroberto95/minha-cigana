@@ -6,11 +6,11 @@ Pessoas no Brasil que gostam de tarô ou têm curiosidade conseguem tirar três 
 
 ## O que entra no beta
 
-- **Primeira leitura como visitante.** Início → tema e pergunta opcional → escolha e revelação de três cartas → resultado em texto → áudio opcional → conversa sobre a leitura.
-- **Chat livre por texto.** Dá para abrir pelo início ou continuar a partir do resultado com a pergunta e as cartas da sessão. Avisos de cota podem ser avaliados sem cobrança.
+- **Primeira leitura com conta.** E-mail → login ou cadastro → tema e pergunta opcional → escolha e revelação de três cartas → resultado em texto → áudio opcional → conversa sobre a leitura.
+- **Chat livre por texto ou gravação curta.** Dá para abrir pelo início ou continuar a partir do resultado com a pergunta e as cartas da sessão. A pessoa escolhe resposta em texto ou narrada. Avisos de cota podem ser avaliados sem cobrança.
 - **Recuperação da leitura.** Se a interpretação falhar, a pessoa consegue tentar novamente e recebe uma interpretação das mesmas cartas.
 
-Carta do Dia, Leitura de Personalidade e tiragem de dez cartas entram em rodadas seguintes. Gravação de voz, conta, sincronização do histórico e compras seguem seus próprios marcos. O beta é um recorte de validação da [especificação](SPEC.md), com os percursos descritos no [mapa de rotas](MAPA-DE-ROTAS.md).
+Carta do Dia, Leitura de Personalidade, tiragem de dez cartas e compras ficam fora do roteiro obrigatório deste piloto. O beta é um recorte de validação da [especificação](SPEC.md), com os percursos descritos no [mapa de rotas](MAPA-DE-ROTAS.md).
 
 ## Ordem de entrega
 

@@ -7,9 +7,10 @@ import { HistoryModule } from './history/history.module.js';
 import { NotFoundFilter } from './not-found.filter.js';
 import { TarotModule } from './tarot/tarot.module.js';
 import { ObservabilityModule } from './observability/observability.module.js';
+import { SpeechModule } from './speech/speech.module.js';
 
 @Module({
-  imports: [ObservabilityModule, HealthModule, AuthModule, ChatModule, HistoryModule, TarotModule],
+  imports: [ObservabilityModule, HealthModule, AuthModule, ChatModule, HistoryModule, TarotModule, SpeechModule],
   providers: [{ provide: APP_FILTER, useClass: NotFoundFilter }],
 })
 export class AppModule {}

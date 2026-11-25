@@ -1,12 +1,14 @@
 import { useIsFocused, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Copy, Field, Panel, Screen, Title } from '../../components/ui';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Button, colors, Copy, Field, Panel, Screen, Title } from '../../components/ui';
 import { LanguagePicker } from '../../components/LanguagePicker';
 import { MysticSoundToggle } from '../../components/MysticSound';
 import { withIdentityScope } from '../../lib/identity-scope';
 import { useSignedIn } from '../../lib/session-token';
-import { login, logout, register } from './auth-api';
+import { useSpeechPlayback } from '../chat/speech';
+import { login, logout, nextAccountStep, register } from './auth-api';
 import { deleteCheckIns, getLearning, getMemory, getProfile, saveProfile, setLearning, setMemory, sexes,
   type LearningPreference, type Profile } from './profile-api';
 
@@ -100,16 +102,73 @@ export function AccountForm({ mode }: { mode: 'signUp' | 'edit' | 'signIn' | 're
 }
 
 export function AccountEntry() {
-  const [registering, setRegistering] = useState(false);
-  return registering
-    ? <ProfileForm editing={false} onSignIn={() => setRegistering(false)} />
-    : <LoginForm onSignUp={() => setRegistering(true)} />;
+  const { t } = useTranslation();
+  const [email, setEmail] = useState('');
+  const [step, setStep] = useState<'email' | 'login' | 'register'>('email');
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<'authInvalid' | 'authRateLimited' | 'authUnavailable'>();
+  const lookup = useRef<AbortController | null>(null);
+  useEffect(() => () => lookup.current?.abort(), []);
+
+  async function continueWithEmail() {
+    if (lookup.current || !email.trim()) return;
+    const request = new AbortController();
+    lookup.current = request;
+    setChecking(true);
+    setError(undefined);
+    try {
+      const next = await nextAccountStep(email.trim(), request.signal);
+      if (request.signal.aborted) return;
+      if (next === 'login' || next === 'register') setStep(next);
+      else setError(next);
+    } catch {
+      if (!request.signal.aborted) setError('authUnavailable');
+    } finally {
+      lookup.current = null;
+      if (!request.signal.aborted) setChecking(false);
+    }
+  }
+
+  const changeEmail = () => setStep('email');
+  if (step === 'login') return <LoginForm initialEmail={email.trim()} onChangeEmail={changeEmail} />;
+  if (step === 'register') return <ProfileForm editing={false} initialEmail={email.trim()} onSignIn={changeEmail} />;
+
+  return <Screen back={false}>
+    <View style={entryStyles.brand}>
+      <Text aria-hidden style={entryStyles.star}>✦</Text>
+      <Text style={entryStyles.brandText}>Cigana do Destino</Text>
+    </View>
+    <View style={entryStyles.cover}>
+      <Image source={require('../../assets/personagem.png')} style={entryStyles.portrait} resizeMode="cover" accessibilityLabel={t('portrait')} />
+      <View style={entryStyles.frame} aria-hidden pointerEvents="none" />
+    </View>
+    <Title>{t('accountWelcome')}</Title>
+    <Copy>{t('accountEmailIntro')}</Copy>
+    <Panel>
+      <EmailField value={email} onChangeText={(value) => { setEmail(value); setError(undefined); }} editable={!checking}
+        onSubmitEditing={() => void continueWithEmail()} />
+      {error && <View role="status" accessibilityLiveRegion="polite"><Copy>{t(error)}</Copy></View>}
+      <Button label={t(checking ? 'accountChecking' : 'accountContinue')} disabled={checking || !email.trim()}
+        onPress={() => void continueWithEmail()} />
+    </Panel>
+  </Screen>;
 }
 
-function LoginForm({ onSignUp }: { onSignUp?: () => void } = {}) {
+const entryStyles = StyleSheet.create({
+  brand: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: 8, minHeight: 42 },
+  star: { color: colors.gold, fontSize: 24 },
+  brandText: { color: colors.cream, fontSize: 16, fontFamily: 'Cinzel_600SemiBold' },
+  cover: { aspectRatio: 1.48, borderTopLeftRadius: 46, borderTopRightRadius: 46, borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20, borderWidth: 1, borderColor: colors.gold, overflow: 'hidden', backgroundColor: colors.surface },
+  portrait: { width: '100%', height: '100%' },
+  frame: { ...StyleSheet.absoluteFill, margin: 6, borderWidth: 1, borderColor: '#D8B66A80',
+    borderTopLeftRadius: 39, borderTopRightRadius: 39, borderBottomLeftRadius: 13, borderBottomRightRadius: 13 },
+});
+
+function LoginForm({ initialEmail = '', onChangeEmail }: { initialEmail?: string; onChangeEmail?: () => void } = {}) {
   const { t } = useTranslation();
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<Awaited<ReturnType<typeof login>> | 'authUnavailable'>();
@@ -121,7 +180,7 @@ function LoginForm({ onSignUp }: { onSignUp?: () => void } = {}) {
     try {
       const problem = await login({ email, password });
       if (problem) setError(problem);
-      else if (!onSignUp) router.dismissTo('/perfil');
+      else if (!onChangeEmail) router.dismissTo('/perfil');
     } catch {
       setError('authUnavailable');
     } finally {
@@ -129,10 +188,10 @@ function LoginForm({ onSignUp }: { onSignUp?: () => void } = {}) {
     }
   }
 
-  return <Screen back={!onSignUp} backTo="/perfil">
+  return <Screen back={!onChangeEmail} backTo="/perfil">
     <Title>{t('signIn')}</Title>
     <Panel>
-      <EmailField value={email} onChangeText={setEmail} editable={!saving} />
+      {onChangeEmail ? <Copy>{email}</Copy> : <EmailField value={email} onChangeText={setEmail} editable={!saving} />}
       <Field label={t('password')} value={password} maxLength={128} autoComplete="current-password"
         secureTextEntry autoCapitalize="none" autoCorrect={false} editable={!saving}
         onChangeText={setPassword} onSubmitEditing={() => void submit()} />
@@ -140,24 +199,28 @@ function LoginForm({ onSignUp }: { onSignUp?: () => void } = {}) {
     {error && <Copy>{t(error)}</Copy>}
     <Button label={t(saving ? 'signingIn' : 'signIn')}
       disabled={saving || !email.trim() || !password} onPress={() => void submit()} />
-    <Button label={t('signUp')} secondary onPress={onSignUp ?? (() => router.replace('/conta/criar'))} />
+    <Button label={t(onChangeEmail ? 'accountChangeEmail' : 'signUp')} disabled={saving} secondary
+      onPress={onChangeEmail ?? (() => router.replace('/conta/criar'))} />
   </Screen>;
 }
 
-function EmailField({ value, onChangeText, editable }: { value: string; onChangeText: (value: string) => void; editable: boolean }) {
+function EmailField({ value, onChangeText, editable, onSubmitEditing }: {
+  value: string; onChangeText: (value: string) => void; editable: boolean; onSubmitEditing?: () => void;
+}) {
   const { t } = useTranslation();
   return <Field label={t('email')} value={value} maxLength={254} keyboardType="email-address"
-    autoComplete="email" autoCapitalize="none" autoCorrect={false} editable={editable} onChangeText={onChangeText} />;
+    autoComplete="email" autoCapitalize="none" autoCorrect={false} editable={editable} onChangeText={onChangeText}
+    onSubmitEditing={onSubmitEditing} />;
 }
 
 const emptyProfile: Profile = { name: '', email: '', sex: null };
 const registrationPasswordLength = 8;
 
-function ProfileForm({ editing, onSignIn }: { editing: boolean; onSignIn?: () => void }) {
+function ProfileForm({ editing, initialEmail = '', onSignIn }: { editing: boolean; initialEmail?: string; onSignIn?: () => void }) {
   const { t } = useTranslation();
   const router = useRouter();
   const signedIn = useSignedIn();
-  const [profile, setProfile] = useState(emptyProfile);
+  const [profile, setProfile] = useState({ ...emptyProfile, email: initialEmail });
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<'loading' | 'ready' | 'loadError'>(onSignIn ? 'ready' : 'loading');
   const [revision, setRevision] = useState(0);
@@ -210,8 +273,8 @@ function ProfileForm({ editing, onSignIn }: { editing: boolean; onSignIn?: () =>
       <Panel>
         <Field label={t('preferredName')} value={profile.name} maxLength={80} autoComplete="name"
           editable={!saving} onChangeText={(name) => setProfile({ ...profile, name })} />
-        <EmailField value={profile.email} editable={!saving && (!editing || !signedIn)}
-          onChangeText={(email) => setProfile({ ...profile, email })} />
+        {onSignIn ? <Copy>{profile.email}</Copy> : <EmailField value={profile.email} editable={!saving && (!editing || !signedIn)}
+          onChangeText={(email) => setProfile({ ...profile, email })} />}
         {!editing && <>
           <Field label={t('password')} value={password} maxLength={registrationPasswordLength * 2} autoComplete="new-password"
             secureTextEntry autoCapitalize="none" autoCorrect={false} editable={!saving} onChangeText={setPassword} />
@@ -226,7 +289,8 @@ function ProfileForm({ editing, onSignIn }: { editing: boolean; onSignIn?: () =>
       {error && <Copy>{t(error)}</Copy>}
       <Button label={t(saving ? 'profileSaving' : editing ? 'saveProfile' : 'signUp')}
         disabled={saving || incomplete} onPress={() => void submit()} />
-      {!editing && <Button label={t('signIn')} secondary onPress={onSignIn ?? (() => router.replace('/conta/entrar'))} />}
+      {!editing && <Button label={t(onSignIn ? 'accountChangeEmail' : 'signIn')} disabled={saving} secondary
+        onPress={onSignIn ?? (() => router.replace('/conta/entrar'))} />}
     </>}
   </Screen>;
 }
@@ -234,12 +298,15 @@ function ProfileForm({ editing, onSignIn }: { editing: boolean; onSignIn?: () =>
 const EditProfileForm = withIdentityScope(ProfileForm);
 
 export function VoiceScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const voice = useSpeechPlayback(i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'pt-BR');
   return <Screen backTo="/perfil">
     <Title>{t('voice')}</Title>
     <Panel>
-      <Copy>{t('voiceUnavailable')}</Copy>
-      <Button label={t('voiceSample')} secondary disabled />
+      <Copy>{t('voiceSampleLine')}</Copy>
+      <Button label={t(voice.speaking ? 'stopSpeech' : 'voiceSample')} secondary
+        onPress={() => voice.speaking ? voice.stop() : voice.speak(t('voiceSampleLine'))} />
+      {voice.speechFailed && <Copy>{t('speechPlaybackError')}</Copy>}
     </Panel>
   </Screen>;
 }

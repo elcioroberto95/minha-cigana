@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { setTimeout as wait } from 'node:timers/promises';
 
 const pageUrl = 'http://127.0.0.1:4173/';
-const accountOptions = [['Entrar', 'Criar conta'], ['Sign in', 'Create account']];
+const accountOptions = [['Seu encontro com Esmeralda', 'Continuar'], ['Your time with Esmeralda', 'Continue']];
 const profile = await mkdtemp(join(process.env.RUNNER_TEMP || tmpdir(), 'expo-chrome-'));
 const signal = AbortSignal.timeout(60_000);
 const chrome = spawn(process.env.CHROME_BINARY || 'google-chrome', [
@@ -22,8 +22,10 @@ try {
   socket = new WebSocket(target.webSocketDebuggerUrl);
   await once(socket, 'open', { signal });
   for (let id = 1; ; id++) {
-    lastText = await pageText(socket, id);
-    if (accountOptions.some((labels) => labels.every((label) => lastText.includes(label)))) break;
+    const entry = await pageEntry(socket, id);
+    lastText = entry?.text ?? '';
+    if (entry?.inputs.length === 1 && entry.inputs[0] === 'email'
+      && accountOptions.some((labels) => labels.every((label) => lastText.includes(label)))) break;
     await wait(250, undefined, { signal });
   }
 } catch (error) {
@@ -50,14 +52,16 @@ async function findPage() {
   signal.throwIfAborted();
 }
 
-async function pageText(connection, id) {
+async function pageEntry(connection, id) {
   const messages = on(connection, 'message', { signal });
   connection.send(JSON.stringify({
-    id, method: 'Runtime.evaluate', params: { expression: 'document.body?.innerText ?? ""', returnByValue: true },
+    id, method: 'Runtime.evaluate', params: {
+      expression: '({ text: document.body?.innerText ?? "", inputs: Array.from(document.querySelectorAll("input"), input => input.type) })',
+      returnByValue: true,
+    },
   }));
   for await (const [message] of messages) {
     const response = JSON.parse(message.data);
-    if (response.id === id) return response.result?.result?.value ?? '';
+    if (response.id === id) return response.result?.result?.value;
   }
-  return '';
 }
