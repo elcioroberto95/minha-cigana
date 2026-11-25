@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-17 — Dar identidade visual e sonora às leituras](#esm-17--dar-identidade-visual-e-sonora-às-leituras)
+**Próxima verificação:** [validar a apresentação e o áudio em Android e iOS](#esm-17--dar-identidade-visual-e-sonora-às-leituras).
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -251,14 +251,15 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 
 ## ESM-17 — Dar identidade visual e sonora às leituras
 
-- **Estado:** Em revisão.
+- **Estado:** Concluída.
 - **Branch:** `esm-17/ritual-visual`.
 - **Escopo:** tipografia display, ambientação da tela inicial, trilha opcional, arte, mensagens de espera, embaralhamento, seleção e revelação das cartas.
 - **Aceite:** mostrar as cartas devolvidas pela API, manter o texto legível e a trilha sob controle do usuário, respeitar a preferência de movimento reduzido e validar o app Expo web.
 - **Direção visual:** títulos em Cinzel, fundo ameixa, dourado antigo e gravuras botânicas. As imagens foram criadas com ImageGen a partir de três instruções artísticas: verso ornamentado com fases da Lua e observatório, atlas com as cenas simbólicas dos arcanos maiores e os emblemas de Copas, Espadas e Ouros, e um bastão dourado em céu violeta para Paus. A trilha sintetizada usa sinos suaves e notas graves.
 - **Evidências:** lint, TypeScript e `npm run build:web` passaram. No Chrome em 360 × 800 com API e PostgreSQL locais, o áudio ligou e pausou pelo controle do Início, a Carta do Dia exibiu a gravura correspondente após a virada e a tiragem de três cartas manteve a grade uniforme e revelou as artes sem giro com movimento reduzido.
 - **Embaralhamento e espera:** no Chrome em 360 × 800, o baralho se abriu e se juntou antes da escolha. Uma tiragem na API local validou os sons de embaralhar, selecionar três cartas e revelar. Com movimento reduzido, a grade abriu sem o embaralhamento animado. Uma resposta de teste com atraso confirmou a rotação de três frases e o desaparecimento do carregador ao chegar a resposta.
-- **Próxima ação:** revisar a apresentação e o áudio em Android e iOS antes de integrar.
+- **Revisão:** [PR #14](https://github.com/elcioroberto95/minha-cigana/pull/14).
+- **Próxima ação:** revisar a apresentação e o áudio em Android e iOS antes da distribuição do app.
 
 ## Modelo de tarefa
 
