@@ -1,66 +1,101 @@
-import * as Speech from 'expo-speech';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { randomUUID } from 'expo-crypto';
+import { File, Paths } from 'expo-file-system';
 import { useIsFocused } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
+import { getIdentityToken, identityFetch } from '../../lib/session-token';
 import type { AppLocale } from '../../localization';
 
+type Playback = { controller: AbortController; dispose?: () => void };
+
 export function useSpeechPlayback(locale: AppLocale) {
-  const [speaking, setSpeaking] = useState(false);
+  const [phase, setPhase] = useState<'idle' | 'preparing' | 'playing'>('idle');
   const [speechFailed, setSpeechFailed] = useState(false);
-  const run = useRef(0);
+  const active = useRef<Playback | null>(null);
   const canPlay = useRef(false);
   const focused = useIsFocused();
 
   const stop = useCallback(() => {
-    run.current++;
-    setSpeaking(false);
-    void Speech.stop().catch(() => {});
+    const previous = active.current;
+    active.current = null;
+    previous?.controller.abort();
+    previous?.dispose?.();
+    setPhase('idle');
   }, []);
 
   useEffect(() => {
     if (!focused) return;
     canPlay.current = true;
-    return () => {
-      canPlay.current = false;
-      stop();
-    };
+    return () => { canPlay.current = false; stop(); };
   }, [focused, stop]);
 
   const speak = useCallback((text: string, onStart?: () => void) => {
     if (!canPlay.current) return;
-    const current = ++run.current;
+    stop();
+    const playback: Playback = { controller: new AbortController() };
+    active.current = playback;
     setSpeechFailed(false);
-    setSpeaking(true);
+    setPhase('preparing');
 
-    function failed() {
-      if (current !== run.current) return;
-      setSpeaking(false);
+    function fail() {
+      if (active.current !== playback) return;
+      stop();
       setSpeechFailed(true);
     }
 
-    void Speech.stop().then(() => {
-      if (current !== run.current) return;
-      const chunks: string[] = [];
-      let remaining = text.trim();
-      while (remaining) {
-        const limit = Math.min(440, remaining.length);
-        const space = limit < remaining.length ? remaining.lastIndexOf(' ', limit) : limit;
-        const end = space > 0 ? space : limit;
-        chunks.push(remaining.slice(0, end));
-        remaining = remaining.slice(end).trimStart();
-      }
-      function play(index: number) {
-        if (current !== run.current) return;
-        if (index === chunks.length) { setSpeaking(false); return; }
-        Speech.speak(chunks[index], {
-          language: locale, pitch: 0.94, rate: 0.86,
-          onStart: index === 0 ? onStart : undefined,
-          onDone: () => play(index + 1), onError: failed,
-          onStopped: () => { if (current === run.current) setSpeaking(false); },
-        });
-      }
-      play(0);
-    }).catch(failed);
-  }, [locale]);
+    void (async () => {
+      const signal = playback.controller.signal;
+      const token = await getIdentityToken();
+      if (!token) throw new Error('Missing session');
+      const response = await identityFetch('/api/speech/synthesize', token, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, locale }), signal,
+      });
+      if (!response.ok) throw new Error('Speech unavailable');
+      const audio = await response.arrayBuffer();
+      await setAudioModeAsync({ playsInSilentMode: true });
+      if (signal.aborted) return;
 
-  return { speaking: focused && speaking, speechFailed, speak, stop };
+      const clip = createClip(audio);
+      playback.dispose = clip.dispose;
+      const player = createAudioPlayer(clip.uri, { updateInterval: 150 });
+      const waiting = setTimeout(fail, 4500);
+      let started = false;
+      const subscription = player.addListener('playbackStatusUpdate', (status) => {
+        if (active.current !== playback) return;
+        if (status.playing && !started) {
+          started = true;
+          clearTimeout(waiting);
+          setPhase('playing');
+          onStart?.();
+        }
+        if (status.didJustFinish) stop();
+      });
+      playback.dispose = () => {
+        clearTimeout(waiting);
+        subscription.remove();
+        try { player.remove(); } finally { clip.dispose(); }
+      };
+      player.play();
+    })().catch(fail);
+  }, [locale, stop]);
+
+  return { speaking: focused && phase !== 'idle', preparing: focused && phase === 'preparing', speechFailed, speak, stop };
+}
+
+function createClip(audio: ArrayBuffer) {
+  if (Platform.OS === 'web') {
+    const uri = URL.createObjectURL(new Blob([audio], { type: 'audio/mpeg' }));
+    return { uri, dispose: () => URL.revokeObjectURL(uri) };
+  }
+  const file = new File(Paths.cache, `esmeralda-${randomUUID()}.mp3`);
+  const dispose = () => { if (file.exists) file.delete(); };
+  try {
+    file.create();
+    file.write(new Uint8Array(audio));
+    return { uri: file.uri, dispose };
+  } catch (error) {
+    dispose();
+    throw error;
+  }
 }

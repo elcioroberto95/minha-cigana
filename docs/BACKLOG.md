@@ -1,6 +1,6 @@
 # Backlog de desenvolvimento
 
-**Próxima tarefa:** [ESM-18 — Fechar o fluxo principal do beta](#esm-18--fechar-o-fluxo-principal-do-beta).
+**Próxima tarefa:** [ESM-19 — Experimentar LangChain e LangGraph na tiragem](#esm-19--experimentar-langchain-e-langgraph-na-tiragem).
 
 **Marco atual:** M1 — Fundação. Veja as transições de estado e a definição de pronto no [workflow](../WORKFLOW.md).
 
@@ -272,6 +272,23 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Evidências:** lint, TypeScript, checagem de arquitetura e 27 testes da API passaram com PostgreSQL local. Os testes verificaram roteamento por e-mail, acesso à tiragem do proprietário, eventos idempotentes e cálculo com tarifa configurada. No Chrome em 360 × 800, o cadastro começou com um único campo de e-mail. O áudio gravado no navegador a partir de uma amostra de teste foi transcrito pelo Whisper real na VPS. Uma resposta simulada confirmou o acionamento da síntese no modo áudio e a ausência de narração automática no modo texto.
 - **Revisão:** [PR #15](https://github.com/elcioroberto95/minha-cigana/pull/15).
 - **Próxima ação:** revisar o PR, configurar transcritor privado e tarifa da VPS na publicação e validar a voz do dispositivo nas builds nativas ao fechar o beta. A primeira linha de base do Ollama na VPS está na ESM-11.
+
+## ESM-19 — Experimentar LangChain e LangGraph na tiragem
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-19/langgraph-tarot`.
+- **Dependências:** ESM-11, ESM-13 e ESM-18. [Decisão 018](DECISOES.md#018--experimento-de-orquestração-na-tiragem).
+- **Aceite:** a rota da tiragem usa o grafo quando configurada, valida as cartas pelo schema e pela ordem esperada, tenta uma vez de novo após saída inválida e mantém as mesmas cartas. A comparação na VPS usa entradas fixas e registra ambas as saídas e latências.
+- **Evidências:** os 29 testes da API passaram com PostgreSQL local. A rota com o grafo recuperou as mesmas cartas após duplicação na primeira saída, armazenou a leitura válida e retornou `503` sem armazenar saída após duas rejeições. Em 25/11/2026, dois casos fixos rodaram com Ollama real na VPS. Em português, HTTP e grafo levaram 11,9 s e 6,9 s. No caso em inglês, levaram 5,5 s e 10,8 s. Ambos preservaram a estrutura, mas o grafo respondeu em português ao caso em inglês.
+- **Próxima ação:** manter `TAROT_INTERPRETER=http` como padrão e revisar o idioma em uma amostra maior antes de promover o grafo.
+
+## ESM-20 — Simplificar a Consulta e narrar com voz feminina
+
+- **Estado:** Em revisão.
+- **Branch:** `esm-19/langgraph-tarot`.
+- **Aceite:** conversa legível com compositor fixo, configurações concentradas em Opções e reprodução da voz neural feminina selecionada pelo idioma da Consulta.
+- **Evidências:** no Chrome em 360 × 800, o campo de pergunta ficou visível antes e depois da resposta simulada, as opções ficaram recolhidas e o controle de áudio apareceu dentro da resposta. O app recebeu e tocou o MP3 gerado pelo Kokoro real na VPS, em cerca de 9,5 s para a resposta de teste. Os testes da API confirmaram autenticação e encaminhamento de `pf_dora` e `af_heart` para os idiomas correspondentes.
+- **Próxima ação:** provisionar o perfil privado `speech` e configurar a síntese ao publicar. Validar a voz nas builds nativas no fechamento do beta.
 
 ## Modelo de tarefa
 

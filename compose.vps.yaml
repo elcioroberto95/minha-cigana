@@ -10,10 +10,16 @@ services:
       DATABASE_URL: postgresql://cigana:${POSTGRES_PASSWORD:?Configure a senha no servidor}@postgres:5432/cigana
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: esmeralda
+      TAROT_INTERPRETER: ${TAROT_INTERPRETER:-http}
       REQUIRE_ACCOUNT: '1'
       SPEECH_TRANSCRIPTION_URL: ${SPEECH_TRANSCRIPTION_URL:-}
       SPEECH_TRANSCRIPTION_MODEL: ${SPEECH_TRANSCRIPTION_MODEL:-whisper-1}
       SPEECH_TRANSCRIPTION_KEY: ${SPEECH_TRANSCRIPTION_KEY:-}
+      SPEECH_SYNTHESIS_URL: ${SPEECH_SYNTHESIS_URL:-}
+      SPEECH_SYNTHESIS_MODEL: ${SPEECH_SYNTHESIS_MODEL:-speaches-ai/Kokoro-82M-v1.0-ONNX}
+      SPEECH_SYNTHESIS_KEY: ${SPEECH_SYNTHESIS_KEY:-}
+      SPEECH_VOICE_PT: ${SPEECH_VOICE_PT:-pf_dora}
+      SPEECH_VOICE_EN: ${SPEECH_VOICE_EN:-af_heart}
       PILOT_COMPUTE_COST_PER_HOUR_BRL: ${PILOT_COMPUTE_COST_PER_HOUR_BRL:-}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081,http://127.0.0.1:8081}
     ports:
@@ -24,3 +30,14 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+  esmeralda-speech:
+    image: ghcr.io/speaches-ai/speaches@sha256:21e3df06d842fb7802ab470dd77c25f0e8c0d22950e8d8c6ae886e851af53ef8
+    profiles: ['speech']
+    cpus: 2
+    mem_limit: 3g
+    restart: unless-stopped
+    volumes:
+      - speech_models:/home/ubuntu/.cache/huggingface/hub
+
+volumes:
+  speech_models:

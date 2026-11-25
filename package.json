@@ -4,6 +4,7 @@
   "private": true,
   "workspaces": ["apps/*"],
   "scripts": {
+    "eval:tarot:compare": "node apps/api/evals/compare-three-cards.mjs",
     "start": "npm run start --workspace=@cigana/mobile",
     "android": "npm run android --workspace=@cigana/mobile",
     "ios": "npm run ios --workspace=@cigana/mobile",

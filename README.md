@@ -36,6 +36,19 @@ npm.cmd --silent run eval:ai > "$env:TEMP\cigana-evals.json"
 
 Os IDs estão em [apps/api/evals/cases.ts](apps/api/evals/cases.ts). O runner usa `http://127.0.0.1:3000`. Defina `EVAL_API_URL` para apontar para outra porta local. Sem IDs, executa os dez casos em sequência. O JSON na saída padrão inclui perguntas, respostas, cartas, checks, latência por chamada e ID de requisição quando fornecido pela API.
 
+### Comparar HTTP com LangChain e LangGraph na tiragem
+
+Na API, `TAROT_INTERPRETER=langgraph` ativa o caminho experimental para a interpretação de três cartas. O padrão é `http`. A opção vale para novas interpretações. Resultados já salvos continuam sendo recuperados pelo mesmo ID.
+
+O LangChain usa `ChatOllama` para pedir ao modelo o schema JSON do Tarô. O LangGraph lê o estado da tiragem, com pergunta, cartas originais, candidato e número de tentativas. O nó `generate` pede a resposta e incrementa o contador. O nó `validate` usa a validação do Tarô para conferir IDs e ordem. A transição após a validação encerra com leitura válida ou permite uma correção antes de encerrar. As duas tentativas compartilham um limite total de 90 segundos e falha de transporte encerra imediatamente. [Integração ChatOllama](https://docs.langchain.com/oss/javascript/integrations/chat/ollama) · [API de grafos](https://docs.langchain.com/oss/javascript/langgraph/graph-api)
+
+Para comparar no ambiente de desenvolvimento, compile a API e execute o script com acesso ao Ollama. Ele lê `OLLAMA_BASE_URL` e `OLLAMA_MODEL` do ambiente e usa dois casos fictícios fixos em português e inglês. Cada caminho recebe as mesmas cartas, orientações e pergunta. O relatório traz validade, latência e a interpretação para revisar idioma e tom simbólico. O script dispensa banco e pode rodar isolado na VPS.
+
+```powershell
+npm.cmd run build:api
+npm.cmd --silent run eval:tarot:compare
+```
+
 - `ready_for_review` significa que a resposta chegou e passou pelos checks aplicáveis. Use o campo `review` para avaliar idioma, tom, relevância e fidelidade às cartas e suas orientações.
 - `flagged` indica uma divergência automática. Os checks verificam a estrutura na tiragem de três cartas, nomes de cartas nos demais formatos, nomes fictícios no histórico e um código que a personagem deve evitar. Abreviações ou paráfrases podem exigir revisão humana.
 - `error` indica falha de transporte, HTTP ou contrato. Confira `calls` para identificar a etapa e correlacionar o evento com os logs. O comando retorna código 2 se houve erro operacional, 1 se houve alerta sem erro e 0 se todos os casos ficaram prontos para revisão.
@@ -66,9 +79,11 @@ Na VPS, `REQUIRE_ACCOUNT=1` exige sessão nas rotas do app e aplica até 90 cham
 
 ## Voz na Consulta e na tiragem
 
-Na Consulta, selecione **Texto** ou **Áudio** para definir como receber as próximas respostas no dispositivo. Aplique **Ouvir** e **Parar áudio** para controlar a narração do resultado da tiragem. A narração usa a voz de português ou inglês disponível no dispositivo, com ritmo mais calmo. O texto permanece disponível. [Expo Speech](https://docs.expo.dev/versions/v58.0.0/sdk/speech/)
+Na Consulta, abra **Opções** para escolher **Texto** ou **Áudio**. Use **Ouvir** na resposta ou no resultado da tiragem para tocar a narração. O texto permanece disponível. A API usa a voz feminina Dora em português brasileiro (`pf_dora`) e Heart em inglês (`af_heart`). [Vozes do Kokoro](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md)
 
 Para habilitar **Gravar áudio**, configure `SPEECH_TRANSCRIPTION_URL` com o endpoint completo `/v1/audio/transcriptions`, `SPEECH_TRANSCRIPTION_MODEL` com o ID do modelo e, se necessário, `SPEECH_TRANSCRIPTION_KEY`. O Compose da VPS lê essas variáveis do ambiente de deploy. Um servidor privado compatível como Speaches pode executar o modelo multilíngue `Systran/faster-whisper-base` na CPU. O app limita a gravação a 30 segundos e a API limita o envio a 1 MiB. A API encaminha o arquivo em memória ao transcritor e não grava a mídia no PostgreSQL. Sem transcritor configurado, a Consulta continua disponível por texto. [Speaches](https://github.com/speaches-ai/speaches)
+
+Para habilitar a narração, configure `SPEECH_SYNTHESIS_URL` com o endpoint completo `/v1/audio/speech`. O modelo padrão é `speaches-ai/Kokoro-82M-v1.0-ONNX`. Use `SPEECH_SYNTHESIS_MODEL`, `SPEECH_SYNTHESIS_KEY`, `SPEECH_VOICE_PT` e `SPEECH_VOICE_EN` se a instalação usar outros valores. O perfil `speech` no Compose da VPS oferece o serviço privado `esmeralda-speech` e um volume para os modelos. Habilite o perfil, instale o Kokoro no serviço e aponte `SPEECH_SYNTHESIS_URL` para `http://esmeralda-speech:8000/v1/audio/speech`. O mesmo serviço pode hospedar o Whisper. [Síntese no Speaches](https://speaches.ai/usage/text-to-speech/)
 
 ## Medição do piloto
 
