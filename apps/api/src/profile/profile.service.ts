@@ -2,18 +2,11 @@ import { ConflictException, HttpException, Injectable, Logger, ServiceUnavailabl
 import type { OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
 import { dailyDate } from '../daily-card/daily-date.js';
-import type { LearnedFact } from '../chat/memory-tool.js';
+import type { PersonalContext } from './application/consultation-memory.js';
+import { relevantLearnedKinds, type LearnedFact } from './domain/learned-fact.js';
 import type { readCheckIn, readProfile } from './profile-input.js';
 
 type Profile = ReturnType<typeof readProfile>;
-type CheckIn = Omit<ReturnType<typeof readCheckIn>, 'date'>;
-export type PersonalContext = {
-  name: string | null;
-  today: CheckIn | null;
-  recentCheckIns: (CheckIn & { date: string })[];
-  savedQuestions: string[];
-  learned?: LearnedFact[];
-};
 
 @Injectable()
 export class ProfileService implements OnModuleDestroy {
@@ -97,15 +90,24 @@ export class ProfileService implements OnModuleDestroy {
     });
   }
 
-  async remember(owner: string, fact: LearnedFact) {
+  learningEnabled(owner: string) {
+    return this.database(async (pool) => {
+      const { rows: [preference] } = await pool.query<{ enabled: boolean }>(
+        'SELECT learning_enabled AS enabled FROM visitor_memory WHERE owner_hash = $1', [owner],
+      );
+      return preference?.enabled ?? false;
+    });
+  }
+
+  async rememberIfEnabled(owner: string, fact: LearnedFact, expiresInDays: number | null) {
     if (!this.pool) return false;
     try {
       const { rowCount } = await this.pool.query(
         `UPDATE visitor_memory SET learned_context = learned_context || jsonb_build_object($2::text,
            jsonb_build_object('value', $3::text, 'expiresAt',
-             CASE WHEN $2 = 'career_goal' THEN now() + interval '30 days' END))
+             now() + ($4::int * interval '1 day')))
          WHERE owner_hash = $1 AND learning_enabled`,
-        [owner, fact.kind, fact.value],
+        [owner, fact.kind, fact.value, expiresInDays],
       );
       return rowCount === 1;
     } catch {
@@ -182,11 +184,10 @@ export class ProfileService implements OnModuleDestroy {
              FROM visitor_memory CROSS JOIN LATERAL jsonb_each(learned_context) AS facts(key, item)
              WHERE owner_hash = $1 AND learning_enabled
                AND (item->>'expiresAt' IS NULL OR (item->>'expiresAt')::timestamptz > now())
-               AND ($3 = 'general' OR ($3 IN ('work', 'money') AND key IN ('occupation', 'career_goal'))
-                 OR ($3 = 'love' AND key = 'relationship'))
+               AND key = ANY($4::text[])
              ORDER BY key
            ) AS learned`,
-        [owner, dailyDate(), topic],
+        [owner, dailyDate(), topic, relevantLearnedKinds(topic)],
       );
       if (!context.learned?.length) delete context.learned;
       if (context.name || context.today || context.recentCheckIns.length || context.savedQuestions.length || context.learned) return context;

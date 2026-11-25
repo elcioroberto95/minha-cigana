@@ -12,9 +12,12 @@ Use o Node.js `26.10.0`, registrado em `.nvmrc`. Na raiz do projeto, em Windows 
 npm.cmd ci
 npm.cmd run lint
 npm.cmd run typecheck
+npm.cmd run check:architecture
 npm.cmd run test:api
 npm.cmd start
 ```
+
+`npm run check:architecture` executa o dependency-cruiser com as [regras da API](apps/api/.dependency-cruiser.cjs), incluindo `import type` e ciclos. A mesma checagem roda no CI.
 
 Para abrir no navegador, use `npm.cmd run web`. Para iniciar no Android, use `npm.cmd run android` com um aparelho ou emulador configurado. Use as abas Início, Tarô, Histórico e Perfil para percorrer as telas. O app indica na própria interface quais ações ainda dependem da API. Veja a [arquitetura mobile](docs/ARQUITETURA-MOBILE.md) para encontrar as telas e as entidades.
 

@@ -1,10 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 import { maxChatHistory } from './chat-config.js';
+import { chatTopics } from './domain/consultation.js';
 import { isVisitorRecordId } from '../visitor/visitor-identity.js';
 
-const topics = ['love', 'money', 'work', 'future', 'spirituality', 'general'] as const;
-
-export type ChatLocale = 'pt-BR' | 'en-US';
+export type { ChatLocale } from './domain/consultation.js';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; model?: string };
 
@@ -24,7 +23,7 @@ function readText(value: unknown, max: number) {
 }
 
 export function readTopic(topic: unknown) {
-  const selectedTopic = topics.find((option) => option === topic);
+  const selectedTopic = chatTopics.find((option) => option === topic);
   if (!selectedTopic) invalid();
   return selectedTopic;
 }
