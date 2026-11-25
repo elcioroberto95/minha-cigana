@@ -270,7 +270,8 @@ A evolução proposta para Madame Esmeralda começa no [diagnóstico técnico](D
 - **Escopo:** entrada por e-mail, consulta em voz ou texto, continuidade da tiragem, métricas do piloto e Evals na VPS.
 - **Aceite:** e-mail decide entrada ou cadastro; áudio pode ser enviado para transcrição e as respostas podem ser ouvidas; Consulta recupera a tiragem do proprietário; eventos e custos são mensuráveis sem conteúdo de mensagens. Builds nativas ficam para o fechamento.
 - **Evidências:** lint, TypeScript, checagem de arquitetura e 27 testes da API passaram com PostgreSQL local. Os testes verificaram roteamento por e-mail, acesso à tiragem do proprietário, eventos idempotentes e cálculo com tarifa configurada. No Chrome em 360 × 800, o cadastro começou com um único campo de e-mail. O áudio gravado no navegador a partir de uma amostra de teste foi transcrito pelo Whisper real na VPS. Uma resposta simulada confirmou o acionamento da síntese no modo áudio e a ausência de narração automática no modo texto.
-- **Próxima ação:** revisar a branch, configurar transcritor privado e tarifa da VPS na publicação e validar a voz do dispositivo nas builds nativas ao fechar o beta. A primeira linha de base do Ollama na VPS está na ESM-11.
+- **Revisão:** [PR #15](https://github.com/elcioroberto95/minha-cigana/pull/15).
+- **Próxima ação:** revisar o PR, configurar transcritor privado e tarifa da VPS na publicação e validar a voz do dispositivo nas builds nativas ao fechar o beta. A primeira linha de base do Ollama na VPS está na ESM-11.
 
 ## Modelo de tarefa
 
